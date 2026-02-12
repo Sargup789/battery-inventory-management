@@ -131,6 +131,8 @@ const Layout = ({ children, roles }: Props & DecodedToken) => {
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
+            height: '100vh',
+            overflowY: 'auto',
           },
         }}
         variant="persistent"
@@ -147,7 +149,7 @@ const Layout = ({ children, roles }: Props & DecodedToken) => {
           </IconButton>
         </DrawerHeader>
         <Divider />
-        <List>
+        <List sx={{ pb: 2 }}>
           {drawerItemsToShowBasedOnRole.map((item) => (
             <ListItem key={item.name} disablePadding onClick={() => router.push(item.path)}>
               <ListItemButton>
@@ -161,7 +163,7 @@ const Layout = ({ children, roles }: Props & DecodedToken) => {
           }
         </List>
       </Drawer>
-      <Main open={open} sx={{ backgroundColor: '#a9a8a9', height: '900px' }}>
+      <Main open={open} sx={{ backgroundColor: '#a9a8a9', minHeight: '100vh' }}>
         <DrawerHeader />
         {children}
       </Main>
