@@ -27,7 +27,7 @@ const LoginModal: React.FC = () => {
 
     const onSubmit = async (data: PasswordData) => {
         try {
-            const response = await axios.post(`/api/router?path=api/auth/reset-password`, data);
+            const response = await axios.post(`/api/router?path=auth/reset-password`, data);
             console.log(response.data?.message + ". Please login again" || 'Reset password successful');
             setUsername(data.username)
             setPassword(data.newPassword)
@@ -43,9 +43,10 @@ const LoginModal: React.FC = () => {
 
     const handleLogin = async () => {
         try {
-            const response = await axios.post('/api/router?path=api/auth/login', {
+            const response = await axios.post('/api/router?path=auth/login', {
                 username,
-                password
+                password,
+                applicationName: "tools",
             });
             setTokenCookie(null, response.data.token);
             let isSameDomain = false;
