@@ -90,12 +90,7 @@ const Layout = ({ children, roles }: Props & DecodedToken) => {
     setOpen(false);
   };
 
-  const visibleDrawerItemsForManager =
-    drawerItems.filter(item => item.name !== 'Users' && item.name !== 'Dropdown Master' && item.name !== 'Checklist' && item.name !== 'Zone')
-
-  const visibleDrawerItemsForOperator = drawerItems.filter(item => item.name !== 'Users' && item.name !== 'Dropdown Master' && item.name !== 'Checklist' && item.name !== 'Zone' && item.name !== "Off-Lease-Trucks")
-
-  const drawerItemsToShowBasedOnRole = roles === 'editor' ? visibleDrawerItemsForManager : roles === 'viewer' ? visibleDrawerItemsForOperator : drawerItems
+  const drawerItemsToShowBasedOnRole = drawerItems
 
   return (
     <Box sx={{ display: 'flex' }}>
