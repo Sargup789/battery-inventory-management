@@ -76,6 +76,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
   justifyContent: 'flex-end',
+  flexShrink: 0,
 }));
 
 const Layout = ({ children, roles }: Props & DecodedToken) => {
@@ -131,8 +132,11 @@ const Layout = ({ children, roles }: Props & DecodedToken) => {
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
-            height: '100vh',
-            overflowY: 'auto',
+            height: '100dvh',
+            maxHeight: '100dvh',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
           },
         }}
         variant="persistent"
@@ -149,7 +153,13 @@ const Layout = ({ children, roles }: Props & DecodedToken) => {
           </IconButton>
         </DrawerHeader>
         <Divider />
-        <List sx={{ pb: 2 }}>
+        <List
+          sx={{
+            pb: 2,
+            flex: 1,
+            overflowY: 'auto',
+          }}
+        >
           {drawerItemsToShowBasedOnRole.map((item) => (
             <ListItem key={item.name} disablePadding onClick={() => router.push(item.path)}>
               <ListItemButton>
