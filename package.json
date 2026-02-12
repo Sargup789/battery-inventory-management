@@ -1,0 +1,19 @@
+{
+  "name": "tools-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "toolsbe",
+    "toolsfe"
+  ],
+  "scripts": {
+    "dev:backend": "npm run start --workspace toolsbe",
+    "dev:frontend": "ROOT_URL=http://127.0.0.1:8001 npm run dev --workspace toolsfe",
+    "dev": "concurrently -k -n backend,frontend -c blue,magenta \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "build": "npm run build --workspace toolsbe && npm run build --workspace toolsfe",
+    "start": "concurrently -k -n backend,frontend -c blue,magenta \"npm run start --workspace toolsbe\" \"ROOT_URL=http://127.0.0.1:8001 npm run start --workspace toolsfe\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

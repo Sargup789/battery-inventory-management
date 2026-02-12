@@ -1,0 +1,19 @@
+# OS / editor
+.DS_Store
+.vscode/
+
+# Node
+node_modules/
+**/node_modules/
+npm-debug.log*
+
+# Build outputs
+toolsbe/build/
+toolsfe/.next/
+
+# Environment files
+toolsbe/.env
+toolsfe/.env.local
+
+# Local logs
+*.log
