@@ -4,7 +4,6 @@ import { IconButton, Tooltip } from "@mui/material";
 import {
   DataGrid,
   GridColDef,
-  GridToolbar,
   GridRenderCellParams,
 } from "@mui/x-data-grid";
 import * as React from "react";
@@ -95,7 +94,6 @@ const LocationTable: React.FC<Props> = ({
         onPageChange={(value) => setPage(value + 1)}
         onPageSizeChange={(value) => setSize(value)}
         disableSelectionOnClick
-        components={{ Toolbar: GridToolbar }}
       />
     </div>
   );

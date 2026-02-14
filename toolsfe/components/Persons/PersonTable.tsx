@@ -5,7 +5,6 @@ import {
   DataGrid,
   GridColDef,
   GridRenderCellParams,
-  GridToolbar,
 } from "@mui/x-data-grid";
 import * as React from "react";
 
@@ -105,7 +104,6 @@ const PersonTable: React.FC<Props> = ({
         onPageChange={(value) => setPage(value + 1)}
         onPageSizeChange={(value) => setSize(value)}
         disableSelectionOnClick
-        components={{ Toolbar: GridToolbar }}
       />
     </div>
   );

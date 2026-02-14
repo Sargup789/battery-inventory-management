@@ -41,6 +41,23 @@ function normalizeKey(s: string): string {
     return (s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
+function findDropdown(dropdowns: DropdownMaster[], aliases: string[]) {
+    const normalizedAliases = aliases.map(normalizeKey);
+    return dropdowns.find((d) => {
+        const dn = normalizeKey(d.dropdownName);
+        const dl = normalizeKey(d.dropdownLabel);
+        return normalizedAliases.includes(dn) || normalizedAliases.includes(dl);
+    });
+}
+
+function getOptionLabel(
+    options: Array<{ key: string; label: string }> | undefined,
+    selected: string
+): string {
+    const match = (options || []).find((opt) => opt.key === selected);
+    return match?.label || selected;
+}
+
 const AddPersonDialog: React.FC<PersonDialogProps> = ({
     open,
     handleClose,
@@ -69,13 +86,17 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
         fetchData();
     }, []);
 
-    const designationDropdown = useMemo(() => {
-        return dropdowns.find((d) => {
-            const dn = normalizeKey(d.dropdownName);
-            const dl = normalizeKey(d.dropdownLabel);
-            return dn === "designation" || dl === "designation";
-        });
-    }, [dropdowns]);
+    const designationDropdown = useMemo(
+        () =>
+            findDropdown(dropdowns, [
+                "designation",
+                "person designation",
+                "designation master",
+                "role",
+                "title",
+            ]),
+        [dropdowns]
+    );
 
     const validate = (values: PersonData) => {
         const errors: Partial<Record<keyof PersonData, string>> = {};
@@ -166,7 +187,18 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
                                     {({ input, meta }) => (
                                         <Box>
                                             <Typography className="label">Designation</Typography>
-                                            <Select {...input} fullWidth size="small" displayEmpty error={meta.touched && !!meta.error}>
+                                            <Select
+                                                {...input}
+                                                fullWidth
+                                                size="small"
+                                                displayEmpty
+                                                error={meta.touched && !!meta.error}
+                                                renderValue={(selected) =>
+                                                    selected
+                                                        ? getOptionLabel(designationDropdown?.options, selected as string)
+                                                        : "Select Designation"
+                                                }
+                                            >
                                                 <MenuItem value="">
                                                     <em>Select Designation</em>
                                                 </MenuItem>

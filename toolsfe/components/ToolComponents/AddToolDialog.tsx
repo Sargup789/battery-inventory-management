@@ -42,6 +42,27 @@ interface ToolDialogProps {
     onSubmit: (values: any) => void;
 }
 
+function normalizeKey(s: string): string {
+    return (s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function findDropdown(dropdowns: DropdownMaster[], aliases: string[]) {
+    const normalizedAliases = aliases.map(normalizeKey);
+    return dropdowns.find((d) => {
+        const dn = normalizeKey(d.dropdownName);
+        const dl = normalizeKey(d.dropdownLabel);
+        return normalizedAliases.includes(dn) || normalizedAliases.includes(dl);
+    });
+}
+
+function getOptionLabel(
+    options: Array<{ key: string; label: string }> | undefined,
+    selected: string
+): string {
+    const match = (options || []).find((opt) => opt.key === selected);
+    return match?.label || selected;
+}
+
 function generateToolId(): string {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let out = "";
@@ -77,13 +98,17 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
     const [isScanning, setIsScanning] = useState(false);
     const [dropdowns, setDropdowns] = useState<DropdownMaster[]>([]);
 
-    const supplierDropdown = useMemo(() => {
-        return dropdowns.find((d) => {
-            const name = (d.dropdownName || "").toLowerCase();
-            const label = (d.dropdownLabel || "").toLowerCase();
-            return name === "supplier" || label === "supplier";
-        });
-    }, [dropdowns]);
+    const supplierDropdown = useMemo(
+        () =>
+            findDropdown(dropdowns, [
+                "supplier",
+                "suppliers",
+                "tool supplier",
+                "tool suppliers",
+                "supplier master",
+            ]),
+        [dropdowns]
+    );
 
     const getAllDropdowns = async () => {
         const response = await axios.get(`/api/router?path=api/dropdownmaster`);
@@ -324,7 +349,11 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
                                                     {...input}
                                                     disabled={isViewMode}
                                                     displayEmpty
-                                                    renderValue={(selected) => (selected ? (selected as string) : "Select supplier")}
+                                                    renderValue={(selected) =>
+                                                        selected
+                                                            ? getOptionLabel(supplierDropdown?.options, selected as string)
+                                                            : "Select supplier"
+                                                    }
                                                 >
                                                     <MenuItem value="">
                                                         <em>Select supplier</em>
@@ -394,4 +423,3 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
 };
 
 export default AddToolDialog;
-

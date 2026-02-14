@@ -37,6 +37,23 @@ function normalizeKey(s: string): string {
   return (s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
+function findDropdown(dropdowns: DropdownMaster[], aliases: string[]) {
+  const normalizedAliases = aliases.map(normalizeKey);
+  return dropdowns.find((d) => {
+    const dn = normalizeKey(d.dropdownName);
+    const dl = normalizeKey(d.dropdownLabel);
+    return normalizedAliases.includes(dn) || normalizedAliases.includes(dl);
+  });
+}
+
+function getOptionLabel(
+  options: Array<{ key: string; label: string }> | undefined,
+  selected: string
+): string {
+  const match = (options || []).find((opt) => opt.key === selected);
+  return match?.label || selected;
+}
+
 const AddLocationDialog: React.FC<ZoneDialogProps> = ({
   open,
   handleClose,
@@ -65,26 +82,33 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
     fetchData();
   }, []);
 
-  const locationNameDropdown = useMemo(() => {
-    return dropdowns.find((d) => {
-      const dn = normalizeKey(d.dropdownName);
-      const dl = normalizeKey(d.dropdownLabel);
-      return dn === "locationname" || dl === "locationname" || dn === "name" || dl === "name";
-    });
-  }, [dropdowns]);
-  const locationTypeDropdown = useMemo(() => {
-    return dropdowns.find((d) => {
-      const dn = normalizeKey(d.dropdownName);
-      const dl = normalizeKey(d.dropdownLabel);
-      return dn === "locationtype" || dl === "locationtype" || dn === "type" || dl === "type";
-    });
-  }, [dropdowns]);
-  const cityDropdown = useMemo(() => {
-    return dropdowns.find((d) => normalizeKey(d.dropdownName) === "city" || normalizeKey(d.dropdownLabel) === "city");
-  }, [dropdowns]);
-  const stateDropdown = useMemo(() => {
-    return dropdowns.find((d) => normalizeKey(d.dropdownName) === "state" || normalizeKey(d.dropdownLabel) === "state");
-  }, [dropdowns]);
+  const locationNameDropdown = useMemo(
+    () =>
+      findDropdown(dropdowns, [
+        "location name",
+        "locationname",
+        "location",
+        "name",
+      ]),
+    [dropdowns]
+  );
+  const locationTypeDropdown = useMemo(
+    () =>
+      findDropdown(dropdowns, [
+        "location type",
+        "locationtype",
+        "type",
+      ]),
+    [dropdowns]
+  );
+  const cityDropdown = useMemo(
+    () => findDropdown(dropdowns, ["city", "location city"]),
+    [dropdowns]
+  );
+  const stateDropdown = useMemo(
+    () => findDropdown(dropdowns, ["state", "location state"]),
+    [dropdowns]
+  );
 
   const getDefaultPayload = (values: LocationFormValues) => {
     // Keep backend compatibility (existing API still expects ZoneData-like shape),
@@ -140,6 +164,14 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
             city: (locationDialogData as any)?.city ?? "",
             state: (locationDialogData as any)?.state ?? "",
           }}
+          validate={(values: LocationFormValues) => {
+            const errors: Partial<Record<keyof LocationFormValues, string>> = {};
+            if (!values.name) errors.name = "Required";
+            if (!values.type) errors.type = "Required";
+            if (!values.city) errors.city = "Required";
+            if (!values.state) errors.state = "Required";
+            return errors;
+          }}
           onSubmit={(values: any) => onSubmit(getDefaultPayload(values as LocationFormValues))}
           render={({ handleSubmit }) => (
             <form onSubmit={handleSubmit}>
@@ -160,10 +192,21 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
                   </Field>
                 )}
                 <Field name="name">
-                  {({ input }) => (
+                  {({ input, meta }) => (
                     <Box>
                       <Typography className="label">Name</Typography>
-                      <Select {...input} fullWidth size="small" displayEmpty>
+                      <Select
+                        {...input}
+                        fullWidth
+                        size="small"
+                        displayEmpty
+                        error={meta.touched && !!meta.error}
+                        renderValue={(selected) =>
+                          selected
+                            ? getOptionLabel(locationNameDropdown?.options, selected as string)
+                            : "Select Name"
+                        }
+                      >
                         <MenuItem value="">
                           <em>Select Name</em>
                         </MenuItem>
@@ -173,15 +216,31 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
                           </MenuItem>
                         ))}
                       </Select>
+                      {meta.touched && meta.error && (
+                        <Typography variant="caption" color="error">
+                          {meta.error}
+                        </Typography>
+                      )}
                     </Box>
                   )}
                 </Field>
 
                 <Field name="type">
-                  {({ input }) => (
+                  {({ input, meta }) => (
                     <Box>
                       <Typography className="label">Type</Typography>
-                      <Select {...input} fullWidth size="small" displayEmpty>
+                      <Select
+                        {...input}
+                        fullWidth
+                        size="small"
+                        displayEmpty
+                        error={meta.touched && !!meta.error}
+                        renderValue={(selected) =>
+                          selected
+                            ? getOptionLabel(locationTypeDropdown?.options, selected as string)
+                            : "Select Type"
+                        }
+                      >
                         <MenuItem value="">
                           <em>Select Type</em>
                         </MenuItem>
@@ -191,15 +250,31 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
                           </MenuItem>
                         ))}
                       </Select>
+                      {meta.touched && meta.error && (
+                        <Typography variant="caption" color="error">
+                          {meta.error}
+                        </Typography>
+                      )}
                     </Box>
                   )}
                 </Field>
 
                 <Field name="city">
-                  {({ input }) => (
+                  {({ input, meta }) => (
                     <Box>
                       <Typography className="label">City</Typography>
-                      <Select {...input} fullWidth size="small" displayEmpty>
+                      <Select
+                        {...input}
+                        fullWidth
+                        size="small"
+                        displayEmpty
+                        error={meta.touched && !!meta.error}
+                        renderValue={(selected) =>
+                          selected
+                            ? getOptionLabel(cityDropdown?.options, selected as string)
+                            : "Select City"
+                        }
+                      >
                         <MenuItem value="">
                           <em>Select City</em>
                         </MenuItem>
@@ -209,15 +284,31 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
                           </MenuItem>
                         ))}
                       </Select>
+                      {meta.touched && meta.error && (
+                        <Typography variant="caption" color="error">
+                          {meta.error}
+                        </Typography>
+                      )}
                     </Box>
                   )}
                 </Field>
 
                 <Field name="state">
-                  {({ input }) => (
+                  {({ input, meta }) => (
                     <Box>
                       <Typography className="label">State</Typography>
-                      <Select {...input} fullWidth size="small" displayEmpty>
+                      <Select
+                        {...input}
+                        fullWidth
+                        size="small"
+                        displayEmpty
+                        error={meta.touched && !!meta.error}
+                        renderValue={(selected) =>
+                          selected
+                            ? getOptionLabel(stateDropdown?.options, selected as string)
+                            : "Select State"
+                        }
+                      >
                         <MenuItem value="">
                           <em>Select State</em>
                         </MenuItem>
@@ -227,6 +318,11 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
                           </MenuItem>
                         ))}
                       </Select>
+                      {meta.touched && meta.error && (
+                        <Typography variant="caption" color="error">
+                          {meta.error}
+                        </Typography>
+                      )}
                     </Box>
                   )}
                 </Field>

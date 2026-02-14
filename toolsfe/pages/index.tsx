@@ -6,6 +6,36 @@ import { ZoneData } from "./location";
 import { useState } from "react";
 import withLogin from "@/components/general/withLogin";
 
+const getEntityId = (item: any): string => {
+  const candidate = item?.id ?? item?._id;
+  if (typeof candidate === "string") return candidate;
+  if (candidate && typeof candidate?.toHexString === "function") return candidate.toHexString();
+  if (candidate && typeof candidate?.toString === "function") return candidate.toString();
+  if (candidate && typeof candidate?.$oid === "string") return candidate.$oid;
+  return "";
+};
+
+const normalizeLocation = (raw: any): ZoneData => ({
+  id: getEntityId(raw),
+  name: raw?.name || "",
+  description: raw?.description || "",
+  type: raw?.type || "",
+  city: raw?.city || "",
+  state: raw?.state || "",
+  toolsCount: Number(raw?.toolsCount ?? 0),
+  maxCapacity: String(raw?.maxCapacity ?? "0"),
+  occupiedLocations: Array.isArray(raw?.occupiedLocations) ? raw.occupiedLocations : [],
+  isActive: typeof raw?.isActive === "boolean" ? raw.isActive : true,
+  isFinalZone: Boolean(raw?.isFinalZone),
+  locationPrefix: raw?.locationPrefix || "",
+  isParentZone: Boolean(raw?.isParentZone),
+  isSubZone: Boolean(raw?.isSubZone),
+  parentZoneId: raw?.parentZoneId ?? null,
+  createdAt: raw?.createdAt || "",
+  updatedAt: raw?.updatedAt || "",
+  subZones: Array.isArray(raw?.subZones) ? raw.subZones.map(normalizeLocation) : null,
+});
+
 const fetchZones = async (page = 1, size = 10) => {
   const response = await axios.get(`/api/router?path=api/locations`, {
     params: {
@@ -13,7 +43,9 @@ const fetchZones = async (page = 1, size = 10) => {
       size
     }
   });
-  return response.data;
+  const raw = response.data;
+  const rows = Array.isArray(raw) ? raw : Array.isArray(raw?.data) ? raw.data : [];
+  return rows.map(normalizeLocation);
 };
 
 

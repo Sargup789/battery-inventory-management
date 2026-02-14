@@ -43,16 +43,22 @@ function Row(props: { row: ZoneData }) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
 
-  const sumOfValue = (array: number[]) => {
-    let sum = 0
-    for (let i = 0; i < array.length; i++) {
-      sum += array[i];
-    }
-    return sum
-  }
+  const getCapacity = (value?: string) => {
+    const parsed = parseInt(value || "0", 10);
+    return Number.isNaN(parsed) ? 0 : parsed;
+  };
+  const getOccupiedCount = (zone?: Partial<ZoneData>) =>
+    Array.isArray(zone?.occupiedLocations) ? zone.occupiedLocations.length : 0;
+  const subZones = Array.isArray(row?.subZones) ? row.subZones : [];
 
-  const maxCapacity = row?.isParentZone && row.subZones ? sumOfValue(row.subZones.map((zone) => zone.maxCapacity ? parseInt(zone.maxCapacity) : 0)) : (parseInt(row.maxCapacity as string))
-  const locOccupied = row?.isParentZone && row.subZones ? sumOfValue(row.subZones.map((zone) => zone.occupiedLocations.length)) : row.occupiedLocations.length
+  const maxCapacity =
+    row?.isParentZone && subZones.length > 0
+      ? subZones.reduce((sum, zone) => sum + getCapacity(zone.maxCapacity), 0)
+      : getCapacity(row.maxCapacity);
+  const locOccupied =
+    row?.isParentZone && subZones.length > 0
+      ? subZones.reduce((sum, zone) => sum + getOccupiedCount(zone), 0)
+      : getOccupiedCount(row);
   const available = maxCapacity - locOccupied
 
   return (
@@ -94,14 +100,14 @@ function Row(props: { row: ZoneData }) {
                     <TableCell align="center" sx={{ fontWeight: 'bold' }}>Active</TableCell>
                   </TableRow>
                 </TableHead>
-                {row.subZones && <TableBody>
-                  {row.subZones.map((subRow) => (
+                {subZones.length > 0 && <TableBody>
+                  {subZones.map((subRow) => (
                     <TableRow key={subRow.id}>
                       <TableCell component="th" scope="row" align="center">
                         {subRow.name}
                       </TableCell>
-                      <TableCell align="center">{subRow.occupiedLocations.length || 0}</TableCell>
-                      <TableCell align="center">{(parseInt(subRow.maxCapacity ? subRow.maxCapacity : "0") - (subRow.occupiedLocations.length || 0))}</TableCell>
+                      <TableCell align="center">{getOccupiedCount(subRow)}</TableCell>
+                      <TableCell align="center">{getCapacity(subRow.maxCapacity) - getOccupiedCount(subRow)}</TableCell>
                       <TableCell align="center">{subRow.maxCapacity}</TableCell>
                       <TableCell align="center">{subRow.isActive ? subRow.isActive.toString().toUpperCase() : "FALSE"}</TableCell>
                     </TableRow>
@@ -119,6 +125,15 @@ function Row(props: { row: ZoneData }) {
 export default function DashboardTable({ dashboardData, setPage, setSize, page, size }: Props) {
   if (!dashboardData) return (<div></div>)
 
+  const getCapacity = (value?: string) => {
+    const parsed = parseInt(value || "0", 10);
+    return Number.isNaN(parsed) ? 0 : parsed;
+  };
+  const getOccupiedCount = (zone?: Partial<ZoneData>) =>
+    Array.isArray(zone?.occupiedLocations) ? zone.occupiedLocations.length : 0;
+  const getSubZones = (zone?: Partial<ZoneData>) =>
+    Array.isArray(zone?.subZones) ? zone.subZones : [];
+
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage + 1);  // +1 because backend pages are 1-indexed while material-ui's pagination is 0-indexed.
   };
@@ -129,23 +144,25 @@ export default function DashboardTable({ dashboardData, setPage, setSize, page, 
   };
 
   const totalMaxCapacity = dashboardData.reduce((total, zone) => {
-    if (zone.isParentZone && zone.subZones) {
-      const subZoneMaxCapacity = zone.subZones.reduce(
-        (subTotal, subZone) =>
-          subTotal + (subZone.maxCapacity ? parseInt(subZone.maxCapacity) : 0),
+    const subZones = getSubZones(zone);
+    if (zone.isParentZone && subZones.length > 0) {
+      const subZoneMaxCapacity = subZones.reduce(
+        (subTotal, subZone) => subTotal + getCapacity(subZone.maxCapacity),
         0
       );
       return total + subZoneMaxCapacity;
     } else {
-      return total + (parseInt(zone.maxCapacity as string) || 0);
+      return total + getCapacity(zone.maxCapacity);
     }
   }, 0);
 
   const totalOccupiedCount = dashboardData.reduce((total, row) => {
     if (!row.isSubZone) {
-      total += row.isParentZone && row.subZones
-        ? row.subZones.reduce((subTotal, subRow) => subTotal + subRow.occupiedLocations.length, 0)
-        : row.occupiedLocations.length;
+      const subZones = getSubZones(row);
+      total +=
+        row.isParentZone && subZones.length > 0
+          ? subZones.reduce((subTotal, subRow) => subTotal + getOccupiedCount(subRow), 0)
+          : getOccupiedCount(row);
     }
     return total;
   }, 0);

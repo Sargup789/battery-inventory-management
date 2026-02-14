@@ -25,6 +25,7 @@ const DropdownMasterComponent = () => {
     const handleAddOption = (dropdownName: string) => {
         setCurrentDropdownName(dropdownName);
         setKeyValue({ key: '', label: '' })
+        setCurrentOption(null);
         setOptionModalOpen(true);
     };
 
@@ -64,14 +65,36 @@ const DropdownMasterComponent = () => {
             const url = `/api/router?path=api/dropdownmaster/${currentDropdownName}`;
             const updatedDropdown = dropdowns.find(d => d.dropdownName === currentDropdownName);
             if (updatedDropdown) {
+                const safeKey = (keyValue.key || "").trim();
+                const safeLabel = (keyValue.label || "").trim();
+                if (!safeKey || !safeLabel) {
+                    toast.error("Both key and value are required");
+                    return;
+                }
+                const existingOptions = Array.isArray(updatedDropdown.options)
+                    ? [...updatedDropdown.options]
+                    : [];
+                const normalizedOption = { key: safeKey, label: safeLabel };
+
                 if (currentOption) {
-                    const optionIndex = updatedDropdown.options.findIndex(opt => opt.key === keyValue.key);
-                    updatedDropdown.options[optionIndex] = keyValue;
+                    const optionIndex = existingOptions.findIndex(
+                        opt => opt.key === currentOption.key
+                    );
+                    if (optionIndex === -1) {
+                        toast.error("Option not found. Refresh and try again.");
+                        return;
+                    }
+                    existingOptions[optionIndex] = normalizedOption;
                 } else {
-                    updatedDropdown.options.push(keyValue);
+                    const duplicateIndex = existingOptions.findIndex(opt => opt.key === safeKey);
+                    if (duplicateIndex !== -1) {
+                        toast.error("Option key already exists");
+                        return;
+                    }
+                    existingOptions.push(normalizedOption);
                 }
                 try {
-                    await axios.put(url, { options: updatedDropdown.options });
+                    await axios.put(url, { options: existingOptions });
                     fetchDropdowns();
                 } catch (error: any) {
                     toast.error(`Failed to update dropdown: ${error.message}`);
@@ -79,6 +102,7 @@ const DropdownMasterComponent = () => {
             }
         }
         setOptionModalOpen(false);
+        setCurrentOption(null);
     };
 
     const currentTable = dropdowns[currentTab]
@@ -105,7 +129,8 @@ const DropdownMasterComponent = () => {
                             backgroundColor: "#9B2735",
                             fontSize: "13px"
                         }}
-                        onClick={() => handleAddOption(currentTable.dropdownName)}
+                        onClick={() => currentTable?.dropdownName && handleAddOption(currentTable.dropdownName)}
+                        disabled={!currentTable?.dropdownName}
                     >
                         Add Record
                     </Button>
@@ -156,7 +181,7 @@ const DropdownMasterComponent = () => {
                         variant='contained'
                         style={{
                             borderRadius: 15,
-                            backgroundColor: "#E96820",
+                            backgroundColor: "#9B2735",
                             fontSize: "13px"
                         }}
                         onClick={handleDeleteOption}

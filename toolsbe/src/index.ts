@@ -16,6 +16,7 @@ import personRouter from "./routes/PersonRoutes";
 import qrCodeRouter from "./routes/QRCodeRoutes";
 import toolRouter from "./routes/ToolRoutes";
 import truckRouter from "./routes/TruckRoutes";
+import { ensureRequiredDropdownMasters } from "./services/DropdownMasterService";
 
 export const appDataSource = new DataSource({
   type: "mongodb",
@@ -40,6 +41,7 @@ const main = async () => {
   app.use(express.json());
 
   await appDataSource.initialize();
+  await ensureRequiredDropdownMasters();
   app.use("/api/tools", authenticateJWT, toolRouter);
   app.use("/api/truck", authenticateJWT, truckRouter);
   app.use("/api/locations", authenticateJWT, locationRouter);
