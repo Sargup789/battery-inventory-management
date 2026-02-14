@@ -5,6 +5,7 @@ import { UseQueryResult, useQuery } from "react-query";
 import { ZoneData } from "./location";
 import React from "react";
 import withLogin from "@/components/general/withLogin";
+import { toast } from "react-toastify";
 
 type ConditionValue = {
   condition: ">" | "=" | "<";
@@ -44,7 +45,7 @@ export interface ToolData {
   toolName: string;
   toolDescription: string;
   supplier: string;
-  status: "Created" | "Assigned" | "Checked-in" | "In-transit";
+  status: "Created" | "Assigned" | "Checked-in" | "In-transit" | "Sold";
   assignedPerson?: string;
   assignedLocation?: string;
   location?: LocationData;
@@ -100,8 +101,44 @@ export interface PersonData {
   updatedAt?: string;
 }
 
-export const fetchTools = async (page = 1, size = 10, filters = {}) => {
-  console.log("fetchTools", process.env.ROOT_URL);
+const getEntityId = (item: any): string => {
+  const candidate = item?.id ?? item?._id;
+  if (typeof candidate === "string") return candidate;
+  if (candidate && typeof candidate?.toHexString === "function") return candidate.toHexString();
+  if (candidate && typeof candidate?.toString === "function") return candidate.toString();
+  if (candidate && typeof candidate?.$oid === "string") return candidate.$oid;
+  return "";
+};
+
+const normalizeStatus = (status: string): ToolData["status"] => {
+  const value = String(status || "").toLowerCase();
+  if (value === "created") return "Created";
+  if (value === "assigned") return "Assigned";
+  if (value === "checked-in") return "Checked-in";
+  if (value === "in-transit") return "In-transit";
+  if (value === "sold") return "Sold";
+  return "Created";
+};
+
+const normalizeTool = (rawTool: any): ToolData => ({
+  id: getEntityId(rawTool),
+  qrCodeId: rawTool?.qrCodeId || "",
+  toolId: rawTool?.toolId || "",
+  partNumber: rawTool?.partNumber || "",
+  toolName: rawTool?.toolName || "",
+  toolDescription: rawTool?.toolDescription || rawTool?.description || "",
+  supplier: rawTool?.supplier || "",
+  status: normalizeStatus(rawTool?.status),
+  assignedPerson: rawTool?.assignedPerson || "",
+  assignedLocation: rawTool?.assignedLocation || rawTool?.location || "",
+  locationId: rawTool?.locationId || rawTool?.zoneId || rawTool?.assignedLocationId,
+  personId: rawTool?.personId || rawTool?.assignedPersonId,
+  lastUpdatedBy: rawTool?.lastUpdatedBy || "",
+  createdAt: rawTool?.createdAt,
+  updatedAt: rawTool?.updatedAt,
+});
+
+export const fetchTools = async (page = 1, size = 10, filters = {}): Promise<ToolApiResponse> => {
   const response = await axios.get(`/api/router?path=api/tools`, {
     params: {
       ...filters,
@@ -109,75 +146,31 @@ export const fetchTools = async (page = 1, size = 10, filters = {}) => {
       size
     }
   });
-  return response.data;
+
+  const raw = response.data;
+  if (Array.isArray(raw)) {
+    const normalized = raw.map(normalizeTool);
+    const start = (page - 1) * size;
+    return {
+      totalCount: normalized.length,
+      page,
+      currentPage: page,
+      data: normalized.slice(start, start + size),
+    };
+  }
+
+  const rawData = Array.isArray(raw?.data) ? raw.data : [];
+  const normalizedData = rawData.map(normalizeTool);
+  return {
+    totalCount: Number(raw?.totalCount ?? normalizedData.length),
+    page: Number(raw?.page ?? page),
+    currentPage: Number(raw?.currentPage ?? page),
+    data: normalizedData,
+  };
 };
 
 // Legacy function name for backward compatibility
 export const fetchTrucks = fetchTools;
-
-
-// Mock data for testing UI
-const mockToolsData: ToolApiResponse = {
-  totalCount: 4,
-  page: 1,
-  currentPage: 1,
-  data: [
-    {
-      id: "1",
-      qrCodeId: "QR001",
-      toolId: "TL001A",
-      partNumber: "PN-12345",
-      toolName: "Cordless Drill",
-      toolDescription: "18V Lithium-Ion Cordless Drill with Battery",
-      supplier: "DeWalt",
-      status: "Created",
-      createdAt: "2026-01-15",
-      updatedAt: "2026-01-15",
-    },
-    {
-      id: "2",
-      qrCodeId: "QR002",
-      toolId: "TL002B",
-      partNumber: "PN-67890",
-      toolName: "Angle Grinder",
-      toolDescription: "4.5 inch Electric Angle Grinder",
-      supplier: "Makita",
-      status: "Assigned",
-      assignedPerson: "John Doe",
-      assignedLocation: "Warehouse A",
-      createdAt: "2026-01-16",
-      updatedAt: "2026-01-20",
-    },
-    {
-      id: "3",
-      qrCodeId: "QR003",
-      toolId: "TL003C",
-      partNumber: "PN-11111",
-      toolName: "Impact Wrench",
-      toolDescription: "1/2 inch Electric Impact Wrench",
-      supplier: "Milwaukee",
-      status: "Checked-in",
-      assignedPerson: "Jane Smith",
-      assignedLocation: "Workshop B",
-      createdAt: "2026-01-18",
-      updatedAt: "2026-02-10",
-    },
-    {
-      id: "4",
-      qrCodeId: "QR004",
-      toolId: "TL004D",
-      partNumber: "PN-22222",
-      toolName: "Circular Saw",
-      toolDescription: "7.25 inch Circular Saw with Laser Guide",
-      supplier: "Bosch",
-      status: "In-transit",
-      assignedPerson: "Mike Johnson",
-      assignedLocation: "Site C",
-      createdAt: "2026-02-01",
-      updatedAt: "2026-02-11",
-    },
-  ],
-};
 
 const Tools = () => {
   const [page, setPage] = React.useState(1);
@@ -200,22 +193,28 @@ const Tools = () => {
     batteryModel: null,
   })
 
-  // Using mock data instead of API call
-  const [tools, setTools] = React.useState<ToolApiResponse>(mockToolsData);
-  const [isLoading] = React.useState(false);
-
-  const refetch = () => {
-    console.log("Refetch called");
-  };
+  const {
+    data: tools,
+    isLoading,
+    refetch,
+  }: UseQueryResult<ToolApiResponse, unknown> = useQuery(
+    ["tools", page, size, JSON.stringify(filtersState)],
+    () => fetchTools(page, size, filtersState),
+    {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      keepPreviousData: true,
+    }
+  );
 
   const deleteTool = async (id: string) => {
-    // Mock delete - filter out from state
-    setTools((prev) => ({
-      ...prev,
-      data: prev.data.filter((t) => t.id !== id),
-      totalCount: prev.totalCount - 1,
-    }));
-    console.log("Deleted tool:", id);
+    try {
+      await axios.delete(`/api/router?path=api/tools/${id}`);
+      toast.success("Successfully deleted tool");
+      refetch();
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Failed to delete tool");
+    }
   };
 
   return (

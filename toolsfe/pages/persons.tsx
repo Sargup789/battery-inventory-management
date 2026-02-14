@@ -1,46 +1,41 @@
-import React, { useEffect, useState } from "react";
-// import { useQuery, UseQueryResult } from "react-query";
-// import axios from "axios";
+import React, { useEffect } from "react";
+import { UseQueryResult, useQuery } from "react-query";
+import axios from "axios";
 import Layout from "@/components/general/Layout";
 import PersonIndex from "@/components/Persons";
 import withLogin, { DecodedToken } from "@/components/general/withLogin";
 import { PersonData } from "@/components/Persons/AddPersonDialog";
+import { toast } from "react-toastify";
 
-// Mock data for testing UI
-const mockPersonsData: PersonData[] = [
-  {
-    id: "1",
-    name: "John Doe",
-    designation: "Manager",
-    emailId: "john.doe@example.com",
-    phoneNumber: "1234567890",
-    immediateBoss: "",
-  },
-  {
-    id: "2",
-    name: "Jane Smith",
-    designation: "Engineer",
-    emailId: "jane.smith@example.com",
-    phoneNumber: "9876543210",
-    immediateBoss: "John Doe",
-  },
-  {
-    id: "3",
-    name: "Mike Johnson",
-    designation: "Technician",
-    emailId: "mike.johnson@example.com",
-    phoneNumber: "5551234567",
-    immediateBoss: "Jane Smith",
-  },
-  {
-    id: "4",
-    name: "Sarah Williams",
-    designation: "Supervisor",
-    emailId: "sarah.williams@example.com",
-    phoneNumber: "5559876543",
-    immediateBoss: "John Doe",
-  },
-];
+const getEntityId = (item: any): string => {
+  const candidate = item?.id ?? item?._id;
+  if (typeof candidate === "string") return candidate;
+  if (candidate && typeof candidate?.toHexString === "function") return candidate.toHexString();
+  if (candidate && typeof candidate?.toString === "function") return candidate.toString();
+  if (candidate && typeof candidate?.$oid === "string") return candidate.$oid;
+  return "";
+};
+
+const normalizePerson = (rawPerson: any): PersonData => ({
+  id: getEntityId(rawPerson),
+  name: rawPerson?.name || "",
+  designation: rawPerson?.designation || "",
+  emailId: rawPerson?.emailId || rawPerson?.email || "",
+  phoneNumber: rawPerson?.phoneNumber || "",
+  immediateBoss: rawPerson?.immediateBoss || "",
+  createdAt: rawPerson?.createdAt,
+  updatedAt: rawPerson?.updatedAt,
+});
+
+const fetchPersons = async (): Promise<PersonData[]> => {
+  const response = await axios.get(`/api/router?path=api/persons`);
+  const rows = Array.isArray(response.data)
+    ? response.data
+    : Array.isArray(response.data?.data)
+      ? response.data.data
+      : [];
+  return rows.map(normalizePerson);
+};
 
 const Persons = ({ roles }: DecodedToken) => {
   useEffect(() => {
@@ -51,21 +46,29 @@ const Persons = ({ roles }: DecodedToken) => {
 
   const [page, setPage] = React.useState(1);
   const [size, setSize] = React.useState(10);
-  const [persons, setPersons] = useState<PersonData[]>(mockPersonsData);
+
+  const {
+    data: persons,
+    refetch,
+    isLoading,
+  }: UseQueryResult<PersonData[], unknown> = useQuery(["persons"], fetchPersons, {
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
 
   const deletePerson = async (id: string) => {
-    // Mock delete - just filter out from state
-    setPersons((prev) => prev.filter((p) => p.id !== id));
-    console.log("Deleted person:", id);
-  };
-
-  const refetch = () => {
-    // Mock refetch - just log for now
-    console.log("Refetch called");
+    try {
+      await axios.delete(`/api/router?path=api/persons/${id}`);
+      toast.success("Successfully deleted person");
+      refetch();
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Failed to delete person");
+    }
   };
 
   return (
     <Layout>
+      {isLoading || !persons ? "Loading..." : (
       <PersonIndex
         personData={persons}
         deletePerson={deletePerson}
@@ -75,6 +78,7 @@ const Persons = ({ roles }: DecodedToken) => {
         page={page}
         size={size}
       />
+      )}
     </Layout>
   );
 };

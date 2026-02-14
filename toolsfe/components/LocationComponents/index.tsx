@@ -101,24 +101,29 @@ const LocationIndex = ({ zoneData, deleteZone, refetch, setPage, setSize, page, 
   };
 
   const onSubmit = async (data: ZoneData) => {
-    let finalData;
-    if (data.isParentZone) {
-      finalData = {
-        name: data.name,
-        description: data.description,
-        isActive: data.isActive,
-        isFinalZone: data.isFinalZone,
-        isParentZone: data.isParentZone
-      }
-    } else {
-      finalData = { ...data }
-    }
+    const payload = {
+      name: data.name,
+      type: data.type || "",
+      city: data.city || "",
+      state: data.state || "",
+      description: data.description || "",
+      maxCapacity: data.maxCapacity || "0",
+      occupiedLocations: Array.isArray(data.occupiedLocations) ? data.occupiedLocations : [],
+      isActive: typeof data.isActive === "boolean" ? data.isActive : true,
+      isFinalZone: Boolean(data.isFinalZone),
+      locationPrefix: data.locationPrefix || "",
+      isParentZone: Boolean(data.isParentZone),
+      isSubZone: Boolean(data.isSubZone),
+      parentZoneId: data.parentZoneId ?? null,
+      subZones: data.subZones ?? null,
+    };
+
     if (Object.keys(locationDialogData).length > 0) {
-      const { id, ...rest } = data;
+      const { id } = data;
       try {
         const response = await axios.put(
           `/api/router?path=api/locations/${id}`,
-          rest
+          payload
         );
         console.log(response.data);
       } catch (error) {
@@ -126,7 +131,7 @@ const LocationIndex = ({ zoneData, deleteZone, refetch, setPage, setSize, page, 
       }
     } else {
       try {
-        const response = await axios.post(`/api/router?path=api/locations`, finalData);
+        const response = await axios.post(`/api/router?path=api/locations`, payload);
         console.log(response.data);
       } catch (error) {
         console.error(error);

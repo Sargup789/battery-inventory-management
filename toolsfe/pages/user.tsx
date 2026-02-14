@@ -4,6 +4,7 @@ import UserIndex from "@/components/UserComponents"
 import axios from "axios";
 import React, { useEffect } from "react";
 import { useQuery, UseQueryResult } from "react-query";
+import { toast } from "react-toastify";
 
 export interface UserData {
     id: string;
@@ -20,35 +21,43 @@ export interface UserApiResponse {
     data: UserData[];
 }
 
+const getEntityId = (item: any): string => {
+    const candidate = item?.id ?? item?._id;
+    if (typeof candidate === "string") return candidate;
+    if (candidate && typeof candidate?.toHexString === "function") return candidate.toHexString();
+    if (candidate && typeof candidate?.toString === "function") return candidate.toString();
+    if (candidate && typeof candidate?.$oid === "string") return candidate.$oid;
+    return "";
+};
 
-// Mock data for testing UI
-const mockUsersData: UserApiResponse = {
-    totalCount: 3,
-    page: 1,
-    currentPage: 1,
-    data: [
-        {
-            id: "1",
-            username: "admin",
-            password: "********",
-            role: "administrator",
-            allowedApplication: "all",
-        },
-        {
-            id: "2",
-            username: "manager",
-            password: "********",
-            role: "editor",
-            allowedApplication: "tools",
-        },
-        {
-            id: "3",
-            username: "operator",
-            password: "********",
-            role: "viewer",
-            allowedApplication: "tools",
-        },
-    ],
+const normalizeUser = (rawUser: any): UserData => {
+    return {
+        id: getEntityId(rawUser),
+        username: rawUser?.username || "",
+        password: "********",
+        role: rawUser?.role || "viewer",
+        allowedApplication: rawUser?.allowedApplication || "tools",
+    };
+};
+
+const fetchUsers = async (page = 1, size = 10): Promise<UserApiResponse> => {
+    const response = await axios.get(`/api/router?path=api/auth/users`, {
+        params: { page, size },
+    });
+
+    const raw = response.data;
+    const rows = Array.isArray(raw?.data)
+        ? raw.data
+        : Array.isArray(raw)
+            ? raw
+            : [];
+
+    return {
+        totalCount: Number(raw?.totalCount ?? rows.length),
+        page: Number(raw?.page ?? page),
+        currentPage: Number(raw?.currentPage ?? page),
+        data: rows.map(normalizeUser),
+    };
 };
 
 const Users = ({ roles }: DecodedToken) => {
@@ -61,22 +70,28 @@ const Users = ({ roles }: DecodedToken) => {
     const [page, setPage] = React.useState(1);
     const [size, setSize] = React.useState(10);
 
-    // Using mock data instead of API call
-    const [users, setUsers] = React.useState<UserApiResponse>(mockUsersData);
-    const [isLoading] = React.useState(false);
-
-    const refetch = () => {
-        console.log("Refetch called");
-    };
+    const {
+        data: users,
+        isLoading,
+        refetch,
+    }: UseQueryResult<UserApiResponse, unknown> = useQuery(
+        ["users", page, size],
+        () => fetchUsers(page, size),
+        {
+            refetchOnWindowFocus: false,
+            refetchOnReconnect: false,
+            keepPreviousData: true,
+        }
+    );
 
     const deleteUser = async (id: string) => {
-        // Mock delete - filter out from state
-        setUsers((prev) => ({
-            ...prev,
-            data: prev.data.filter((u) => u.id !== id),
-            totalCount: prev.totalCount - 1,
-        }));
-        console.log("Deleted user:", id);
+        try {
+            await axios.delete(`/api/router?path=api/auth/${id}`);
+            toast.success("Successfully deleted user");
+            refetch();
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message || "Failed to delete user");
+        }
     };
 
     return (

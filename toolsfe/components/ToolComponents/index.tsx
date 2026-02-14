@@ -117,10 +117,11 @@ const ToolIndex = ({ toolApidata, deleteTool, refetch, setPage, setSize, page, s
   };
 
   // Function to mark the tool as sold
-  const markToolAsSold = async (tool: ToolData) => {
+  const markToolAsSold = async (toolId: string) => {
     try {
-      const response = await axios.put(`/api/router?path=api/tools/${tool.id}`, {
-        ...tool,
+      const currentTool = toolApidata.data.find((tool) => tool.id === toolId);
+      const response = await axios.put(`/api/router?path=api/tools/${toolId}`, {
+        ...currentTool,
         status: "Sold"
       });
       toast.success("Tool marked as sold!");

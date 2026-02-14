@@ -103,7 +103,10 @@ export const getAllUsers = async (page: number, size: number) => {
 };
 
 export const deleteUser = async (id: string): Promise<void> => {
-  await UserRepository.delete({ id: new ObjectId(id) });
+  if (!ObjectId.isValid(id)) {
+    throw new Error("Invalid user id.");
+  }
+  await UserRepository.delete({ _id: new ObjectId(id) } as any);
 };
 
 export const updateUser = async (

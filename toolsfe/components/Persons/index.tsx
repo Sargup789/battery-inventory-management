@@ -41,12 +41,21 @@ const PersonIndex = ({
     };
 
     const onSubmit = async (data: PersonData) => {
+        const payload = {
+            ...data,
+            email: data.emailId,
+            emailId: data.emailId,
+        };
         if (Object.keys(personDialogData).length > 0) {
             const { id, ...rest } = data;
             try {
                 const response = await axios.put(
                     `/api/router?path=api/persons/${id}`,
-                    rest
+                    {
+                        ...rest,
+                        email: rest.emailId,
+                        emailId: rest.emailId,
+                    }
                 );
                 toast.success("Successfully updated person");
                 console.log(response.data);
@@ -56,7 +65,7 @@ const PersonIndex = ({
             }
         } else {
             try {
-                const response = await axios.post(`/api/router?path=api/persons`, data);
+                const response = await axios.post(`/api/router?path=api/persons`, payload);
                 toast.success("Successfully created person");
                 console.log(response.data);
             } catch (error) {

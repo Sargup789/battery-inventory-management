@@ -4,11 +4,15 @@ import axios from "axios";
 import Layout from "@/components/general/Layout";
 import LocationIndex from "@/components/LocationComponents";
 import withLogin, { DecodedToken } from "@/components/general/withLogin";
+import { toast } from "react-toastify";
 
 export interface ZoneData {
   id: string;
   name: string;
   description: string;
+  type?: string;
+  city?: string;
+  state?: string;
   maxCapacity?: string;
   occupiedLocations: string[];
   isActive: boolean;
@@ -22,57 +26,44 @@ export interface ZoneData {
   subZones: ZoneData[] | null
 }
 
-// Mock data for testing UI
-const mockLocationsData: ZoneData[] = [
-  {
-    id: "1",
-    name: "Warehouse A",
-    description: "Main storage warehouse",
-    maxCapacity: "1000",
-    occupiedLocations: ["A1", "A2", "A3"],
-    isActive: true,
-    isFinalZone: true,
-    locationPrefix: "WH-A",
-    isParentZone: false,
-    isSubZone: false,
-    parentZoneId: null,
-    createdAt: "2026-01-10",
-    updatedAt: "2026-01-10",
-    subZones: null,
-  },
-  {
-    id: "2",
-    name: "Workshop B",
-    description: "Tool maintenance workshop",
-    maxCapacity: "500",
-    occupiedLocations: ["B1", "B2"],
-    isActive: true,
-    isFinalZone: true,
-    locationPrefix: "WS-B",
-    isParentZone: false,
-    isSubZone: false,
-    parentZoneId: null,
-    createdAt: "2026-01-12",
-    updatedAt: "2026-01-12",
-    subZones: null,
-  },
-  {
-    id: "3",
-    name: "Site C",
-    description: "Construction site location",
-    maxCapacity: "200",
-    occupiedLocations: ["C1"],
-    isActive: true,
-    isFinalZone: true,
-    locationPrefix: "ST-C",
-    isParentZone: false,
-    isSubZone: false,
-    parentZoneId: null,
-    createdAt: "2026-01-15",
-    updatedAt: "2026-02-05",
-    subZones: null,
-  },
-];
+const getEntityId = (item: any): string => {
+  const candidate = item?.id ?? item?._id;
+  if (typeof candidate === "string") return candidate;
+  if (candidate && typeof candidate?.toHexString === "function") return candidate.toHexString();
+  if (candidate && typeof candidate?.toString === "function") return candidate.toString();
+  if (candidate && typeof candidate?.$oid === "string") return candidate.$oid;
+  return "";
+};
+
+const normalizeLocation = (raw: any): ZoneData => {
+  const rawSubZones = Array.isArray(raw?.subZones) ? raw.subZones : null;
+  return {
+    id: getEntityId(raw),
+    name: raw?.name || "",
+    description: raw?.description || "",
+    type: raw?.type || "",
+    city: raw?.city || "",
+    state: raw?.state || "",
+    maxCapacity: String(raw?.maxCapacity ?? "0"),
+    occupiedLocations: Array.isArray(raw?.occupiedLocations) ? raw.occupiedLocations : [],
+    isActive: typeof raw?.isActive === "boolean" ? raw.isActive : true,
+    isFinalZone: Boolean(raw?.isFinalZone),
+    locationPrefix: raw?.locationPrefix || "",
+    isParentZone: Boolean(raw?.isParentZone),
+    isSubZone: Boolean(raw?.isSubZone),
+    parentZoneId: raw?.parentZoneId ?? null,
+    createdAt: raw?.createdAt || "",
+    updatedAt: raw?.updatedAt || "",
+    subZones: rawSubZones ? rawSubZones.map(normalizeLocation) : null,
+  };
+};
+
+const fetchLocations = async (): Promise<ZoneData[]> => {
+  const response = await axios.get(`/api/router?path=api/locations`);
+  const raw = response.data;
+  const locationRows = Array.isArray(raw) ? raw : Array.isArray(raw?.data) ? raw.data : [];
+  return locationRows.map(normalizeLocation);
+};
 
 const Zone = ({ roles }: DecodedToken) => {
   useEffect(() => {
@@ -83,21 +74,24 @@ const Zone = ({ roles }: DecodedToken) => {
   const [page, setPage] = React.useState(1);
   const [size, setSize] = React.useState(10);
 
-  // Using mock data instead of API call
-  const [zones, setZones] = React.useState<ZoneData[]>(mockLocationsData);
-  const [isLoading] = React.useState(false);
-
-  const refetch = () => {
-    console.log("Refetch called");
-  };
+  const {
+    data: zones,
+    isLoading,
+    refetch,
+  }: UseQueryResult<ZoneData[], unknown> = useQuery(["zones"], fetchLocations, {
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
 
   const deleteZone = async (id: string) => {
-    // Mock delete - filter out from state
-    setZones((prev) => prev.filter((z) => z.id !== id));
-    console.log("Deleted location:", id);
+    try {
+      await axios.delete(`/api/router?path=api/locations/${id}`);
+      toast.success("Successfully deleted location");
+      refetch();
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Failed to delete location");
+    }
   };
-
-  console.log(zones, "zones");
 
   return (
     <Layout>

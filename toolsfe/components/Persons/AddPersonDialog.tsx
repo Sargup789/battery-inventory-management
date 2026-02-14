@@ -48,44 +48,25 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
     onSubmit,
 }) => {
     const isEditMode = Object.keys(personDialogData).length > 0;
-    // Mock dropdown data for testing
-    const mockDropdowns: DropdownMaster[] = [
-        {
-            id: "1",
-            dropdownName: "designation",
-            dropdownLabel: "Designation",
-            options: [
-                { key: "Manager", label: "Manager" },
-                { key: "Engineer", label: "Engineer" },
-                { key: "Technician", label: "Technician" },
-                { key: "Supervisor", label: "Supervisor" },
-                { key: "Operator", label: "Operator" },
-                { key: "Team Lead", label: "Team Lead" },
-            ],
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        },
-    ];
+    const [dropdowns, setDropdowns] = useState<DropdownMaster[]>([]);
 
-    const [dropdowns, setDropdowns] = useState<DropdownMaster[]>(mockDropdowns);
+    const getAllDropdowns = async () => {
+        const response = await axios.get(`/api/router?path=api/dropdownmaster`);
+        return response.data;
+    };
 
-    // const getAllDropdowns = async () => {
-    //   const response = await axios.get(`/api/router?path=api/dropdownmaster`);
-    //   return response.data;
-    // };
-
-    // useEffect(() => {
-    //   const fetchData = async () => {
-    //     try {
-    //       const dropdownData = await getAllDropdowns();
-    //       setDropdowns(dropdownData);
-    //     } catch (error) {
-    //       // eslint-disable-next-line no-console
-    //       console.error("Failed to fetch dropdown master:", error);
-    //     }
-    //   };
-    //   fetchData();
-    // }, []);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const dropdownData = await getAllDropdowns();
+                setDropdowns(Array.isArray(dropdownData) ? dropdownData : []);
+            } catch (error) {
+                // eslint-disable-next-line no-console
+                console.error("Failed to fetch dropdown master:", error);
+            }
+        };
+        fetchData();
+    }, []);
 
     const designationDropdown = useMemo(() => {
         return dropdowns.find((d) => {
