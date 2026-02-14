@@ -72,7 +72,7 @@ const LoginModal: React.FC = () => {
             <Dialog open={true} onClose={() => { }}>
                 <DialogTitle>
                     <img
-                        src={"/images/toyota.png"}
+                        src={"/images/ttcm.jpeg"}
                         alt="Logo"
                         style={{ width: '75%', height: '200px', marginLeft: '40px' }}
                     />
@@ -115,7 +115,7 @@ const LoginModal: React.FC = () => {
                         <Button
                             style={{
                                 borderRadius: 15,
-                                backgroundColor: "#E96820",
+                                backgroundColor: "#9B2735",
                                 fontSize: "13px"
                             }}
                             onClick={handleLogin}
