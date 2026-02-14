@@ -27,8 +27,7 @@ const LoginModal: React.FC = () => {
 
     const onSubmit = async (data: PasswordData) => {
         try {
-            const response = await axios.post(`/api/router?path=api/auth/reset-password`, data);
-            console.log(response.data?.message + ". Please login again" || 'Reset password successful');
+            await axios.post(`/api/router?path=api/auth/reset-password`, data);
             setUsername(data.username)
             setPassword(data.newPassword)
             handleLogin()
@@ -52,9 +51,8 @@ const LoginModal: React.FC = () => {
             let isSameDomain = false;
             try {
                 isSameDomain = new URL(window.document.referrer).origin === window.location.origin;
-            } catch (err: any) {
-                toast.error(err.response?.data?.message || 'Not able to login. Please check username and password');
-                console.warn("Invalid or empty referrer");
+            } catch {
+                // Ignore invalid or empty referrer and use default redirect.
             }
             if (typeof window !== 'undefined' && window.history.length > 2 && isSameDomain) {
                 router.back();
@@ -62,7 +60,6 @@ const LoginModal: React.FC = () => {
                 router.push('/');
             }
         } catch (err: any) {
-            console.log(err.message);
             setError(err.response?.data?.message || 'Login failed');
         }
     };

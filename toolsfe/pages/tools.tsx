@@ -7,29 +7,6 @@ import React from "react";
 import withLogin from "@/components/general/withLogin";
 import { toast } from "react-toastify";
 
-type ConditionValue = {
-  condition: ">" | "=" | "<";
-  value: string | null;
-};
-
-export interface FiltersState {
-  zoneId: null | string,
-  make: null | string,
-  model: null | string,
-  manufacturedYear: null | ConditionValue,
-  hourMeter: null | ConditionValue,
-  serialNumber: null | string,
-  stockNumber: null | string,
-  fuelType: null | string,
-  isRetailReady: null | boolean,
-  status: null | string,
-  arrivalDate: null | string
-  batteryMake: null | string,
-  batteryModel: null | string,
-  allocation: null | string,
-  price: null | ConditionValue
-};
-
 export interface ToolApiResponse {
   totalCount: number;
   page: number;
@@ -45,7 +22,7 @@ export interface ToolData {
   toolName: string;
   toolDescription: string;
   supplier: string;
-  status: "Created" | "Assigned" | "Checked-in" | "In-transit" | "Sold";
+  status: "Created" | "Assigned" | "Checked-in" | "In-transit";
   assignedPerson?: string;
   assignedPersonDesignation?: string;
   assignedPersonEmail?: string;
@@ -62,27 +39,6 @@ export interface ToolData {
   createdAt?: string;
   updatedAt?: string;
 }
-
-// Legacy truck data interface for backward compatibility
-export interface TruckData extends ToolData {
-  arrivalDate?: string;
-  manufacturedYear?: string;
-  model?: string;
-  make?: string;
-  hourMeter?: string;
-  serialNumber?: string;
-  stockNumber?: string;
-  fuelType?: string;
-  allocation?: string;
-  price?: string;
-  batteryMake?: string;
-  batteryModel?: string;
-  isRetailReady?: boolean;
-  zone?: ZoneData;
-  zoneId?: string;
-}
-
-export interface TruckApiResponse extends ToolApiResponse { }
 
 export interface LocationData {
   id: string;
@@ -122,7 +78,6 @@ const normalizeStatus = (status: string): ToolData["status"] => {
   if (value === "assigned") return "Assigned";
   if (value === "checked-in") return "Checked-in";
   if (value === "in-transit") return "In-transit";
-  if (value === "sold") return "Sold";
   return "Created";
 };
 
@@ -150,10 +105,9 @@ const normalizeTool = (rawTool: any): ToolData => ({
   updatedAt: rawTool?.updatedAt,
 });
 
-export const fetchTools = async (page = 1, size = 10, filters = {}): Promise<ToolApiResponse> => {
+export const fetchTools = async (page = 1, size = 10): Promise<ToolApiResponse> => {
   const response = await axios.get(`/api/router?path=api/tools`, {
     params: {
-      ...filters,
       page,
       size
     }
@@ -181,37 +135,17 @@ export const fetchTools = async (page = 1, size = 10, filters = {}): Promise<Too
   };
 };
 
-// Legacy function name for backward compatibility
-export const fetchTrucks = fetchTools;
-
 const Tools = () => {
   const [page, setPage] = React.useState(1);
   const [size, setSize] = React.useState(10);
-  const [filtersState, setFilterState] = React.useState<FiltersState>({
-    zoneId: null,
-    make: null,
-    model: null,
-    manufacturedYear: { condition: "=", value: null },
-    stockNumber: null,
-    serialNumber: null,
-    fuelType: null,
-    isRetailReady: null,
-    allocation: null,
-    price: { condition: "=", value: null },
-    status: null,
-    hourMeter: { condition: "=", value: null },
-    arrivalDate: null,
-    batteryMake: null,
-    batteryModel: null,
-  })
 
   const {
     data: tools,
     isLoading,
     refetch,
   }: UseQueryResult<ToolApiResponse, unknown> = useQuery(
-    ["tools", page, size, JSON.stringify(filtersState)],
-    () => fetchTools(page, size, filtersState),
+    ["tools", page, size],
+    () => fetchTools(page, size),
     {
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
@@ -241,8 +175,6 @@ const Tools = () => {
           refetch={refetch}
           setPage={setPage}
           setSize={setSize}
-          filtersState={filtersState}
-          setFilterState={setFilterState}
           page={page}
           size={size} />
       )}

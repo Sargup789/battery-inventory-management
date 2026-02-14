@@ -57,8 +57,6 @@ export default async function list(req: any, res: any) {
 
     for (const targetBaseUrl of targets) {
       try {
-        console.log("Encoded Path =>", path);
-        console.log("apiUrl", `${targetBaseUrl}/${path}`);
         return await Axios({
           ...baseConfig,
           url: `${targetBaseUrl}/${path}`,
@@ -100,9 +98,6 @@ export default async function list(req: any, res: any) {
     }
     res.json(response.data);
   } catch (error: any) {
-    console.log(error, "error");
-    console.log("status = ", error.response?.status);
-    console.log("message = ", error.response?.data?.error);
     return res.status(error.response?.status || 500).json({
       success: false,
       message:

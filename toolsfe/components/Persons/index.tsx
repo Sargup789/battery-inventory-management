@@ -1,4 +1,4 @@
-import { Button, Typography } from "@mui/material";
+import { Button } from "@mui/material";
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import AddPersonDialog, { PersonData } from "./AddPersonDialog";
@@ -49,7 +49,7 @@ const PersonIndex = ({
         if (Object.keys(personDialogData).length > 0) {
             const { id, ...rest } = data;
             try {
-                const response = await axios.put(
+                await axios.put(
                     `/api/router?path=api/persons/${id}`,
                     {
                         ...rest,
@@ -58,16 +58,14 @@ const PersonIndex = ({
                     }
                 );
                 toast.success("Successfully updated person");
-                console.log(response.data);
             } catch (error) {
                 console.error(error);
                 toast.error("Failed to update person");
             }
         } else {
             try {
-                const response = await axios.post(`/api/router?path=api/persons`, payload);
+                await axios.post(`/api/router?path=api/persons`, payload);
                 toast.success("Successfully created person");
-                console.log(response.data);
             } catch (error) {
                 console.error(error);
                 toast.error("Failed to create person");

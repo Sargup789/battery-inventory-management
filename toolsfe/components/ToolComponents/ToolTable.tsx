@@ -7,8 +7,6 @@ import * as React from 'react';
 import { useState } from 'react';
 import QRCode from 'react-qr-code';
 import PrintDialog from '../QRCodeComponents/PrintDialog';
-import moment from "moment";
-import SellIcon from '@mui/icons-material/Sell';
 import { green, amber } from '@mui/material/colors';
 import withLogin, { DecodedToken } from '@/components/general/withLogin';
 interface Props {
@@ -21,11 +19,10 @@ interface Props {
     viewTool: (data: ToolData) => void;
     size: number;
     onRowSelect?: (id: string) => void;
-    markToolAsSold: (id: string) => Promise<void>;
 }
 
 const Tool = ({
-    roles, toolApidata, deleteTool, markToolAsSold, editTool, setPage, setSize, page, size, viewTool, onRowSelect = () => { }
+    roles, toolApidata, deleteTool, editTool, setPage, setSize, page, size, viewTool, onRowSelect = () => { }
 }: Props & DecodedToken) => {
     const [printDialogOpen, setPrintDialogOpen] = useState(false);
     const [printCode, setPrintCode] = useState('');
@@ -61,16 +58,6 @@ const Tool = ({
                     children={<DeleteOutline fontSize="small" />}
                 />
             </Tooltip>}
-            {roles !== 'viewer' && (
-                <Tooltip title="Mark as Sold" followCursor>
-                    <IconButton
-                        size="small"
-                        onClick={() => markToolAsSold(params.row.id as string)}
-                        disabled={params.row.status === 'Sold'}
-                        children={<SellIcon fontSize='small' />}
-                    />
-                </Tooltip>
-            )}
         </>
     );
 

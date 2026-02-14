@@ -1,4 +1,4 @@
-import { Button, Typography } from "@mui/material"
+import { Button } from "@mui/material"
 import { useState } from "react";
 import AddUserDialog from "./AddUserDialog";
 import UserTable from "./Usertable"
@@ -28,22 +28,19 @@ const UserIndex = ({ userApiData, deleteUser, refetch, setPage, setSize, page, s
   };
 
   const onSubmit = async (data: UserData) => {
-    console.log(data, 'data')
     if (Object.keys(userDialogData).length > 0) {
       const { id, ...rest } = data;
       try {
-        const response = await axios.put(
+        await axios.put(
           `/api/router?path=api/auth/users/${id}`,
           rest
         );
-        console.log(response.data);
       } catch (error) {
         console.error(error);
       }
     } else {
       try {
-        const response = await axios.post(`/api/router?path=api/auth/register`, data);
-        console.log(response.data);
+        await axios.post(`/api/router?path=api/auth/register`, data);
       } catch (error) {
         console.error(error);
       }

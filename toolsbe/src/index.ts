@@ -36,14 +36,8 @@ export const DropdownMasterRepository =
   appDataSource.getMongoRepository(DropdownMaster);
 
 const main = async () => {
-  console.time("main");
   const app = express();
   app.use(express.json());
-
-  app.use((req, res, next) => {
-    console.log(req.method, req.path);
-    next();
-  });
 
   await appDataSource.initialize();
   app.use("/api/tools", authenticateJWT, toolRouter);

@@ -63,7 +63,6 @@ const DropdownMasterComponent = () => {
         if (currentDropdownName) {
             const url = `/api/router?path=api/dropdownmaster/${currentDropdownName}`;
             const updatedDropdown = dropdowns.find(d => d.dropdownName === currentDropdownName);
-            console.log(updatedDropdown, 'updateDropdown', currentOption, keyValue)
             if (updatedDropdown) {
                 if (currentOption) {
                     const optionIndex = updatedDropdown.options.findIndex(opt => opt.key === keyValue.key);

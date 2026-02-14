@@ -7,14 +7,12 @@ import { useState } from "react";
 import withLogin from "@/components/general/withLogin";
 
 const fetchZones = async (page = 1, size = 10) => {
-  console.log("fetchLocations", process.env.ROOT_URL);
   const response = await axios.get(`/api/router?path=api/locations`, {
     params: {
       page,
       size
     }
   });
-  console.log(response.data, "response.data");
   return response.data;
 };
 
@@ -28,7 +26,6 @@ const index = () => {
   const {
     data: zones,
     isLoading,
-    refetch,
   }: UseQueryResult<ZoneData[], unknown> = useQuery(["zones", page, size], () => fetchZones(page, size), {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,

@@ -83,7 +83,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   flexShrink: 0,
 }));
 
-const Layout = ({ children, roles }: Props & DecodedToken) => {
+const Layout = ({ children }: Props & DecodedToken) => {
   const [open, setOpen] = React.useState(true);
   const router = useRouter()
 
@@ -94,8 +94,6 @@ const Layout = ({ children, roles }: Props & DecodedToken) => {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-
-  const drawerItemsToShowBasedOnRole = drawerItems
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -164,7 +162,7 @@ const Layout = ({ children, roles }: Props & DecodedToken) => {
             overflowY: 'auto',
           }}
         >
-          {drawerItemsToShowBasedOnRole.map((item) => (
+          {drawerItems.map((item) => (
             <ListItem key={item.name} disablePadding onClick={() => router.push(item.path)}>
               <ListItemButton>
                 <ListItemIcon>
