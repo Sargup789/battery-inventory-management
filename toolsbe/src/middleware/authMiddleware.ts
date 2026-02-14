@@ -12,10 +12,16 @@ export const authenticateJWT = async (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.headers.authorization;
+  const authHeader = (req.headers.authorization || req.headers["Authorization"]) as
+    | string
+    | undefined;
+  const token = authHeader?.startsWith("Bearer ")
+    ? authHeader.slice(7)
+    : authHeader;
+
   if (token) {
     try {
-      const decoded = jwt.verify(token, SECRET_KEY);
+      const decoded = jwt.verify(token, SECRET_KEY) as { username?: string };
       const userRepo = appDataSource.getMongoRepository(User);
       const user = await userRepo.findOne({
         where: { username: decoded.username },

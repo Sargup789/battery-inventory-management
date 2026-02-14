@@ -1,7 +1,7 @@
 import { ToolApiResponse, ToolData } from '@/pages/tools';
 import { DeleteOutline, EditOutlined, RemoveRedEyeOutlined } from '@mui/icons-material';
 import { IconButton, Tooltip, Chip } from '@mui/material';
-import { DataGrid, GridColDef, GridCellParams } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridCellParams, GridToolbar } from '@mui/x-data-grid';
 import { useRouter } from 'next/router';
 import * as React from 'react';
 import { useState } from 'react';
@@ -161,11 +161,59 @@ const Tool = ({
             valueFormatter: (params) => params.value || 'N/A',
         },
         {
+            field: 'assignedPersonDesignation',
+            headerName: 'Person Designation',
+            width: 180,
+            align: 'center',
+            headerAlign: 'center',
+            valueFormatter: (params) => params.value || 'N/A',
+        },
+        {
+            field: 'assignedPersonEmail',
+            headerName: 'Person Email',
+            width: 220,
+            align: 'center',
+            headerAlign: 'center',
+            valueFormatter: (params) => params.value || 'N/A',
+        },
+        {
+            field: 'assignedPersonPhoneNumber',
+            headerName: 'Person Phone',
+            width: 180,
+            align: 'center',
+            headerAlign: 'center',
+            valueFormatter: (params) => params.value || 'N/A',
+        },
+        {
             field: 'assignedLocation',
             headerName: 'Assigned Location',
             width: 180,
             align: 'center',
             sortable: true,
+            headerAlign: 'center',
+            valueFormatter: (params) => params.value || 'N/A',
+        },
+        {
+            field: 'assignedLocationType',
+            headerName: 'Location Type',
+            width: 160,
+            align: 'center',
+            headerAlign: 'center',
+            valueFormatter: (params) => params.value || 'N/A',
+        },
+        {
+            field: 'assignedLocationCity',
+            headerName: 'Location City',
+            width: 160,
+            align: 'center',
+            headerAlign: 'center',
+            valueFormatter: (params) => params.value || 'N/A',
+        },
+        {
+            field: 'assignedLocationState',
+            headerName: 'Location State',
+            width: 160,
+            align: 'center',
             headerAlign: 'center',
             valueFormatter: (params) => params.value || 'N/A',
         },
@@ -223,6 +271,7 @@ const Tool = ({
                     if (onRowSelect)
                         onRowSelect(ids[0])
                 }}
+                components={{ Toolbar: GridToolbar }}
                 sx={{
                     '& .MuiDataGrid-cell': {
                         textAlign: 'center',

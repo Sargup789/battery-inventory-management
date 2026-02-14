@@ -7,6 +7,8 @@ import KeyboardDoubleArrowDownRoundedIcon from '@mui/icons-material/KeyboardDoub
 import KeyboardDoubleArrowUpRoundedIcon from '@mui/icons-material/KeyboardDoubleArrowUpRounded';
 import ArrowDropDownCircleOutlinedIcon from '@mui/icons-material/ArrowDropDownCircleOutlined';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import { Box, CssBaseline, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, styled, Toolbar, Typography } from '@mui/material';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import LogoutButton from './withLogout';
@@ -21,8 +23,10 @@ const drawerItems = [
   { name: 'Tools', path: '/tools', icon: <HandymanIcon /> },
   { name: 'Locations', path: '/location', icon: <CabinIcon /> },
   { name: 'Persons', path: '/persons', icon: <PersonAddIcon /> },
-  { name: 'Check-in Tools', path: '/checkin', icon: <KeyboardDoubleArrowDownRoundedIcon /> },
-  { name: 'Check-out Tools', path: '/checkout', icon: <KeyboardDoubleArrowUpRoundedIcon /> },
+  { name: 'Assign Tools', path: '/assign', icon: <AssignmentIndIcon /> },
+  { name: 'Check-out Tool', path: '/checkout', icon: <KeyboardDoubleArrowUpRoundedIcon /> },
+  { name: 'Check-in Tool', path: '/checkin', icon: <KeyboardDoubleArrowDownRoundedIcon /> },
+  { name: 'Check Tool Status', path: '/checkstatus', icon: <ManageSearchIcon /> },
   { name: 'Dropdown Master', path: '/dropdownmaster', icon: <ArrowDropDownCircleOutlinedIcon /> },
   { name: 'Users', path: '/user', icon: <PeopleIcon /> },
 ]

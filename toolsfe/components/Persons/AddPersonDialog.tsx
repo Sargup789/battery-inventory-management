@@ -24,6 +24,7 @@ export interface PersonData {
     emailId: string;
     phoneNumber: string;
     immediateBoss: string;
+    toolsCount?: number;
     createdAt?: string;
     updatedAt?: string;
 }

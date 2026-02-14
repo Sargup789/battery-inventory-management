@@ -47,7 +47,13 @@ export interface ToolData {
   supplier: string;
   status: "Created" | "Assigned" | "Checked-in" | "In-transit" | "Sold";
   assignedPerson?: string;
+  assignedPersonDesignation?: string;
+  assignedPersonEmail?: string;
+  assignedPersonPhoneNumber?: string;
   assignedLocation?: string;
+  assignedLocationType?: string;
+  assignedLocationCity?: string;
+  assignedLocationState?: string;
   location?: LocationData;
   locationId?: string;
   person?: PersonData;
@@ -130,7 +136,13 @@ const normalizeTool = (rawTool: any): ToolData => ({
   supplier: rawTool?.supplier || "",
   status: normalizeStatus(rawTool?.status),
   assignedPerson: rawTool?.assignedPerson || "",
+  assignedPersonDesignation: rawTool?.assignedPersonDesignation || "",
+  assignedPersonEmail: rawTool?.assignedPersonEmail || "",
+  assignedPersonPhoneNumber: rawTool?.assignedPersonPhoneNumber || "",
   assignedLocation: rawTool?.assignedLocation || rawTool?.location || "",
+  assignedLocationType: rawTool?.assignedLocationType || "",
+  assignedLocationCity: rawTool?.assignedLocationCity || "",
+  assignedLocationState: rawTool?.assignedLocationState || "",
   locationId: rawTool?.locationId || rawTool?.zoneId || rawTool?.assignedLocationId,
   personId: rawTool?.personId || rawTool?.assignedPersonId,
   lastUpdatedBy: rawTool?.lastUpdatedBy || "",

@@ -1,6 +1,15 @@
-import { LocationRepository } from "..";
+import { LocationRepository, ToolRepository } from "..";
 import { Location } from "../entity/Location";
 import { ObjectId } from "mongodb";
+
+const toEntityId = (value: any): string => {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  if (typeof value?.toHexString === "function") return value.toHexString();
+  if (typeof value?.toString === "function") return value.toString();
+  if (typeof value?.$oid === "string") return value.$oid;
+  return "";
+};
 
 export const createLocation = async (
   locationData: Partial<Location>
@@ -29,13 +38,45 @@ export const updateLocation = async (
 };
 
 export const getLocation = async (id: string): Promise<Location | null> => {
-  return await LocationRepository.findOne({
+  const location = await LocationRepository.findOne({
     where: { _id: new ObjectId(id) } as any,
   });
+  if (!location) return null;
+
+  const locationId = toEntityId((location as any)._id || (location as any).id);
+  const toolsCount = await ToolRepository.count({
+    where: { assignedLocationId: locationId } as any,
+  });
+
+  return {
+    ...(location as any),
+    toolsCount,
+  } as Location;
 };
 
 export const getAllLocations = async (): Promise<Location[]> => {
-  return await LocationRepository.find();
+  const locations = await LocationRepository.find();
+  if (!locations.length) return [];
+
+  const allTools = await ToolRepository.find();
+  const locationToolCountMap = new Map<string, number>();
+
+  allTools.forEach((tool: any) => {
+    const assignedLocationId = toEntityId(tool?.assignedLocationId);
+    if (!assignedLocationId) return;
+    locationToolCountMap.set(
+      assignedLocationId,
+      (locationToolCountMap.get(assignedLocationId) || 0) + 1
+    );
+  });
+
+  return locations.map((location: any) => {
+    const locationId = toEntityId(location?._id || location?.id);
+    return {
+      ...location,
+      toolsCount: locationToolCountMap.get(locationId) || 0,
+    };
+  }) as Location[];
 };
 
 export const getAvailableLocations = async (id: string): Promise<string[]> => {

@@ -31,7 +31,7 @@ export default async function list(req: any, res: any) {
     method: req.method,
     headers: {
       "Content-Type": req.headers["content-type"] || "application/json",
-      Authorization: `${accessToken}`,
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
     },
   } as any;
 
@@ -46,14 +46,29 @@ export default async function list(req: any, res: any) {
   const isAuthPath = (path: string) =>
     path.startsWith("auth/") || path.startsWith("api/auth/");
 
+  const uniqueUrls = (urls: Array<string | undefined>) =>
+    Array.from(new Set(urls.filter((u): u is string => Boolean(u))));
+
   const requestPath = async (path: string) => {
-    const targetBaseUrl = isAuthPath(path) ? authUrl : apiUrl;
-    console.log("Encoded Path =>", path);
-    console.log("apiUrl", `${targetBaseUrl}/${path}`);
-    return Axios({
-      ...baseConfig,
-      url: `${targetBaseUrl}/${path}`,
-    });
+    const targets = isAuthPath(path)
+      ? uniqueUrls([apiUrl, authUrl])
+      : uniqueUrls([apiUrl]);
+    let lastError: any;
+
+    for (const targetBaseUrl of targets) {
+      try {
+        console.log("Encoded Path =>", path);
+        console.log("apiUrl", `${targetBaseUrl}/${path}`);
+        return await Axios({
+          ...baseConfig,
+          url: `${targetBaseUrl}/${path}`,
+        });
+      } catch (error: any) {
+        lastError = error;
+      }
+    }
+
+    throw lastError;
   };
 
   const getFallbackAuthPath = (path: string): string | null => {
@@ -72,7 +87,10 @@ export default async function list(req: any, res: any) {
       response = await requestPath(encodedPath);
     } catch (primaryError: any) {
       const status = primaryError?.response?.status;
-      const fallbackPath = status === 404 ? getFallbackAuthPath(encodedPath) : null;
+      const fallbackPath =
+        status === 404
+          ? getFallbackAuthPath(encodedPath)
+          : null;
 
       if (!fallbackPath) {
         throw primaryError;

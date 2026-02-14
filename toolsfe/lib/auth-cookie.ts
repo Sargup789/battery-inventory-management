@@ -3,6 +3,7 @@ import { NextPageContext } from "next";
 import { parseCookies, setCookie, destroyCookie } from "nookies";
 
 const TOKEN_NAME = "toyota_token";
+const LEGACY_TOKEN_NAMES = ["token", "accessToken"];
 const MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
 export function setTokenCookie(
@@ -26,9 +27,19 @@ export function removeTokenCookie(ctx: NextPageContext | null): void {
     maxAge: -1,
     path: "/",
   });
+  LEGACY_TOKEN_NAMES.forEach((name) =>
+    destroyCookie(ctx, name, {
+      maxAge: -1,
+      path: "/",
+    })
+  );
 }
 
 export function getTokenCookie(req: any): string | undefined {
   const cookies = parseCookies({ req });
-  return cookies[TOKEN_NAME];
+  if (cookies[TOKEN_NAME]) return cookies[TOKEN_NAME];
+  for (const name of LEGACY_TOKEN_NAMES) {
+    if (cookies[name]) return cookies[name];
+  }
+  return undefined;
 }

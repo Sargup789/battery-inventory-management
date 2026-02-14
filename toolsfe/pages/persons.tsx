@@ -23,6 +23,7 @@ const normalizePerson = (rawPerson: any): PersonData => ({
   emailId: rawPerson?.emailId || rawPerson?.email || "",
   phoneNumber: rawPerson?.phoneNumber || "",
   immediateBoss: rawPerson?.immediateBoss || "",
+  toolsCount: Number(rawPerson?.toolsCount ?? 0),
   createdAt: rawPerson?.createdAt,
   updatedAt: rawPerson?.updatedAt,
 });

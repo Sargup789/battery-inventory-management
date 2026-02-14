@@ -13,6 +13,7 @@ export interface ZoneData {
   type?: string;
   city?: string;
   state?: string;
+  toolsCount?: number;
   maxCapacity?: string;
   occupiedLocations: string[];
   isActive: boolean;
@@ -44,6 +45,7 @@ const normalizeLocation = (raw: any): ZoneData => {
     type: raw?.type || "",
     city: raw?.city || "",
     state: raw?.state || "",
+    toolsCount: Number(raw?.toolsCount ?? 0),
     maxCapacity: String(raw?.maxCapacity ?? "0"),
     occupiedLocations: Array.isArray(raw?.occupiedLocations) ? raw.occupiedLocations : [],
     isActive: typeof raw?.isActive === "boolean" ? raw.isActive : true,

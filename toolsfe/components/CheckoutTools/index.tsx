@@ -1,17 +1,42 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { QrReader } from 'react-qr-reader';
-import { TextField, Button, Box, Typography, IconButton, InputAdornment } from '@mui/material';
+import { TextField, Button, Box, Typography, IconButton, InputAdornment, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { toast } from 'react-toastify';
 import { ToolData } from '@/pages/tools';
 import ClearIcon from '@mui/icons-material/Clear';
 import moment from 'moment';
+import { PersonData } from '../Persons/AddPersonDialog';
 
 const CheckoutForm: React.FC = () => {
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [toolDetails, setToolDetails] = useState<ToolData | null>(null);
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [persons, setPersons] = useState<PersonData[]>([]);
+  const [selectedPersonId, setSelectedPersonId] = useState('');
+
+  React.useEffect(() => {
+    axios
+      .get('/api/router?path=api/persons')
+      .then((res) => {
+        const rows = Array.isArray(res.data) ? res.data : [];
+        setPersons(
+          rows.map((person: any) => ({
+            id:
+              person?.id ||
+              person?._id?.$oid ||
+              person?._id?.toString?.() ||
+              '',
+            name: person?.name || '',
+            designation: person?.designation || '',
+            emailId: person?.emailId || person?.email || '',
+            phoneNumber: person?.phoneNumber || '',
+            immediateBoss: person?.immediateBoss || '',
+          }))
+        );
+      })
+      .catch(() => toast.error('Error fetching persons.'));
+  }, []);
 
   const handleScan = async (result: any) => {
     const scannedCode = result?.text;
@@ -19,13 +44,9 @@ const CheckoutForm: React.FC = () => {
       setQrCode(scannedCode);
       setIsScanning(false);
       try {
-        const response = await axios.get(`api/router?path=api/truck/qrCode/${scannedCode}`);
+        const response = await axios.get(`/api/router?path=api/truck/qrCode/${scannedCode}`);
         setToolDetails(response.data);
-        if (response.data.zoneId) {
-          setShowConfirmDialog(true);
-        } else {
-          toast.warn('Truck is not checked in.');
-        }
+        setSelectedPersonId(response.data?.assignedPersonId || '');
       } catch (error: any) {
         const errmsg = error?.response?.data?.message;
         toast.error(errmsg || "Something went wrong");
@@ -33,15 +54,17 @@ const CheckoutForm: React.FC = () => {
     }
   };
 
-  console.log(showConfirmDialog, "dialog");
-
   const handleCheckout = async () => {
+    if (!selectedPersonId) {
+      toast.error('Please select person.');
+      return;
+    }
     try {
-      await axios.post(`/api/router?path=api/tools/check-out`, { toolId: toolDetails?.id });
+      await axios.post(`/api/router?path=api/tools/check-out`, { toolId: toolDetails?.id, personId: selectedPersonId });
       toast.success('Tool checked out successfully.');
-      setShowConfirmDialog(false);
       setToolDetails(null)
       setQrCode(null)
+      setSelectedPersonId('')
     } catch (error: any) {
       const errmsg = error?.response?.data?.message;
       toast.error(errmsg || 'Error during checkout.');
@@ -94,22 +117,28 @@ const CheckoutForm: React.FC = () => {
           <Typography variant="body1">Created At: {toolDetails.createdAt ? moment(toolDetails.createdAt).format("MMM DD, YYYY") : 'N/A'}</Typography>
           <Typography variant="body1">Updated At: {toolDetails.updatedAt ? moment(toolDetails.updatedAt).format("MMM DD, YYYY") : 'N/A'}</Typography>
 
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="checkout-person-label">Select Person</InputLabel>
+            <Select
+              labelId="checkout-person-label"
+              label="Select Person"
+              value={selectedPersonId}
+              onChange={(e) => setSelectedPersonId(e.target.value as string)}
+            >
+              {persons.map((person) => (
+                <MenuItem key={person.id} value={person.id}>
+                  {person.name} ({person.designation})
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           <br />
-          <Typography sx={{ fontWeight: 'bold' }}>Do you want to checkout this truck?</Typography>
-          <Button type="submit" variant="contained" color="primary" style={{ marginTop: '15px' }} onClick={handleCheckout}>Confirm</Button>
+          <Typography sx={{ fontWeight: 'bold' }}>Do you want to check-out this tool?</Typography>
+          <Button type="submit" variant="contained" color="primary" style={{ marginTop: '15px' }} onClick={handleCheckout}>Check-out Tool</Button>
         </Box>
 
       )}
-      {/* <Dialog open={showConfirmDialog} onClose={() => setShowConfirmDialog(false)}>
-                <DialogTitle>Confirm Checkout</DialogTitle>
-                <DialogContent>
-                    <Typography>Do you want to checkout this truck?</Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setShowConfirmDialog(false)} color="primary">Cancel</Button>
-                    <Button onClick={handleCheckout} color="primary">Yes</Button>
-                </DialogActions>
-            </Dialog> */}
     </Box>
   );
 };

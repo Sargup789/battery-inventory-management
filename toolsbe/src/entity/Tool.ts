@@ -46,7 +46,25 @@ export class Tool {
   assignedLocation: string;
 
   @Column({ nullable: true })
+  assignedLocationType: string;
+
+  @Column({ nullable: true })
+  assignedLocationCity: string;
+
+  @Column({ nullable: true })
+  assignedLocationState: string;
+
+  @Column({ nullable: true })
   assignedPerson: string;
+
+  @Column({ nullable: true })
+  assignedPersonDesignation: string;
+
+  @Column({ nullable: true })
+  assignedPersonEmail: string;
+
+  @Column({ nullable: true })
+  assignedPersonPhoneNumber: string;
 
   @Column({ nullable: true })
   zoneId: string;
