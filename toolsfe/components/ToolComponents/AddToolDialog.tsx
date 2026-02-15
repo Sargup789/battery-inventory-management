@@ -97,6 +97,8 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
     const isEditMode = useMemo(() => Object.keys(toolDialogData || {}).length > 0, [toolDialogData]);
     const [isScanning, setIsScanning] = useState(false);
     const [dropdowns, setDropdowns] = useState<DropdownMaster[]>([]);
+    const [scannedQrCode, setScannedQrCode] = useState<string>("");
+    const formRef = React.useRef<any>(null);
 
     const supplierDropdown = useMemo(
         () =>
@@ -131,29 +133,46 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
     useEffect(() => {
         if (!open) {
             setIsScanning(false);
+            setScannedQrCode("");
         }
     }, [open]);
 
-    const initialValues: ToolFormValues = {
+    // Sync scanned QR code into the form via ref (avoids stale closure in QrReader)
+    useEffect(() => {
+        console.log("[QR-DEBUG] useEffect fired — scannedQrCode:", JSON.stringify(scannedQrCode), "formRef.current:", !!formRef.current);
+        if (scannedQrCode && formRef.current) {
+            console.log("[QR-DEBUG] calling form.change('qrCodeId',", scannedQrCode, ")");
+            formRef.current.change("qrCodeId", scannedQrCode);
+            const state = formRef.current.getState();
+            console.log("[QR-DEBUG] form state after change:", JSON.stringify(state.values));
+            setScannedQrCode("");
+        } else if (scannedQrCode && !formRef.current) {
+            console.warn("[QR-DEBUG] formRef.current is NULL — cannot set value");
+        }
+    }, [scannedQrCode]);
+
+    const initialValues: ToolFormValues = useMemo(() => ({
         qrCodeId: isEditMode ? (toolDialogData?.qrCodeId ?? "") : "",
         toolId: isEditMode ? (toolDialogData?.toolId ?? "") : generateToolId(),
         partNumber: toolDialogData?.partNumber ?? "",
         toolName: toolDialogData?.toolName ?? "",
         toolDescription: toolDialogData?.toolDescription ?? "",
         supplier: toolDialogData?.supplier ?? "",
-    };
+    }), [isEditMode, toolDialogData]);
 
-    const handleScanResult = (setValue: (field: keyof ToolFormValues, value: any) => void) => (result: any, error: any) => {
-        if (result?.text) {
-            const scanned = extractQrCodeFromText(result.text);
-            if (scanned) {
-                setValue("qrCodeId", scanned);
-                setIsScanning(false);
+    const handleScanResult = (result: any, error: any) => {
+        if (result) {
+            const text = typeof result.getText === "function" ? result.getText() : result?.text;
+            console.log("[QR-DEBUG] handleScanResult — detected text:", JSON.stringify(text));
+            if (text) {
+                const scanned = extractQrCodeFromText(text);
+                console.log("[QR-DEBUG] handleScanResult — scanned:", JSON.stringify(scanned));
+                if (scanned) {
+                    console.log("[QR-DEBUG] handleScanResult — calling setScannedQrCode + setIsScanning(false)");
+                    setScannedQrCode(scanned);
+                    setIsScanning(false);
+                }
             }
-        }
-        if (error) {
-            // eslint-disable-next-line no-console
-            console.info(error);
         }
     };
 
@@ -197,7 +216,10 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
                     initialValues={initialValues}
                     validate={validate}
                     onSubmit={(values) => onSubmit(values as any)}
-                    render={({ handleSubmit, form, submitting, values }) => (
+                    render={({ handleSubmit, form, submitting, values }) => {
+                        formRef.current = form;
+                        console.log("[QR-DEBUG] Form render — values.qrCodeId:", JSON.stringify(values.qrCodeId));
+                        return (
                         <form onSubmit={handleSubmit}>
                             <Box
                                 sx={{
@@ -251,10 +273,9 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
                                                         Scan QR Code to fill Scanned QR Code
                                                     </Typography>
                                                     <QrReader
-                                                        onResult={handleScanResult((field, val) => form.change(field, val))}
+                                                        onResult={handleScanResult}
                                                         constraints={{ facingMode: "environment" }}
-                                                        // @ts-ignore
-                                                        style={{ width: "100%" }}
+                                                        containerStyle={{ width: "100%" }}
                                                     />
                                                     <Button sx={{ mt: 1 }} onClick={() => setIsScanning(false)}>
                                                         Close Scanner
@@ -415,7 +436,8 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
                                 )}
                             </DialogActions>
                         </form>
-                    )}
+                    );
+                    }}
                 />
             </DialogContent>
         </Dialog>
