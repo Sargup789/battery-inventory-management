@@ -62,7 +62,7 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
     open,
     handleClose,
     personDialogData,
-    persons,
+    persons: _persons,
     onSubmit,
 }) => {
     const isEditMode = Object.keys(personDialogData).length > 0;
@@ -214,7 +214,7 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
                                                 </MenuItem>
                                                 {(designationDropdown?.options ?? []).map((opt) => (
                                                     <MenuItem key={opt.key} value={opt.key}>
-                                                        {opt.label}
+                                                        {opt.key}
                                                     </MenuItem>
                                                 ))}
                                             </Select>
@@ -281,7 +281,7 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
                                                 </MenuItem>
                                                 {(immediateBossDropdown?.options ?? []).map((opt) => (
                                                     <MenuItem key={opt.key} value={opt.key}>
-                                                        {opt.label}
+                                                        {opt.key}
                                                     </MenuItem>
                                                 ))}
                                             </Select>

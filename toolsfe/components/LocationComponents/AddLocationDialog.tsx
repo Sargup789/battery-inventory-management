@@ -246,7 +246,7 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
                         </MenuItem>
                         {(locationTypeDropdown?.options ?? []).map((opt) => (
                           <MenuItem key={opt.key} value={opt.key}>
-                            {opt.label}
+                            {opt.key}
                           </MenuItem>
                         ))}
                       </Select>
@@ -280,7 +280,7 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
                         </MenuItem>
                         {(cityDropdown?.options ?? []).map((opt) => (
                           <MenuItem key={opt.key} value={opt.key}>
-                            {opt.label}
+                            {opt.key}
                           </MenuItem>
                         ))}
                       </Select>
@@ -314,7 +314,7 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
                         </MenuItem>
                         {(stateDropdown?.options ?? []).map((opt) => (
                           <MenuItem key={opt.key} value={opt.key}>
-                            {opt.label}
+                            {opt.key}
                           </MenuItem>
                         ))}
                       </Select>

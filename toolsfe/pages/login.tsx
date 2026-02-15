@@ -71,7 +71,7 @@ const LoginModal: React.FC = () => {
                     <img
                         src={"/images/ttcm.jpeg"}
                         alt="Logo"
-                        style={{ width: '75%', height: '200px', marginLeft: '40px' }}
+                        style={{  width: '100%', height: '150px', display: 'flex', alignItems: 'center' }}
                     />
                     <h2>Login</h2>
                     <p>Sign In to your account</p>
