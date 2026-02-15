@@ -203,7 +203,7 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
                         error={meta.touched && !!meta.error}
                         renderValue={(selected) =>
                           selected
-                            ? getOptionLabel(locationNameDropdown?.options, selected as string)
+                            ? String(selected)
                             : "Select Name"
                         }
                       >
@@ -212,7 +212,7 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
                         </MenuItem>
                         {(locationNameDropdown?.options ?? []).map((opt) => (
                           <MenuItem key={opt.key} value={opt.key}>
-                            {opt.label}
+                            {opt.key}
                           </MenuItem>
                         ))}
                       </Select>

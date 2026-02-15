@@ -47,6 +47,7 @@ export const ensureRequiredDropdownMasters = async (): Promise<void> => {
     { dropdownName: "city", dropdownLabel: "City" },
     { dropdownName: "state", dropdownLabel: "State" },
     { dropdownName: "designation", dropdownLabel: "Designation" },
+    { dropdownName: "immediateBoss", dropdownLabel: "Immediate Boss" },
   ];
 
   const existing = await DropdownMasterRepository.find();

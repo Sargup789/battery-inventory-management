@@ -98,6 +98,16 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
         [dropdowns]
     );
 
+    const immediateBossDropdown = useMemo(
+        () =>
+            findDropdown(dropdowns, [
+                "immediateBoss",
+                "immediate boss",
+                "immediate boss master",
+            ]),
+        [dropdowns]
+    );
+
     const validate = (values: PersonData) => {
         const errors: Partial<Record<keyof PersonData, string>> = {};
         if (!values.name) errors.name = "Required";
@@ -251,20 +261,29 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
                                 </Field>
 
                                 <Field name="immediateBoss">
-                                    {({ input }) => (
+                                    {({ input, meta }) => (
                                         <Box sx={{ gridColumn: { xs: "1", sm: "1 / -1" } }}>
                                             <Typography className="label">Immediate Boss</Typography>
-                                            <Select {...input} fullWidth size="small" displayEmpty>
+                                            <Select
+                                                {...input}
+                                                fullWidth
+                                                size="small"
+                                                displayEmpty
+                                                error={meta.touched && !!meta.error}
+                                                renderValue={(selected) =>
+                                                    selected
+                                                        ? getOptionLabel(immediateBossDropdown?.options, selected as string)
+                                                        : "Select Immediate Boss"
+                                                }
+                                            >
                                                 <MenuItem value="">
-                                                    <em>None</em>
+                                                    <em>Select Immediate Boss</em>
                                                 </MenuItem>
-                                                {persons
-                                                    .filter((p) => p.id !== (personDialogData as any)?.id)
-                                                    .map((person) => (
-                                                        <MenuItem key={person.id} value={person.name}>
-                                                            {person.name} ({person.designation})
-                                                        </MenuItem>
-                                                    ))}
+                                                {(immediateBossDropdown?.options ?? []).map((opt) => (
+                                                    <MenuItem key={opt.key} value={opt.key}>
+                                                        {opt.label}
+                                                    </MenuItem>
+                                                ))}
                                             </Select>
                                         </Box>
                                     )}

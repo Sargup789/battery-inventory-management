@@ -31,13 +31,13 @@ const DashboardIndex = ({ dashboardData, setSize, setPage, page, size }: Props) 
                         Generate QR Code
                     </Button>
                 </Typography>
-                <DashboardTable
+                {/* <DashboardTable
                     dashboardData={dashboardData}
                     setPage={setPage}
                     setSize={setSize}
                     page={page}
                     size={size}
-                />
+                /> */}
             </div>
         </QueryClientProvider>
     )
