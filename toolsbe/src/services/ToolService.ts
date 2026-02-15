@@ -119,7 +119,11 @@ export const createTool = async (
 export const deleteTool = async (id: string): Promise<void> => {
   const tool = await resolveToolByRef(id);
   if (!tool) throw new Error("Tool not found");
-  await ToolRepository.delete({ _id: (tool as any)._id } as any);
+  await ToolRepository.deleteOne({
+    where: {
+      _id: (tool as any)._id,
+    },
+  });
 };
 
 export const updateTool = async (

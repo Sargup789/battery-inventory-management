@@ -21,7 +21,11 @@ export const createLocation = async (
 };
 
 export const deleteLocation = async (id: string): Promise<void> => {
-  await LocationRepository.delete({ _id: new ObjectId(id) } as any);
+  await LocationRepository.deleteOne({
+    where: {
+      _id: new ObjectId(id),
+    },
+  });
 };
 
 export const updateLocation = async (

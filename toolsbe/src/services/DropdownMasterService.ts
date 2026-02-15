@@ -9,7 +9,9 @@ export const createDropdown = async (
 };
 
 export const deleteDropdown = async (dropdownName: string): Promise<void> => {
-  await DropdownMasterRepository.delete({ dropdownName });
+  await DropdownMasterRepository.deleteOne({
+    where: { dropdownName },
+  });
 };
 
 export const updateDropdown = async (
