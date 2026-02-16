@@ -106,11 +106,7 @@ export const deleteUser = async (id: string): Promise<void> => {
   if (!ObjectId.isValid(id)) {
     throw new Error("Invalid user id.");
   }
-  await UserRepository.deleteOne({
-    where: {
-      _id: new ObjectId(id),
-    },
-  });
+  await UserRepository.deleteOne({ _id: new ObjectId(id) });
 };
 
 export const updateUser = async (

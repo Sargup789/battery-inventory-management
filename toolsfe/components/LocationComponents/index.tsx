@@ -5,6 +5,7 @@ import AddLocationDialog from "./AddLocationDialog";
 import LocationTable from "./LocationTable";
 import { ZoneData } from "@/pages/location";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 type Props = {
   zoneData: ZoneData[];
@@ -53,7 +54,11 @@ const LocationIndex = ({ zoneData, deleteZone, refetch, setPage, setSize, page, 
     } else {
       try {
         await axios.post(`/api/router?path=api/locations`, payload);
-      } catch (error) {
+      } catch (error: any) {
+        if (error?.response?.status === 409) {
+          toast.error("This location is already created");
+          return;
+        }
         console.error(error);
       }
     }

@@ -14,6 +14,17 @@ const toEntityId = (value: any): string => {
 export const createLocation = async (
   locationData: Partial<Location>
 ): Promise<Location> => {
+  const existing = await LocationRepository.findOne({
+    where: {
+      name: locationData.name,
+      type: locationData.type,
+      city: locationData.city,
+      state: locationData.state,
+    } as any,
+  });
+  if (existing) {
+    throw new Error("DUPLICATE_LOCATION");
+  }
   const location = new Location(locationData);
   location.createdAt = new Date();
   location.updatedAt = new Date();
@@ -21,11 +32,7 @@ export const createLocation = async (
 };
 
 export const deleteLocation = async (id: string): Promise<void> => {
-  await LocationRepository.deleteOne({
-    where: {
-      _id: new ObjectId(id),
-    },
-  });
+  await LocationRepository.deleteOne({ _id: new ObjectId(id) });
 };
 
 export const updateLocation = async (

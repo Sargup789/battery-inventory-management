@@ -49,9 +49,5 @@ export const getAllQrCodes = async () => {
 };
 
 export const deleteQrCode = async (id: string) => {
-  await QRCodeRepository.deleteOne({
-    where: {
-      _id: new ObjectId(id),
-    },
-  });
+  await QRCodeRepository.deleteOne({ _id: new ObjectId(id) });
 };

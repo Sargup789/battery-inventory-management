@@ -21,11 +21,7 @@ export const createPerson = async (
 };
 
 export const deletePerson = async (id: string): Promise<void> => {
-  await PersonRepository.deleteOne({
-    where: {
-      _id: new ObjectId(id),
-    },
-  });
+  await PersonRepository.deleteOne({ _id: new ObjectId(id) });
 };
 
 export const updatePerson = async (

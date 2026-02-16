@@ -6,6 +6,9 @@ export const createLocation = async (req: Request, res: Response) => {
     const location = await locationService.createLocation(req.body);
     res.json(location);
   } catch (err) {
+    if (err.message === "DUPLICATE_LOCATION") {
+      return res.status(409).json({ error: "This location already exists" });
+    }
     res.status(500).json({ error: err.message });
   }
 };
