@@ -1,9 +1,12 @@
 import { Request, Response } from "express";
 import * as toolService from "../services/ToolService";
 
-export const createTool = async (req: Request, res: Response) => {
+export const createTool = async (req: Request & { user?: any }, res: Response) => {
   try {
-    const tool = await toolService.createTool(req.body);
+    const tool = await toolService.createTool({
+      ...req.body,
+      lastUpdatedBy: req.user?.username || "",
+    });
     res.json(tool);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -31,9 +34,12 @@ export const getAllTools = async (req: Request, res: Response) => {
   }
 };
 
-export const updateTool = async (req: Request, res: Response) => {
+export const updateTool = async (req: Request & { user?: any }, res: Response) => {
   try {
-    const tool = await toolService.updateTool(req.params.id, req.body);
+    const tool = await toolService.updateTool(req.params.id, {
+      ...req.body,
+      lastUpdatedBy: req.user?.username || "",
+    });
     res.json(tool);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -49,28 +55,28 @@ export const deleteTool = async (req: Request, res: Response) => {
   }
 };
 
-export const assignTool = async (req: Request, res: Response) => {
+export const assignTool = async (req: Request & { user?: any }, res: Response) => {
   try {
     const { toolId, locationId, personId } = req.body;
-    const tool = await toolService.assignTool(toolId, locationId, personId);
+    const tool = await toolService.assignTool(toolId, locationId, personId, req.user?.username);
     res.json(tool);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-export const checkOutTool = async (req: Request, res: Response) => {
+export const checkOutTool = async (req: Request & { user?: any }, res: Response) => {
   try {
     const toolId = req.body.toolId || req.body.id;
     const { personId } = req.body;
-    const tool = await toolService.checkOutTool(toolId, personId);
+    const tool = await toolService.checkOutTool(toolId, personId, req.user?.username);
     res.json(tool);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-export const checkInTool = async (req: Request, res: Response) => {
+export const checkInTool = async (req: Request & { user?: any }, res: Response) => {
   try {
     const toolId = req.body.toolId || req.body.id;
     const { personId, zoneId, location, isRetailReady } = req.body;
@@ -83,7 +89,8 @@ export const checkInTool = async (req: Request, res: Response) => {
       personId,
       zoneId,
       location,
-      retailReadyValue
+      retailReadyValue,
+      req.user?.username
     );
     res.json(tool);
   } catch (err) {

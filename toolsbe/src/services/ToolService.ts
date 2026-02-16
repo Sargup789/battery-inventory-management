@@ -174,7 +174,8 @@ export const getAllTools = async (): Promise<Tool[]> => {
 export const assignTool = async (
   toolId: string,
   locationId: string,
-  personId: string
+  personId: string,
+  username?: string
 ): Promise<Tool> => {
   const tool = await getToolByToolId(toolId);
   if (!tool) throw new Error("Tool not found");
@@ -206,13 +207,15 @@ export const assignTool = async (
   tool.assignedPersonPhoneNumber = (person as any)?.phoneNumber || "";
   tool.status = ToolStatus.Assigned;
   tool.updatedAt = new Date();
+  if (username) tool.lastUpdatedBy = username;
 
   return await ToolRepository.save(tool);
 };
 
 export const checkOutTool = async (
   toolRef: string,
-  personId?: string
+  personId?: string,
+  username?: string
 ): Promise<Tool> => {
   const tool = await resolveToolByRef(toolRef);
   if (!tool) throw new Error("Tool not found");
@@ -225,6 +228,7 @@ export const checkOutTool = async (
   tool.zoneId = null;
   tool.location = null;
   tool.updatedAt = new Date();
+  if (username) tool.lastUpdatedBy = username;
 
   return await ToolRepository.save(tool);
 };
@@ -234,7 +238,8 @@ export const checkInTool = async (
   personId?: string,
   zoneId?: string,
   location?: string,
-  isRetailReady?: boolean
+  isRetailReady?: boolean,
+  username?: string
 ): Promise<Tool> => {
   const tool = await resolveToolByRef(toolRef);
   if (!tool) throw new Error("Tool not found");
@@ -257,6 +262,7 @@ export const checkInTool = async (
 
   tool.status = ToolStatus.CheckedIn;
   tool.updatedAt = new Date();
+  if (username) tool.lastUpdatedBy = username;
 
   return await ToolRepository.save(tool);
 };

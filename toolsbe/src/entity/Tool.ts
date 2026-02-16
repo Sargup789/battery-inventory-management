@@ -75,6 +75,9 @@ export class Tool {
   @Column({ nullable: true })
   isRetailReady: boolean;
 
+  @Column({ nullable: true })
+  lastUpdatedBy: string;
+
   @Column()
   createdAt: Date;
 

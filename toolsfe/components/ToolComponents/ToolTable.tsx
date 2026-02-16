@@ -5,6 +5,7 @@ import { DataGrid, GridColDef, GridCellParams } from '@mui/x-data-grid';
 import * as React from 'react';
 import { useState } from 'react';
 import PrintDialog from '../QRCodeComponents/PrintDialog';
+import QRCode from 'react-qr-code';
 import { green, amber } from '@mui/material/colors';
 import withLogin, { DecodedToken } from '@/components/general/withLogin';
 interface Props {
@@ -35,31 +36,45 @@ const Tool = ({
           children={<RemoveRedEyeOutlined fontSize="small" />}
         />
       </Tooltip>
-      {roles !== 'viewer' && <Tooltip title="Edit" followCursor>
+       <Tooltip title="Edit" followCursor>
         <IconButton
           size="small"
           onClick={() => editTool(params.row as ToolData)}
           children={<EditOutlined fontSize="small" />}
         />
-      </Tooltip>}
-      {roles === 'administrator' && <Tooltip title="Delete" followCursor>
+      </Tooltip>
+     <Tooltip title="Delete" followCursor>
         <IconButton
           size="small"
           onClick={() => deleteTool(params.row.id as string)}
           children={<DeleteOutline fontSize="small" />}
         />
-      </Tooltip>}
+      </Tooltip>
     </>
   );
 
   const columns: GridColDef[] = [
     {
       field: 'qrCodeId',
-      headerName: 'QR Code ID',
+      headerName: 'QR Code',
       width: 150,
-      sortable: true,
+      sortable: false,
       headerAlign: 'center',
       align: 'center',
+      renderCell: (params: GridCellParams) => {
+        const code = params.value as string;
+        if (!code) return 'N/A';
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <QRCode value={code} size={40} level="H" 
+             onClick={() => {
+              setPrintCode(code);
+              setPrintDialogOpen(true);
+            }}
+            />
+          </div>
+        );
+      },
     },
     {
       field: 'toolId',
@@ -199,9 +214,10 @@ const Tool = ({
       field: 'lastUpdatedBy',
       headerName: 'Last Updated By',
       width: 150,
-
       align: 'center',
-      sortable: true
+      sortable: true,
+      headerAlign: 'center',
+      valueFormatter: (params) => params.value || 'N/A',
     },
     {
       field: 'actions',
