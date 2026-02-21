@@ -27,8 +27,25 @@ export const getTool = async (req: Request, res: Response) => {
 
 export const getAllTools = async (req: Request, res: Response) => {
   try {
-    const tools = await toolService.getAllTools();
-    res.json(tools);
+    const page = parseInt(req.query.page as string) || 1;
+    const size = parseInt(req.query.size as string) || 10;
+    const filters: toolService.ToolFilters = {};
+
+    if (req.query.status) filters.status = req.query.status as string;
+    if (req.query.supplier) filters.supplier = req.query.supplier as string;
+    if (req.query.assignedLocation) filters.assignedLocation = req.query.assignedLocation as string;
+    if (req.query.assignedPerson) filters.assignedPerson = req.query.assignedPerson as string;
+    if (req.query.partNumber) filters.partNumber = req.query.partNumber as string;
+    if (req.query.toolName) filters.toolName = req.query.toolName as string;
+    if (req.query.search) filters.search = req.query.search as string;
+
+    const result = await toolService.getAllTools(page, size, filters);
+    res.json({
+      data: result.data,
+      totalCount: result.totalCount,
+      currentPage: page,
+      pageSize: size,
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -93,6 +110,15 @@ export const checkInTool = async (req: Request & { user?: any }, res: Response) 
       req.user?.username
     );
     res.json(tool);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getToolFilterOptions = async (req: Request, res: Response) => {
+  try {
+    const filterOptions = await toolService.getToolFilterOptions();
+    res.json(filterOptions);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

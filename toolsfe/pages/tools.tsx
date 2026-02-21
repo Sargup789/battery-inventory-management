@@ -105,12 +105,24 @@ const normalizeTool = (rawTool: any): ToolData => ({
   updatedAt: rawTool?.updatedAt,
 });
 
-export const fetchTools = async (page = 1, size = 10): Promise<ToolApiResponse> => {
+export interface ToolFilters {
+  status?: string;
+  supplier?: string;
+  assignedLocation?: string;
+  assignedPerson?: string;
+  partNumber?: string;
+  toolName?: string;
+  search?: string;
+}
+
+export const fetchTools = async (page = 1, size = 10, filters: ToolFilters = {}): Promise<ToolApiResponse> => {
+  const params: Record<string, any> = { page, size };
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value) params[key] = value;
+  });
+
   const response = await axios.get(`/api/router?path=api/tools`, {
-    params: {
-      page,
-      size
-    }
+    params,
   });
 
   const raw = response.data;
@@ -138,20 +150,26 @@ export const fetchTools = async (page = 1, size = 10): Promise<ToolApiResponse> 
 const Tools = () => {
   const [page, setPage] = React.useState(1);
   const [size, setSize] = React.useState(10);
+  const [filters, setFilters] = React.useState<ToolFilters>({});
 
   const {
     data: tools,
     isLoading,
     refetch,
   }: UseQueryResult<ToolApiResponse, unknown> = useQuery(
-    ["tools", page, size],
-    () => fetchTools(page, size),
+    ["tools", page, size, filters],
+    () => fetchTools(page, size, filters),
     {
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       keepPreviousData: true,
     }
   );
+
+  const handleFiltersChange = (newFilters: ToolFilters) => {
+    setFilters(newFilters);
+    setPage(1);
+  };
 
   const deleteTool = async (id: string) => {
     try {
@@ -176,7 +194,9 @@ const Tools = () => {
           setPage={setPage}
           setSize={setSize}
           page={page}
-          size={size} />
+          size={size}
+          filters={filters}
+          onFiltersChange={handleFiltersChange} />
       )}
     </Layout>
   )

@@ -7,6 +7,7 @@ const toolRouter = Router();
 // CRUD operations
 toolRouter.post("/", authenticateJWT, ToolController.createTool);
 toolRouter.get("/", authenticateJWT, ToolController.getAllTools);
+toolRouter.get("/filters", authenticateJWT, ToolController.getToolFilterOptions);
 toolRouter.get("/status/:toolId", authenticateJWT, ToolController.getToolStatus);
 toolRouter.get("/qr-code/:qrCodeId", authenticateJWT, ToolController.getToolByQrCode);
 

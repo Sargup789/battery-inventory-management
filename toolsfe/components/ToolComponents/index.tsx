@@ -1,26 +1,30 @@
-import { Button } from "@mui/material"
+import { Box, Button, Typography } from "@mui/material"
 import { useState } from "react";
 import AddToolDialog from "./AddToolDialog";
 import ToolTable from "./ToolTable"
-import { ToolApiResponse, ToolData } from "@/pages/tools";
+import { ToolApiResponse, ToolData, ToolFilters } from "@/pages/tools";
 import { QueryClient, QueryClientProvider } from "react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
+import ToolTableFilters from "./ToolTableFilters";
 
 type Props = {
   toolApidata: ToolApiResponse;
   deleteTool: (id: string) => void;
   refetch: () => void;
-  setPage: (page: number) => void
-  setSize: (size: number) => void
-  page: number
-  size: number
+  setPage: (page: number) => void;
+  setSize: (size: number) => void;
+  page: number;
+  size: number;
+  filters: ToolFilters;
+  onFiltersChange: (filters: ToolFilters) => void;
 };
 const queryClient = new QueryClient();
 
-const ToolIndex = ({ toolApidata, deleteTool, refetch, setPage, setSize, page, size }: Props) => {
+const ToolIndex = ({ toolApidata, deleteTool, refetch, setPage, setSize, page, size, filters, onFiltersChange }: Props) => {
   const [addToolDialogOpen, setAddToolDialogOpen] = useState(false);
   const [toolDialogData, setToolDialogData] = useState<ToolData | {}>({});
+  const [showFilters, setShowFilters] = useState(false);
   const [isViewMode, setIsViewMode] = useState(false);
 
   const viewTool = (tool: ToolData) => {
@@ -66,10 +70,12 @@ const ToolIndex = ({ toolApidata, deleteTool, refetch, setPage, setSize, page, s
     refetch();
   };
 
+  const hasActiveFilters = Object.values(filters).some((v) => !!v);
+
   return (
     <QueryClientProvider client={queryClient}>
       <div className="m-6">
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+        <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
           <Button
             style={{
               borderRadius: 15,
@@ -77,11 +83,29 @@ const ToolIndex = ({ toolApidata, deleteTool, refetch, setPage, setSize, page, s
               fontSize: "13px"
             }}
             variant="contained"
-            onClick={() => setAddToolDialogOpen(true)}
+            onClick={() => setShowFilters(prev => !prev)}
           >
-            Add Tool
+            {showFilters ? "Hide Filters" : "Show Filters"}
           </Button>
-        </div>
+          <Typography align='left' style={{ display: 'flex', alignItems: 'center' }}>
+            <Button
+              style={{
+                borderRadius: 15,
+                backgroundColor: "#9B2735",
+                fontSize: "13px"
+              }}
+              variant="contained"
+              onClick={() => setAddToolDialogOpen(true)}
+            >
+              Add Tool
+            </Button>
+          </Typography>
+        </Box>
+        {(showFilters || hasActiveFilters) && (
+          <Box sx={{ background: 'white', width: '100%', marginBottom: '16px' }}>
+            <ToolTableFilters filtersState={filters} setFilterState={onFiltersChange} />
+          </Box>
+        )}
         <ToolTable
           toolApidata={toolApidata}
           deleteTool={deleteTool}

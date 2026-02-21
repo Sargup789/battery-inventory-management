@@ -6,6 +6,7 @@ import {
 } from "..";
 import { Tool, ToolStatus } from "../entity/Tool";
 import { ObjectId } from "mongodb";
+import { getDropdown } from "./DropdownMasterService";
 
 // Generate 6 character alphanumeric Tool ID
 const generateToolId = (): string => {
@@ -163,8 +164,84 @@ export const getToolByQrCodeId = async (
   });
 };
 
-export const getAllTools = async (): Promise<Tool[]> => {
-  return await ToolRepository.find();
+export interface ToolFilters {
+  status?: string;
+  supplier?: string;
+  assignedLocation?: string;
+  assignedPerson?: string;
+  partNumber?: string;
+  toolName?: string;
+  search?: string;
+}
+
+export const getAllTools = async (
+  page: number = 1,
+  size: number = 10,
+  filters: ToolFilters = {}
+): Promise<{ data: Tool[]; totalCount: number }> => {
+  const where: Record<string, any> = {};
+
+  if (filters.status) {
+    where.status = filters.status;
+  }
+  if (filters.supplier) {
+    where.supplier = { $regex: filters.supplier, $options: "i" };
+  }
+  if (filters.assignedLocation) {
+    where.assignedLocation = { $regex: filters.assignedLocation, $options: "i" };
+  }
+  if (filters.assignedPerson) {
+    where.assignedPerson = { $regex: filters.assignedPerson, $options: "i" };
+  }
+  if (filters.partNumber) {
+    where.partNumber = { $regex: filters.partNumber, $options: "i" };
+  }
+  if (filters.toolName) {
+    where.toolName = { $regex: filters.toolName, $options: "i" };
+  }
+  if (filters.search) {
+    const searchRegex = { $regex: filters.search, $options: "i" };
+    where.$or = [
+      { toolId: searchRegex },
+      { toolName: searchRegex },
+      { partNumber: searchRegex },
+      { toolDescription: searchRegex },
+      { assignedPerson: searchRegex },
+      { assignedLocation: searchRegex },
+    ];
+  }
+
+  const [data, totalCount] = await Promise.all([
+    ToolRepository.find({
+      where,
+      skip: (page - 1) * size,
+      take: size,
+      order: { updatedAt: "DESC" },
+    }),
+    ToolRepository.count(where),
+  ]);
+
+  return { data, totalCount };
+};
+
+export const getToolFilterOptions = async (): Promise<any> => {
+  const supplierData = await getDropdown("supplier");
+  const statusData = await ToolRepository.distinct("status", {});
+  const assignedLocations = await ToolRepository.distinct("assignedLocation", {});
+  const assignedPersons = await ToolRepository.distinct("assignedPerson", {});
+  const partNumbers = await ToolRepository.distinct("partNumber", {});
+  const toolNames = await ToolRepository.distinct("toolName", {});
+  const suppliers = await ToolRepository.distinct("supplier", {});
+
+  return {
+    statusData: statusData.filter(Boolean),
+    supplierDropdown: supplierData?.options?.map((o: any) => o.key) || [],
+    suppliers: suppliers.filter(Boolean),
+    assignedLocations: assignedLocations.filter(Boolean),
+    assignedPersons: assignedPersons.filter(Boolean),
+    partNumbers: partNumbers.filter(Boolean),
+    toolNames: toolNames.filter(Boolean),
+  };
 };
 
 export const assignTool = async (
