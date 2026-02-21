@@ -1,6 +1,7 @@
 import { PersonRepository, ToolRepository } from "..";
 import { Person } from "../entity/Person";
 import { ObjectId } from "mongodb";
+import { getDropdown } from "./DropdownMasterService";
 
 const toEntityId = (value: any): string => {
   if (!value) return "";
@@ -54,9 +55,46 @@ export const getPerson = async (id: string): Promise<Person | null> => {
   } as Person;
 };
 
-export const getAllPersons = async (): Promise<Person[]> => {
-  const persons = await PersonRepository.find();
-  if (!persons.length) return [];
+export interface PersonFilters {
+  name?: string;
+  designation?: string;
+  email?: string;
+  phoneNumber?: string;
+  immediateBoss?: string;
+}
+
+export const getAllPersons = async (
+  page: number = 1,
+  size: number = 10,
+  filters: PersonFilters = {}
+): Promise<{ data: Person[]; totalCount: number }> => {
+  const where: Record<string, any> = {};
+
+  if (filters.name) {
+    where.name = { $regex: filters.name, $options: "i" };
+  }
+  if (filters.designation) {
+    where.designation = { $regex: filters.designation, $options: "i" };
+  }
+  if (filters.email) {
+    where.email = { $regex: filters.email, $options: "i" };
+  }
+  if (filters.phoneNumber) {
+    where.phoneNumber = { $regex: filters.phoneNumber, $options: "i" };
+  }
+  if (filters.immediateBoss) {
+    where.immediateBoss = { $regex: filters.immediateBoss, $options: "i" };
+  }
+
+  const persons = await PersonRepository.find({
+    where,
+    skip: (page - 1) * size,
+    take: size,
+    order: { updatedAt: "DESC" },
+  });
+  const totalCount = await PersonRepository.count(where);
+
+  if (!persons.length) return { data: [], totalCount };
 
   const allTools = await ToolRepository.find();
   const personToolCountMap = new Map<string, number>();
@@ -70,11 +108,33 @@ export const getAllPersons = async (): Promise<Person[]> => {
     );
   });
 
-  return persons.map((person: any) => {
+  const data = persons.map((person: any) => {
     const personId = toEntityId(person?._id || person?.id);
     return {
       ...person,
       toolsCount: personToolCountMap.get(personId) || 0,
     };
   }) as Person[];
+
+  return { data, totalCount };
+};
+
+export const getPersonFilterOptions = async (): Promise<any> => {
+  const designationData = await getDropdown("designation");
+  const immediateBossData = await getDropdown("immediateBoss");
+  const names = await PersonRepository.distinct("name", {});
+  const designations = await PersonRepository.distinct("designation", {});
+  const emails = await PersonRepository.distinct("email", {});
+  const phoneNumbers = await PersonRepository.distinct("phoneNumber", {});
+  const immediateBosses = await PersonRepository.distinct("immediateBoss", {});
+
+  return {
+    names: names.filter(Boolean),
+    designationDropdown: designationData?.options?.map((o: any) => o.key) || [],
+    designations: designations.filter(Boolean),
+    emails: emails.filter(Boolean),
+    phoneNumbers: phoneNumbers.filter(Boolean),
+    immediateBossDropdown: immediateBossData?.options?.map((o: any) => o.key) || [],
+    immediateBosses: immediateBosses.filter(Boolean),
+  };
 };

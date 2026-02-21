@@ -28,14 +28,45 @@ const normalizePerson = (rawPerson: any): PersonData => ({
   updatedAt: rawPerson?.updatedAt,
 });
 
-const fetchPersons = async (): Promise<PersonData[]> => {
-  const response = await axios.get(`/api/router?path=api/persons`);
-  const rows = Array.isArray(response.data)
-    ? response.data
-    : Array.isArray(response.data?.data)
-      ? response.data.data
-      : [];
-  return rows.map(normalizePerson);
+export interface PersonFilters {
+  name?: string;
+  designation?: string;
+  email?: string;
+  phoneNumber?: string;
+  immediateBoss?: string;
+}
+
+export interface PersonApiResponse {
+  totalCount: number;
+  currentPage: number;
+  data: PersonData[];
+}
+
+const fetchPersons = async (page = 1, size = 10, filters: PersonFilters = {}): Promise<PersonApiResponse> => {
+  const params: Record<string, any> = { page, size };
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value) params[key] = value;
+  });
+
+  const response = await axios.get(`/api/router?path=api/persons`, { params });
+  const raw = response.data;
+
+  if (Array.isArray(raw)) {
+    const normalized = raw.map(normalizePerson);
+    const start = (page - 1) * size;
+    return {
+      totalCount: normalized.length,
+      currentPage: page,
+      data: normalized.slice(start, start + size),
+    };
+  }
+
+  const rawData = Array.isArray(raw?.data) ? raw.data : [];
+  return {
+    totalCount: Number(raw?.totalCount ?? rawData.length),
+    currentPage: Number(raw?.currentPage ?? page),
+    data: rawData.map(normalizePerson),
+  };
 };
 
 const Persons = ({ roles }: DecodedToken) => {
@@ -47,15 +78,26 @@ const Persons = ({ roles }: DecodedToken) => {
 
   const [page, setPage] = React.useState(1);
   const [size, setSize] = React.useState(10);
+  const [filters, setFilters] = React.useState<PersonFilters>({});
 
   const {
     data: persons,
     refetch,
     isLoading,
-  }: UseQueryResult<PersonData[], unknown> = useQuery(["persons"], fetchPersons, {
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  });
+  }: UseQueryResult<PersonApiResponse, unknown> = useQuery(
+    ["persons", page, size, filters],
+    () => fetchPersons(page, size, filters),
+    {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      keepPreviousData: true,
+    }
+  );
+
+  const handleFiltersChange = (newFilters: PersonFilters) => {
+    setFilters(newFilters);
+    setPage(1);
+  };
 
   const deletePerson = async (id: string) => {
     try {
@@ -71,13 +113,15 @@ const Persons = ({ roles }: DecodedToken) => {
     <Layout>
       {isLoading || !persons ? "Loading..." : (
       <PersonIndex
-        personData={persons}
+        personApiData={persons}
         deletePerson={deletePerson}
         refetch={refetch}
         setPage={setPage}
         setSize={setSize}
         page={page}
         size={size}
+        filters={filters}
+        onFiltersChange={handleFiltersChange}
       />
       )}
     </Layout>

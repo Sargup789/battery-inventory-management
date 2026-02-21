@@ -1,27 +1,31 @@
-import { Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import AddLocationDialog from "./AddLocationDialog";
 import LocationTable from "./LocationTable";
-import { ZoneData } from "@/pages/location";
+import { LocationApiResponse, LocationFilters, ZoneData } from "@/pages/location";
+import LocationTableFilters from "./LocationTableFilters";
 import axios from "axios";
 import { toast } from "react-toastify";
 
 type Props = {
-  zoneData: ZoneData[];
+  locationApiData: LocationApiResponse;
   deleteZone: (id: string) => void;
   refetch: () => void;
-  setPage: (page: number) => void
-  setSize: (size: number) => void
-  page: number
-  size: number
+  setPage: (page: number) => void;
+  setSize: (size: number) => void;
+  page: number;
+  size: number;
+  filters: LocationFilters;
+  onFiltersChange: (filters: LocationFilters) => void;
 };
 
 const queryClient = new QueryClient();
 
-const LocationIndex = ({ zoneData, deleteZone, refetch, setPage, setSize, page, size }: Props) => {
+const LocationIndex = ({ locationApiData, deleteZone, refetch, setPage, setSize, page, size, filters, onFiltersChange }: Props) => {
   const [addLocationDialogOpen, setAddLocationDialogOpen] = useState(false);
   const [locationDialogData, setLocationDialogData] = useState<ZoneData | {}>({});
+  const [showFilters, setShowFilters] = useState(false);
 
   const editZone = (zone: ZoneData) => {
     setLocationDialogData(zone);
@@ -66,10 +70,12 @@ const LocationIndex = ({ zoneData, deleteZone, refetch, setPage, setSize, page, 
     refetch();
   };
 
+  const hasActiveFilters = Object.values(filters).some((v) => !!v);
+
   return (
     <QueryClientProvider client={queryClient}>
       <div className="m-6">
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+        <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
           <Button
             style={{
               borderRadius: 15,
@@ -77,13 +83,31 @@ const LocationIndex = ({ zoneData, deleteZone, refetch, setPage, setSize, page, 
               fontSize: "13px"
             }}
             variant="contained"
-            onClick={() => setAddLocationDialogOpen(true)}
+            onClick={() => setShowFilters(prev => !prev)}
           >
-            Add Location
+            {showFilters ? "Hide Filters" : "Show Filters"}
           </Button>
-        </div>
+          <Typography align='left' style={{ display: 'flex', alignItems: 'center' }}>
+            <Button
+              style={{
+                borderRadius: 15,
+                backgroundColor: "#9B2735",
+                fontSize: "13px"
+              }}
+              variant="contained"
+              onClick={() => setAddLocationDialogOpen(true)}
+            >
+              Add Location
+            </Button>
+          </Typography>
+        </Box>
+        {(showFilters || hasActiveFilters) && (
+          <Box sx={{ background: 'white', width: '100%', marginBottom: '16px' }}>
+            <LocationTableFilters filtersState={filters} setFilterState={onFiltersChange} />
+          </Box>
+        )}
         <LocationTable
-          zoneData={zoneData}
+          zoneData={locationApiData.data}
           deleteZone={deleteZone}
           editZone={editZone}
           setPage={setPage}
@@ -95,7 +119,7 @@ const LocationIndex = ({ zoneData, deleteZone, refetch, setPage, setSize, page, 
           open={addLocationDialogOpen}
           locationDialogData={locationDialogData}
           handleClose={handleClose}
-          parentZones={zoneData}
+          parentZones={locationApiData.data}
           onSubmit={onSubmit}
         />
       </div>

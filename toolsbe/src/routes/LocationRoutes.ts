@@ -7,6 +7,7 @@ const locationRouter = Router();
 // CRUD operations
 locationRouter.post("/", authenticateJWT, LocationController.createLocation);
 locationRouter.get("/", authenticateJWT, LocationController.getAllLocations);
+locationRouter.get("/filters", authenticateJWT, LocationController.getLocationFilterOptions);
 locationRouter.get(
   "/:id/availableLocations",
   authenticateJWT,

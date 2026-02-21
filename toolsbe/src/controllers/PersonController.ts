@@ -24,8 +24,32 @@ export const getPerson = async (req: Request, res: Response) => {
 
 export const getAllPersons = async (req: Request, res: Response) => {
   try {
-    const persons = await personService.getAllPersons();
-    res.json(persons);
+    const page = parseInt(req.query.page as string) || 1;
+    const size = parseInt(req.query.size as string) || 10;
+    const filters: personService.PersonFilters = {};
+
+    if (req.query.name) filters.name = req.query.name as string;
+    if (req.query.designation) filters.designation = req.query.designation as string;
+    if (req.query.email) filters.email = req.query.email as string;
+    if (req.query.phoneNumber) filters.phoneNumber = req.query.phoneNumber as string;
+    if (req.query.immediateBoss) filters.immediateBoss = req.query.immediateBoss as string;
+
+    const result = await personService.getAllPersons(page, size, filters);
+    res.json({
+      data: result.data,
+      totalCount: result.totalCount,
+      currentPage: page,
+      pageSize: size,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getPersonFilterOptions = async (req: Request, res: Response) => {
+  try {
+    const filterOptions = await personService.getPersonFilterOptions();
+    res.json(filterOptions);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

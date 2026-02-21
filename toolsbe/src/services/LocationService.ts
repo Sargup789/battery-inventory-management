@@ -1,6 +1,7 @@
 import { LocationRepository, ToolRepository } from "..";
 import { Location } from "../entity/Location";
 import { ObjectId } from "mongodb";
+import { getDropdown } from "./DropdownMasterService";
 
 const toEntityId = (value: any): string => {
   if (!value) return "";
@@ -65,9 +66,42 @@ export const getLocation = async (id: string): Promise<Location | null> => {
   } as Location;
 };
 
-export const getAllLocations = async (): Promise<Location[]> => {
-  const locations = await LocationRepository.find();
-  if (!locations.length) return [];
+export interface LocationFilters {
+  name?: string;
+  type?: string;
+  city?: string;
+  state?: string;
+}
+
+export const getAllLocations = async (
+  page: number = 1,
+  size: number = 10,
+  filters: LocationFilters = {}
+): Promise<{ data: Location[]; totalCount: number }> => {
+  const where: Record<string, any> = {};
+
+  if (filters.name) {
+    where.name = { $regex: filters.name, $options: "i" };
+  }
+  if (filters.type) {
+    where.type = { $regex: filters.type, $options: "i" };
+  }
+  if (filters.city) {
+    where.city = { $regex: filters.city, $options: "i" };
+  }
+  if (filters.state) {
+    where.state = { $regex: filters.state, $options: "i" };
+  }
+
+  const locations = await LocationRepository.find({
+    where,
+    skip: (page - 1) * size,
+    take: size,
+    order: { updatedAt: "DESC" },
+  });
+  const totalCount = await LocationRepository.count(where);
+
+  if (!locations.length) return { data: [], totalCount };
 
   const allTools = await ToolRepository.find();
   const locationToolCountMap = new Map<string, number>();
@@ -81,13 +115,37 @@ export const getAllLocations = async (): Promise<Location[]> => {
     );
   });
 
-  return locations.map((location: any) => {
+  const data = locations.map((location: any) => {
     const locationId = toEntityId(location?._id || location?.id);
     return {
       ...location,
       toolsCount: locationToolCountMap.get(locationId) || 0,
     };
   }) as Location[];
+
+  return { data, totalCount };
+};
+
+export const getLocationFilterOptions = async (): Promise<any> => {
+  const locationNameData = await getDropdown("locationName");
+  const locationTypeData = await getDropdown("locationType");
+  const cityData = await getDropdown("city");
+  const stateData = await getDropdown("state");
+  const names = await LocationRepository.distinct("name", {});
+  const types = await LocationRepository.distinct("type", {});
+  const cities = await LocationRepository.distinct("city", {});
+  const states = await LocationRepository.distinct("state", {});
+
+  return {
+    locationNameDropdown: locationNameData?.options?.map((o: any) => o.key) || [],
+    names: names.filter(Boolean),
+    locationTypeDropdown: locationTypeData?.options?.map((o: any) => o.key) || [],
+    types: types.filter(Boolean),
+    cityDropdown: cityData?.options?.map((o: any) => o.key) || [],
+    cities: cities.filter(Boolean),
+    stateDropdown: stateData?.options?.map((o: any) => o.key) || [],
+    states: states.filter(Boolean),
+  };
 };
 
 export const getAvailableLocations = async (id: string): Promise<string[]> => {

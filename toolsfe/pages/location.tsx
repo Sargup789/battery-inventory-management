@@ -60,11 +60,44 @@ const normalizeLocation = (raw: any): ZoneData => {
   };
 };
 
-const fetchLocations = async (): Promise<ZoneData[]> => {
-  const response = await axios.get(`/api/router?path=api/locations`);
+export interface LocationFilters {
+  name?: string;
+  type?: string;
+  city?: string;
+  state?: string;
+}
+
+export interface LocationApiResponse {
+  totalCount: number;
+  currentPage: number;
+  data: ZoneData[];
+}
+
+const fetchLocations = async (page = 1, size = 10, filters: LocationFilters = {}): Promise<LocationApiResponse> => {
+  const params: Record<string, any> = { page, size };
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value) params[key] = value;
+  });
+
+  const response = await axios.get(`/api/router?path=api/locations`, { params });
   const raw = response.data;
-  const locationRows = Array.isArray(raw) ? raw : Array.isArray(raw?.data) ? raw.data : [];
-  return locationRows.map(normalizeLocation);
+
+  if (Array.isArray(raw)) {
+    const normalized = raw.map(normalizeLocation);
+    const start = (page - 1) * size;
+    return {
+      totalCount: normalized.length,
+      currentPage: page,
+      data: normalized.slice(start, start + size),
+    };
+  }
+
+  const rawData = Array.isArray(raw?.data) ? raw.data : [];
+  return {
+    totalCount: Number(raw?.totalCount ?? rawData.length),
+    currentPage: Number(raw?.currentPage ?? page),
+    data: rawData.map(normalizeLocation),
+  };
 };
 
 const Zone = ({ roles }: DecodedToken) => {
@@ -75,15 +108,26 @@ const Zone = ({ roles }: DecodedToken) => {
   }, [roles])
   const [page, setPage] = React.useState(1);
   const [size, setSize] = React.useState(10);
+  const [filters, setFilters] = React.useState<LocationFilters>({});
 
   const {
     data: zones,
     isLoading,
     refetch,
-  }: UseQueryResult<ZoneData[], unknown> = useQuery(["zones"], fetchLocations, {
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  });
+  }: UseQueryResult<LocationApiResponse, unknown> = useQuery(
+    ["zones", page, size, filters],
+    () => fetchLocations(page, size, filters),
+    {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      keepPreviousData: true,
+    }
+  );
+
+  const handleFiltersChange = (newFilters: LocationFilters) => {
+    setFilters(newFilters);
+    setPage(1);
+  };
 
   const deleteZone = async (id: string) => {
     try {
@@ -100,10 +144,17 @@ const Zone = ({ roles }: DecodedToken) => {
       {isLoading || !zones ? (
         "Loading..."
       ) : (
-        <LocationIndex zoneData={zones} deleteZone={deleteZone} refetch={refetch} setPage={setPage}
+        <LocationIndex
+          locationApiData={zones}
+          deleteZone={deleteZone}
+          refetch={refetch}
+          setPage={setPage}
           setSize={setSize}
           page={page}
-          size={size} />
+          size={size}
+          filters={filters}
+          onFiltersChange={handleFiltersChange}
+        />
       )}
     </Layout>
   );
