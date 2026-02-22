@@ -106,6 +106,11 @@ const LocationTable: React.FC<Props> = ({
         onPageChange={(value) => setPage(value + 1)}
         onPageSizeChange={(value) => setSize(value)}
         disableSelectionOnClick
+        sx={{
+          '& .MuiDataGrid-cell': { textAlign: 'center', justifyContent: 'center', display: 'flex' },
+          '& .MuiDataGrid-columnHeaderTitle': { fontWeight: '700' },
+          '& .MuiDataGrid-columnHeaderTitleContainer': { justifyContent: 'center' },
+        }}
       />
     </div>
   );

@@ -73,7 +73,7 @@ const CheckoutForm: React.FC = () => {
 
   return (
     <Box p={3} bgcolor="white" boxShadow={2}>
-      <Typography variant="h5">Checkout Form</Typography>
+      <Typography variant="h5">Checkout Tool</Typography>
       {isScanning ? (
         <div>
           <QrReader
