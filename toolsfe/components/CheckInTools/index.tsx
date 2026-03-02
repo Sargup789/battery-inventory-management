@@ -39,6 +39,7 @@ const CheckinForm: React.FC = () => {
               person?._id?.toString?.() ||
               "",
             name: person?.name || "",
+            employeeId: person?.employeeId || "",
             designation: person?.designation || "",
             emailId: person?.emailId || person?.email || "",
             phoneNumber: person?.phoneNumber || "",

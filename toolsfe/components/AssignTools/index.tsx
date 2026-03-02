@@ -76,6 +76,7 @@ const AssignToolsForm: React.FC = () => {
           rows.map((person: any) => ({
             id: getEntityId(person),
             name: person?.name || "",
+            employeeId: person?.employeeId || "",
             designation: person?.designation || "",
             emailId: person?.emailId || person?.email || "",
             phoneNumber: person?.phoneNumber || "",
