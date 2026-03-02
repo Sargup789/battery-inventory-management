@@ -29,6 +29,7 @@ export const getAllPersons = async (req: Request, res: Response) => {
     const filters: personService.PersonFilters = {};
 
     if (req.query.name) filters.name = req.query.name as string;
+    if (req.query.employeeId) filters.employeeId = req.query.employeeId as string;
     if (req.query.designation) filters.designation = req.query.designation as string;
     if (req.query.email) filters.email = req.query.email as string;
     if (req.query.phoneNumber) filters.phoneNumber = req.query.phoneNumber as string;

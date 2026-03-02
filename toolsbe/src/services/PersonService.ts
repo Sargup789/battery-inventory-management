@@ -57,6 +57,7 @@ export const getPerson = async (id: string): Promise<Person | null> => {
 
 export interface PersonFilters {
   name?: string;
+  employeeId?: string;
   designation?: string;
   email?: string;
   phoneNumber?: string;
@@ -72,6 +73,9 @@ export const getAllPersons = async (
 
   if (filters.name) {
     where.name = { $regex: filters.name, $options: "i" };
+  }
+  if (filters.employeeId) {
+    where.employeeId = { $regex: filters.employeeId, $options: "i" };
   }
   if (filters.designation) {
     where.designation = { $regex: filters.designation, $options: "i" };
@@ -123,6 +127,7 @@ export const getPersonFilterOptions = async (): Promise<any> => {
   const designationData = await getDropdown("designation");
   const immediateBossData = await getDropdown("immediateBoss");
   const names = await PersonRepository.distinct("name", {});
+  const employeeIds = await PersonRepository.distinct("employeeId", {});
   const designations = await PersonRepository.distinct("designation", {});
   const emails = await PersonRepository.distinct("email", {});
   const phoneNumbers = await PersonRepository.distinct("phoneNumber", {});
@@ -130,6 +135,7 @@ export const getPersonFilterOptions = async (): Promise<any> => {
 
   return {
     names: names.filter(Boolean),
+    employeeIds: employeeIds.filter(Boolean),
     designationDropdown: designationData?.options?.map((o: any) => o.key) || [],
     designations: designations.filter(Boolean),
     emails: emails.filter(Boolean),

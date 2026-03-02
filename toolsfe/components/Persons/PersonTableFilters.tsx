@@ -7,6 +7,7 @@ import { PersonFilters } from '@/pages/persons';
 
 export interface PersonFiltersData {
     names: string[];
+    employeeIds: string[];
     designationDropdown: string[];
     designations: string[];
     emails: string[];
@@ -87,6 +88,13 @@ const PersonTableFilters = ({ filtersState, setFilterState }: Props) => {
                     selectedValue={filtersState?.name}
                     onFilterChange={(value) => handleFilterStateChange('name', value)}
                     onClearClick={() => handleClearClick('name')}
+                />
+                <FilterFormControl
+                    label="Employee ID"
+                    values={filters?.employeeIds}
+                    selectedValue={filtersState?.employeeId}
+                    onFilterChange={(value) => handleFilterStateChange('employeeId', value)}
+                    onClearClick={() => handleClearClick('employeeId')}
                 />
                 <FilterFormControl
                     label="Designation"

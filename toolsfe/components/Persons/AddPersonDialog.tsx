@@ -20,6 +20,7 @@ import { DropdownMaster } from "../types";
 export interface PersonData {
     id?: string;
     name: string;
+    employeeId: string;
     designation: string;
     emailId: string;
     phoneNumber: string;
@@ -111,6 +112,7 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
     const validate = (values: PersonData) => {
         const errors: Partial<Record<keyof PersonData, string>> = {};
         if (!values.name) errors.name = "Required";
+        if (!values.employeeId) errors.employeeId = "Required";
         if (!values.designation) errors.designation = "Required";
         if (!values.emailId) {
             errors.emailId = "Required";
@@ -154,6 +156,7 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
                     initialValues={{
                         id: (personDialogData as any)?.id ?? undefined,
                         name: (personDialogData as any)?.name ?? "",
+                        employeeId: (personDialogData as any)?.employeeId ?? "",
                         designation: (personDialogData as any)?.designation ?? "",
                         emailId: (personDialogData as any)?.emailId ?? "",
                         phoneNumber: (personDialogData as any)?.phoneNumber ?? "",
@@ -177,6 +180,21 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
                                         {({ input }) => <input type="hidden" {...input} />}
                                     </Field>
                                 )}
+                                     <Field name="employeeId">
+                                    {({ input, meta }) => (
+                                        <Box>
+                                            <Typography className="label">Employee ID</Typography>
+                                            <TextField
+                                                {...input}
+                                                fullWidth
+                                                size="small"
+                                                placeholder="Enter employee ID"
+                                                error={meta.touched && !!meta.error}
+                                                helperText={meta.touched && meta.error ? meta.error : " "}
+                                            />
+                                        </Box>
+                                    )}
+                                </Field>
                                 <Field name="name">
                                     {({ input, meta }) => (
                                         <Box>
@@ -192,7 +210,6 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
                                         </Box>
                                     )}
                                 </Field>
-
                                 <Field name="designation">
                                     {({ input, meta }) => (
                                         <Box>

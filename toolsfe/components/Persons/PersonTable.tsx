@@ -29,6 +29,14 @@ const PersonTable: React.FC<Props> = ({
 }) => {
   const columns: GridColDef[] = [
     {
+      field: "employeeId",
+      headerName: "Employee ID",
+      flex: 1,
+      align: 'center',
+      headerAlign: 'center',
+      minWidth: 140,
+    },
+    {
       field: "name",
       headerName: "Name",
       flex: 1,

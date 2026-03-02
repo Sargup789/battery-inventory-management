@@ -8,6 +8,9 @@ export class Person {
   @Column()
   name: string;
 
+  @Column({ nullable: true })
+  employeeId: string;
+
   @Column()
   designation: string; // Reference to DropDownMaster option key
 

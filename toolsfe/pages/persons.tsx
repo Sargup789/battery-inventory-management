@@ -19,6 +19,7 @@ const getEntityId = (item: any): string => {
 const normalizePerson = (rawPerson: any): PersonData => ({
   id: getEntityId(rawPerson),
   name: rawPerson?.name || "",
+  employeeId: rawPerson?.employeeId || "",
   designation: rawPerson?.designation || "",
   emailId: rawPerson?.emailId || rawPerson?.email || "",
   phoneNumber: rawPerson?.phoneNumber || "",
@@ -30,6 +31,7 @@ const normalizePerson = (rawPerson: any): PersonData => ({
 
 export interface PersonFilters {
   name?: string;
+  employeeId?: string;
   designation?: string;
   email?: string;
   phoneNumber?: string;
