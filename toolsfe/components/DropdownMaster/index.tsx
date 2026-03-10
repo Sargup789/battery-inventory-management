@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'next-i18next';
 import Box from '@mui/material/Box';
 import { Tab, Tabs, Button, Table, TableBody, TableCell, TableHead, TableRow, Dialog, DialogActions, DialogContent, DialogTitle, TextField, IconButton, Tooltip, Grid } from '@mui/material';
 import axios from 'axios';
@@ -7,6 +8,7 @@ import { DropdownMaster, DropdownOption } from '../types';
 import { toast } from 'react-toastify';
 
 const DropdownMasterComponent = () => {
+    const { t } = useTranslation('common');
     const [dropdowns, setDropdowns] = useState<DropdownMaster[]>([]);
     const [currentTab, setCurrentTab] = useState(0);
     const [optionModalOpen, setOptionModalOpen] = useState(false);
@@ -56,7 +58,7 @@ const DropdownMasterComponent = () => {
                 setDropdowns(response.data);
             })
             .catch((error: any) => {
-                toast.error(`Error fetching dropdowns: ${error.message}`);
+                toast.error(`${t('dropdown.fetchError')} ${error.message}`);
             });
     }
 
@@ -68,7 +70,7 @@ const DropdownMasterComponent = () => {
                 const safeKey = (keyValue.key || "").trim();
                 const safeLabel = (keyValue.label || "").trim();
                 if (!safeKey || !safeLabel) {
-                    toast.error("Both key and value are required");
+                    toast.error(t('dropdown.bothRequired'));
                     return;
                 }
                 const existingOptions = Array.isArray(updatedDropdown.options)
@@ -81,14 +83,14 @@ const DropdownMasterComponent = () => {
                         opt => opt.key === currentOption.key
                     );
                     if (optionIndex === -1) {
-                        toast.error("Option not found. Refresh and try again.");
+                        toast.error(t('dropdown.optionNotFound'));
                         return;
                     }
                     existingOptions[optionIndex] = normalizedOption;
                 } else {
                     const duplicateIndex = existingOptions.findIndex(opt => opt.key === safeKey);
                     if (duplicateIndex !== -1) {
-                        toast.error("Option key already exists");
+                        toast.error(t('dropdown.keyExists'));
                         return;
                     }
                     existingOptions.push(normalizedOption);
@@ -97,7 +99,7 @@ const DropdownMasterComponent = () => {
                     await axios.put(url, { options: existingOptions });
                     fetchDropdowns();
                 } catch (error: any) {
-                    toast.error(`Failed to update dropdown: ${error.message}`);
+                    toast.error(`${t('dropdown.updateError')} ${error.message}`);
                 }
             }
         }
@@ -118,7 +120,7 @@ const DropdownMasterComponent = () => {
 
             <Grid container justifyContent="space-between" alignItems="center" marginBottom={2}>
                 <Grid item>
-                    <strong>Options List for {currentTable?.dropdownLabel}</strong>
+                    <strong>{t('dropdown.optionsListFor')} {currentTable?.dropdownLabel}</strong>
                 </Grid>
                 <Grid item>
                     <Button
@@ -132,7 +134,7 @@ const DropdownMasterComponent = () => {
                         onClick={() => currentTable?.dropdownName && handleAddOption(currentTable.dropdownName)}
                         disabled={!currentTable?.dropdownName}
                     >
-                        Add Record
+                        {t('dropdown.addRecord')}
                     </Button>
                 </Grid>
             </Grid>
@@ -140,10 +142,10 @@ const DropdownMasterComponent = () => {
             <Table>
                 <TableHead>
                     <TableRow>
-                        <TableCell>Index</TableCell>
-                        <TableCell>Label</TableCell>
-                        <TableCell>Value</TableCell>
-                        <TableCell>Actions</TableCell>
+                        <TableCell>{t('dropdown.index')}</TableCell>
+                        <TableCell>{t('dropdown.label')}</TableCell>
+                        <TableCell>{t('dropdown.value')}</TableCell>
+                        <TableCell>{t('common.actions')}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -153,12 +155,12 @@ const DropdownMasterComponent = () => {
                             <TableCell>{option.key}</TableCell>
                             <TableCell>{option.label}</TableCell>
                             <TableCell>
-                                <Tooltip title="Edit">
+                                <Tooltip title={t('common.edit')}>
                                     <IconButton size="small" onClick={() => handleEditOption(currentTable.dropdownName, option)}>
                                         <EditOutlined fontSize="small" />
                                     </IconButton>
                                 </Tooltip>
-                                <Tooltip title="Delete">
+                                <Tooltip title={t('common.delete')}>
                                     <IconButton size="small" onClick={() => { setDeleteModalOpen(true); setCurrentDropdownName(currentTable.dropdownName); setCurrentOption(option) }}>
                                         <DeleteOutline fontSize="small" />
                                     </IconButton>
@@ -171,12 +173,12 @@ const DropdownMasterComponent = () => {
 
 
             <Dialog open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
-                <DialogTitle>Delete Option</DialogTitle>
+                <DialogTitle>{t('dropdown.deleteOption')}</DialogTitle>
                 <DialogContent>
-                    Are you sure you want to delete this option?
+                    {t('dropdown.deleteConfirm')}
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setDeleteModalOpen(false)}>Cancel</Button>
+                    <Button onClick={() => setDeleteModalOpen(false)}>{t('common.cancel')}</Button>
                     <Button
                         variant='contained'
                         style={{
@@ -186,7 +188,7 @@ const DropdownMasterComponent = () => {
                         }}
                         onClick={handleDeleteOption}
                     >
-                        Delete
+                        {t('common.delete')}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -204,7 +206,7 @@ const DropdownMasterComponent = () => {
                             alignItems: "center",
                         }}
                     >
-                        {currentOption ? "Edit Option" : "Add Option"}
+                        {currentOption ? t('dropdown.editOption') : t('dropdown.addOption')}
                     </Box>
                     <IconButton
                         children={<HighlightOff />}
@@ -215,13 +217,13 @@ const DropdownMasterComponent = () => {
                 </DialogTitle>
                 <DialogContent sx={{ flexDirection: 'column', display: 'flex' }}>
                     <TextField
-                        label="Label"
+                        label={t('dropdown.label')}
                         value={keyValue.key}
                         sx={{ margin: "6px 3px" }}
                         onChange={e => setKeyValue({ ...keyValue, key: e.target.value })}
                     />
                     <TextField
-                        label="Value"
+                        label={t('dropdown.value')}
                         value={keyValue.label}
                         sx={{ margin: "6px 3px" }}
                         onChange={e => setKeyValue({ ...keyValue, label: e.target.value })}
@@ -232,7 +234,7 @@ const DropdownMasterComponent = () => {
                         borderRadius: 15,
                         backgroundColor: "#9B2735",
                         fontSize: "13px"
-                    }} onClick={() => handleSaveOption()}>Save</Button>
+                    }} onClick={() => handleSaveOption()}>{t('common.save')}</Button>
                 </DialogActions>
             </Dialog>
         </Box>

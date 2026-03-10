@@ -10,6 +10,7 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import * as React from 'react';
+import { useTranslation } from 'next-i18next';
 
 interface Props {
     userApiData: UserApiResponse
@@ -23,6 +24,7 @@ interface Props {
 
 
 export default function UserTable({ userApiData, deleteUser, setPage, setSize, page, size }: Props) {
+    const { t } = useTranslation('common');
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage + 1);  // Backend might be 1-indexed, but Material-UI pagination is 0-indexed.
@@ -33,7 +35,7 @@ export default function UserTable({ userApiData, deleteUser, setPage, setSize, p
         setPage(1);  // Reset to the first page when rows per page change.
     };
 
-    if (!userApiData.data) return (<div>Loading...</div>)
+    if (!userApiData.data) return (<div>{t('common.loading')}</div>)
 
     return (
         <Paper sx={{ width: '100%', overflow: 'hidden' }}>
@@ -41,10 +43,10 @@ export default function UserTable({ userApiData, deleteUser, setPage, setSize, p
                 <Table stickyHeader aria-label="sticky table">
                     <TableHead>
                         <TableRow>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Username</TableCell>
-                            <TableCell align='center' sx={{ fontWeight: 'bold' }}>Password</TableCell>
-                            <TableCell align='center' sx={{ fontWeight: 'bold' }}>Role</TableCell>
-                            <TableCell align='center' sx={{ fontWeight: 'bold' }}>Action</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>{t('user.username')}</TableCell>
+                            <TableCell align='center' sx={{ fontWeight: 'bold' }}>{t('user.password')}</TableCell>
+                            <TableCell align='center' sx={{ fontWeight: 'bold' }}>{t('user.role')}</TableCell>
+                            <TableCell align='center' sx={{ fontWeight: 'bold' }}>{t('user.action')}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -56,16 +58,16 @@ export default function UserTable({ userApiData, deleteUser, setPage, setSize, p
                                 <TableCell align='center'>{"*****"}</TableCell>
                                 <TableCell align='center'>
                                     {historyRow.role === "administrator"
-                                        ? "ADMIN"
+                                        ? t('user.admin')
                                         : historyRow.role === "editor"
-                                            ? "MANAGER"
+                                            ? t('user.managerRole')
                                             : historyRow.role === "viewer"
-                                                ? "OPERATOR"
+                                                ? t('user.operatorRole')
                                                 : ""
                                     }
                                 </TableCell>
                                 <TableCell align='center'>
-                                    <Tooltip title="Delete" followCursor>
+                                    <Tooltip title={t('common.delete')} followCursor>
                                         <IconButton
                                             size="small"
                                             onClick={() => deleteUser(historyRow.id)}

@@ -15,6 +15,7 @@ import {
 import { Form, Field } from "react-final-form";
 import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from 'next-i18next';
 import { DropdownMaster } from "../types";
 
 export interface PersonData {
@@ -66,6 +67,7 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
     persons: _persons,
     onSubmit,
 }) => {
+    const { t } = useTranslation('common');
     const isEditMode = Object.keys(personDialogData).length > 0;
     const [dropdowns, setDropdowns] = useState<DropdownMaster[]>([]);
 
@@ -111,18 +113,18 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
 
     const validate = (values: PersonData) => {
         const errors: Partial<Record<keyof PersonData, string>> = {};
-        if (!values.name) errors.name = "Required";
-        if (!values.employeeId) errors.employeeId = "Required";
-        if (!values.designation) errors.designation = "Required";
+        if (!values.name) errors.name = t('common.required');
+        if (!values.employeeId) errors.employeeId = t('common.required');
+        if (!values.designation) errors.designation = t('common.required');
         if (!values.emailId) {
-            errors.emailId = "Required";
+            errors.emailId = t('common.required');
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.emailId)) {
-            errors.emailId = "Invalid email";
+            errors.emailId = t('person.invalidEmail');
         }
         if (!values.phoneNumber) {
-            errors.phoneNumber = "Required";
+            errors.phoneNumber = t('common.required');
         } else if (!/^\d{10}$/.test(values.phoneNumber.replace(/\D/g, ""))) {
-            errors.phoneNumber = "Must be 10 digits";
+            errors.phoneNumber = t('person.mustBe10Digits');
         }
         return errors;
     };
@@ -142,7 +144,7 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
                         alignItems: "center",
                     }}
                 >
-                    {isEditMode ? "Edit" : "Add"} Person
+                    {isEditMode ? t('common.edit') : t('common.add')} {t('person.person')}
                 </Box>
                 <IconButton
                     children={<HighlightOff />}
@@ -183,12 +185,12 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
                                      <Field name="employeeId">
                                     {({ input, meta }) => (
                                         <Box>
-                                            <Typography className="label">Employee ID</Typography>
+                                            <Typography className="label">{t('person.employeeId')}</Typography>
                                             <TextField
                                                 {...input}
                                                 fullWidth
                                                 size="small"
-                                                placeholder="Enter employee ID"
+                                                placeholder={t('person.enterEmployeeId')}
                                                 error={meta.touched && !!meta.error}
                                                 helperText={meta.touched && meta.error ? meta.error : " "}
                                             />
@@ -198,12 +200,12 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
                                 <Field name="name">
                                     {({ input, meta }) => (
                                         <Box>
-                                            <Typography className="label">Name</Typography>
+                                            <Typography className="label">{t('common.name')}</Typography>
                                             <TextField
                                                 {...input}
                                                 fullWidth
                                                 size="small"
-                                                placeholder="Enter name"
+                                                placeholder={t('person.enterName')}
                                                 error={meta.touched && !!meta.error}
                                                 helperText={meta.touched && meta.error ? meta.error : " "}
                                             />
@@ -213,7 +215,7 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
                                 <Field name="designation">
                                     {({ input, meta }) => (
                                         <Box>
-                                            <Typography className="label">Designation</Typography>
+                                            <Typography className="label">{t('person.designation')}</Typography>
                                             <Select
                                                 {...input}
                                                 fullWidth
@@ -223,11 +225,11 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
                                                 renderValue={(selected) =>
                                                     selected
                                                         ? getOptionLabel(designationDropdown?.options, selected as string)
-                                                        : "Select Designation"
+                                                        : t('person.selectDesignation')
                                                 }
                                             >
                                                 <MenuItem value="">
-                                                    <em>Select Designation</em>
+                                                    <em>{t('person.selectDesignation')}</em>
                                                 </MenuItem>
                                                 {(designationDropdown?.options ?? []).map((opt) => (
                                                     <MenuItem key={opt.key} value={opt.key}>
@@ -247,13 +249,13 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
                                 <Field name="emailId">
                                     {({ input, meta }) => (
                                         <Box>
-                                            <Typography className="label">Email ID</Typography>
+                                            <Typography className="label">{t('person.emailId')}</Typography>
                                             <TextField
                                                 {...input}
                                                 fullWidth
                                                 size="small"
                                                 type="email"
-                                                placeholder="Enter email"
+                                                placeholder={t('person.enterEmail')}
                                                 error={meta.touched && !!meta.error}
                                                 helperText={meta.touched && meta.error ? meta.error : " "}
                                             />
@@ -264,12 +266,12 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
                                 <Field name="phoneNumber">
                                     {({ input, meta }) => (
                                         <Box>
-                                            <Typography className="label">Phone Number</Typography>
+                                            <Typography className="label">{t('person.phoneNumber')}</Typography>
                                             <TextField
                                                 {...input}
                                                 fullWidth
                                                 size="small"
-                                                placeholder="Enter phone number"
+                                                placeholder={t('person.enterPhone')}
                                                 error={meta.touched && !!meta.error}
                                                 helperText={meta.touched && meta.error ? meta.error : " "}
                                             />
@@ -280,7 +282,7 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
                                 <Field name="immediateBoss">
                                     {({ input, meta }) => (
                                         <Box sx={{ gridColumn: { xs: "1", sm: "1 / -1" } }}>
-                                            <Typography className="label">Immediate Boss</Typography>
+                                            <Typography className="label">{t('person.immediateBoss')}</Typography>
                                             <Select
                                                 {...input}
                                                 fullWidth
@@ -290,11 +292,11 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
                                                 renderValue={(selected) =>
                                                     selected
                                                         ? getOptionLabel(immediateBossDropdown?.options, selected as string)
-                                                        : "Select Immediate Boss"
+                                                        : t('person.selectImmediateBoss')
                                                 }
                                             >
                                                 <MenuItem value="">
-                                                    <em>Select Immediate Boss</em>
+                                                    <em>{t('person.selectImmediateBoss')}</em>
                                                 </MenuItem>
                                                 {(immediateBossDropdown?.options ?? []).map((opt) => (
                                                     <MenuItem key={opt.key} value={opt.key}>
@@ -316,7 +318,7 @@ const AddPersonDialog: React.FC<PersonDialogProps> = ({
                                     variant="contained"
                                     type="submit"
                                 >
-                                    Save
+                                    {t('common.save')}
                                 </Button>
                             </DialogActions>
                         </form>

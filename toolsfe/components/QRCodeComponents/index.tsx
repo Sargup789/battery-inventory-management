@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'next-i18next';
 import axios from 'axios';
 import { Box, Button, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
 import QRCode from 'react-qr-code';
@@ -13,6 +14,7 @@ interface QRCodeData {
 }
 
 const QRCodeIndex = () => {
+    const { t } = useTranslation('common');
     const [quantity, setQuantity] = useState("");
     const [qrCodes, setQrCodes] = useState<QRCodeData[]>([]);
     const [printDialogOpen, setPrintDialogOpen] = useState(false);
@@ -40,7 +42,7 @@ const QRCodeIndex = () => {
                 link.click();
             })
             .catch((error) => {
-                console.error('oops, something went wrong!', error);
+                console.error(t('qrCode.errorGenerate'), error);
             });
     };
 
@@ -52,13 +54,13 @@ const QRCodeIndex = () => {
 
     return (
         <Box sx={{ padding: 3, backgroundColor: 'white', borderRadius: 2 }}>
-            <Typography variant="h6" marginBottom={2}>Generate QR Code</Typography>
+            <Typography variant="h6" marginBottom={2}>{t('qrCode.generateQrCode')}</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
                 <TextField
                     type="number"
                     value={quantity}
                     onChange={handleQuantityChange}
-                    label="Quantity"
+                    label={t('qrCode.quantity')}
                     size='small'
                     variant="outlined"
                     sx={{ marginRight: 1, flexGrow: 0.5 }}
@@ -72,7 +74,7 @@ const QRCodeIndex = () => {
                     }}
                     onClick={handleGenerate}
                 >
-                    Generate
+                    {t('common.generate')}
                 </Button>
             </Box>
 
@@ -81,9 +83,9 @@ const QRCodeIndex = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell>Code</TableCell>
-                                <TableCell>QR Code</TableCell>
-                                <TableCell>Actions</TableCell>
+                                <TableCell>{t('qrCode.code')}</TableCell>
+                                <TableCell>{t('qrCode.qrCode')}</TableCell>
+                                <TableCell>{t('common.actions')}</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -108,7 +110,7 @@ const QRCodeIndex = () => {
                                             }}
                                             onClick={() => handleSave(qrCode.code)}
                                         >
-                                            Save
+                                            {t('common.save')}
                                         </Button>
                                         <Button
                                             variant="contained"
@@ -120,7 +122,7 @@ const QRCodeIndex = () => {
                                             }}
                                             onClick={() => handlePrint(qrCode.code)}
                                         >
-                                            Print
+                                            {t('common.print')}
                                         </Button>
                                     </TableCell>
 

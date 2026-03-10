@@ -2,6 +2,7 @@ import { UserData } from "@/pages/user";
 import { HighlightOff } from "@mui/icons-material";
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { Field, Form } from "react-final-form";
+import { useTranslation } from 'next-i18next';
 
 
 
@@ -17,6 +18,7 @@ const AddUserDialog: React.FC<UserDialogProps> = ({
     userDialogData,
     onSubmit,
 }) => {
+    const { t } = useTranslation('common');
     return (
         <Dialog maxWidth="sm" fullWidth open={open} onClose={handleClose}>
             <DialogTitle
@@ -32,7 +34,7 @@ const AddUserDialog: React.FC<UserDialogProps> = ({
                         alignItems: "center",
                     }}
                 >
-                    Add User
+                    {t('user.addUser')}
                 </Box>
                 <IconButton
                     children={<HighlightOff />}
@@ -59,12 +61,12 @@ const AddUserDialog: React.FC<UserDialogProps> = ({
                                 <Field name="username">
                                     {({ input }) => (
                                         <Box>
-                                            <Typography className="label">Username</Typography>
+                                            <Typography className="label">{t('user.username')}</Typography>
                                             <TextField
                                                 {...input}
                                                 fullWidth
                                                 size="small"
-                                                placeholder="Enter username"
+                                                placeholder={t('user.enterUsername')}
                                             />
                                         </Box>
                                     )}
@@ -72,12 +74,12 @@ const AddUserDialog: React.FC<UserDialogProps> = ({
                                 <Field name="password">
                                     {({ input }) => (
                                         <Box>
-                                            <Typography className="label">Password</Typography>
+                                            <Typography className="label">{t('user.password')}</Typography>
                                             <TextField
                                                 {...input}
                                                 fullWidth
                                                 size="small"
-                                                placeholder="Enter password"
+                                                placeholder={t('user.enterPassword')}
                                             />
                                         </Box>
                                     )}
@@ -85,11 +87,11 @@ const AddUserDialog: React.FC<UserDialogProps> = ({
                                 <Field name="role">
                                     {({ input }) => (
                                         <Box>
-                                            <Typography className="label">Role</Typography>
+                                            <Typography className="label">{t('user.role')}</Typography>
                                             <Select {...input} fullWidth>
-                                                <MenuItem value="administrator">Administrator</MenuItem>
-                                                <MenuItem value="editor">Manager</MenuItem>
-                                                <MenuItem value="viewer">Operator</MenuItem>
+                                                <MenuItem value="administrator">{t('user.administrator')}</MenuItem>
+                                                <MenuItem value="editor">{t('user.manager')}</MenuItem>
+                                                <MenuItem value="viewer">{t('user.operator')}</MenuItem>
                                             </Select>
                                         </Box>
                                     )}
@@ -105,7 +107,7 @@ const AddUserDialog: React.FC<UserDialogProps> = ({
                                     variant="contained"
                                     type="submit"
                                 >
-                                    Save
+                                    {t('common.save')}
                                 </Button>
                             </DialogActions>
                         </form>

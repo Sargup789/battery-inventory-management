@@ -1,5 +1,6 @@
 import { Box, Button, Typography } from "@mui/material";
 import { useState } from "react";
+import { useTranslation } from 'next-i18next';
 import { QueryClient, QueryClientProvider } from "react-query";
 import AddPersonDialog, { PersonData } from "./AddPersonDialog";
 import PersonTable from "./PersonTable";
@@ -33,6 +34,7 @@ const PersonIndex = ({
     filters,
     onFiltersChange,
 }: Props) => {
+    const { t } = useTranslation('common');
     const [addPersonDialogOpen, setAddPersonDialogOpen] = useState(false);
     const [personDialogData, setPersonDialogData] = useState<PersonData | {}>({});
     const [showFilters, setShowFilters] = useState(false);
@@ -64,18 +66,18 @@ const PersonIndex = ({
                         emailId: rest.emailId,
                     }
                 );
-                toast.success("Successfully updated person");
+                toast.success(t('person.updateSuccess'));
             } catch (error) {
                 console.error(error);
-                toast.error("Failed to update person");
+                toast.error(t('person.updateFailed'));
             }
         } else {
             try {
                 await axios.post(`/api/router?path=api/persons`, payload);
-                toast.success("Successfully created person");
+                toast.success(t('person.createSuccess'));
             } catch (error) {
                 console.error(error);
-                toast.error("Failed to create person");
+                toast.error(t('person.createFailed'));
             }
         }
         handleClose();
@@ -97,7 +99,7 @@ const PersonIndex = ({
                         variant="contained"
                         onClick={() => setShowFilters(prev => !prev)}
                     >
-                        {showFilters ? "Hide Filters" : "Show Filters"}
+                        {showFilters ? t('common.hideFilters') : t('common.showFilters')}
                     </Button>
                     <Typography align='left' style={{ display: 'flex', alignItems: 'center' }}>
                         <Button
@@ -109,7 +111,7 @@ const PersonIndex = ({
                             variant="contained"
                             onClick={() => setAddPersonDialogOpen(true)}
                         >
-                            Add Person
+                            {t('person.addPerson')}
                         </Button>
                     </Typography>
                 </Box>

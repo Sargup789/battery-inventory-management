@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useTranslation } from 'next-i18next';
 import { QrReader } from "react-qr-reader";
 import {
   Box,
@@ -15,6 +16,7 @@ import { ToolData } from "@/pages/tools";
 import moment from "moment";
 
 const CheckToolStatusForm: React.FC = () => {
+  const { t } = useTranslation('common');
   const [qrCode, setQrCode] = useState("");
   const [isScanning, setIsScanning] = useState(false);
   const [tool, setTool] = useState<ToolData | null>(null);
@@ -28,13 +30,13 @@ const CheckToolStatusForm: React.FC = () => {
       const response = await axios.get(`/api/router?path=api/truck/qrCode/${scannedCode}`);
       setTool(response.data);
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Error fetching tool status.");
+      toast.error(error?.response?.data?.message || t('toolStatus.fetchError'));
     }
   };
 
   return (
     <Box p={3} bgcolor="white" boxShadow={2}>
-      <Typography variant="h5">Check Tool Status</Typography>
+      <Typography variant="h5">{t('toolStatus.checkToolStatus')}</Typography>
       {isScanning ? (
         <div>
           <QrReader
@@ -43,11 +45,11 @@ const CheckToolStatusForm: React.FC = () => {
             // @ts-ignore
             style={{ width: "40%", height: "40%" }}
           />
-          <Button onClick={() => setIsScanning(false)}>Close Scanner</Button>
+          <Button onClick={() => setIsScanning(false)}>{t('toolStatus.closeScanner')}</Button>
         </div>
       ) : (
         <TextField
-          label="Scan QR Code"
+          label={t('toolStatus.scanQrCode')}
           value={qrCode}
           margin="normal"
           fullWidth
@@ -55,7 +57,7 @@ const CheckToolStatusForm: React.FC = () => {
             endAdornment: (
               <>
                 <InputAdornment position="end">
-                  <Button onClick={() => setIsScanning(true)}>Scan</Button>
+                  <Button onClick={() => setIsScanning(true)}>{t('common.scan')}</Button>
                 </InputAdornment>
                 <InputAdornment position="end">
                   <IconButton
@@ -75,39 +77,39 @@ const CheckToolStatusForm: React.FC = () => {
 
       {tool && (
         <Box mt={2} display="flex" flexDirection="column" gap={1}>
-          <Typography variant="h6">Tool Details</Typography>
-          <Typography>QR Code ID: {tool.qrCodeId || "N/A"}</Typography>
-          <Typography>Tool ID: {tool.toolId || "N/A"}</Typography>
-          <Typography>Part Number: {tool.partNumber || "N/A"}</Typography>
-          <Typography>Tool Name: {tool.toolName || "N/A"}</Typography>
-          <Typography>Tool Description: {tool.toolDescription || "N/A"}</Typography>
-          <Typography>Supplier: {tool.supplier || "N/A"}</Typography>
-          <Typography>Status: {tool.status || "N/A"}</Typography>
-          <Typography>Assigned Person: {(tool as any).assignedPerson || "N/A"}</Typography>
+          <Typography variant="h6">{t('toolStatus.toolDetails')}</Typography>
+          <Typography>{t('toolStatus.qrCodeId')}: {tool.qrCodeId || t('common.na')}</Typography>
+          <Typography>{t('tool.toolId')}: {tool.toolId || t('common.na')}</Typography>
+          <Typography>{t('tool.partNumber')}: {tool.partNumber || t('common.na')}</Typography>
+          <Typography>{t('tool.toolName')}: {tool.toolName || t('common.na')}</Typography>
+          <Typography>{t('tool.toolDescription')}: {tool.toolDescription || t('common.na')}</Typography>
+          <Typography>{t('tool.supplier')}: {tool.supplier || t('common.na')}</Typography>
+          <Typography>{t('common.status')}: {tool.status || t('common.na')}</Typography>
+          <Typography>{t('tool.assignedPerson')}: {(tool as any).assignedPerson || t('common.na')}</Typography>
           <Typography>
-            Person Designation: {(tool as any).assignedPersonDesignation || "N/A"}
+            {t('tool.personDesignation')}: {(tool as any).assignedPersonDesignation || t('common.na')}
           </Typography>
-          <Typography>Person Email: {(tool as any).assignedPersonEmail || "N/A"}</Typography>
+          <Typography>{t('tool.personEmail')}: {(tool as any).assignedPersonEmail || t('common.na')}</Typography>
           <Typography>
-            Person Phone: {(tool as any).assignedPersonPhoneNumber || "N/A"}
+            {t('tool.personPhone')}: {(tool as any).assignedPersonPhoneNumber || t('common.na')}
           </Typography>
-          <Typography>Assigned Location: {(tool as any).assignedLocation || "N/A"}</Typography>
+          <Typography>{t('tool.assignedLocation')}: {(tool as any).assignedLocation || t('common.na')}</Typography>
           <Typography>
-            Location Type: {(tool as any).assignedLocationType || "N/A"}
-          </Typography>
-          <Typography>
-            Location City: {(tool as any).assignedLocationCity || "N/A"}
+            {t('tool.locationType')}: {(tool as any).assignedLocationType || t('common.na')}
           </Typography>
           <Typography>
-            Location State: {(tool as any).assignedLocationState || "N/A"}
+            {t('tool.locationCity')}: {(tool as any).assignedLocationCity || t('common.na')}
           </Typography>
           <Typography>
-            Created At:{" "}
-            {tool.createdAt ? moment(tool.createdAt).format("MMM DD, YYYY HH:mm") : "N/A"}
+            {t('tool.locationState')}: {(tool as any).assignedLocationState || t('common.na')}
           </Typography>
           <Typography>
-            Updated At:{" "}
-            {tool.updatedAt ? moment(tool.updatedAt).format("MMM DD, YYYY HH:mm") : "N/A"}
+            {t('toolStatus.createdAt')}:{" "}
+            {tool.createdAt ? moment(tool.createdAt).format("MMM DD, YYYY HH:mm") : t('common.na')}
+          </Typography>
+          <Typography>
+            {t('toolStatus.updatedAt')}:{" "}
+            {tool.updatedAt ? moment(tool.updatedAt).format("MMM DD, YYYY HH:mm") : t('common.na')}
           </Typography>
         </Box>
       )}

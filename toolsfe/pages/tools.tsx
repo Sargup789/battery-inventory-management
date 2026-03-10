@@ -6,6 +6,8 @@ import { ZoneData } from "./location";
 import React from "react";
 import withLogin from "@/components/general/withLogin";
 import { toast } from "react-toastify";
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 
 export interface ToolApiResponse {
   totalCount: number;
@@ -148,6 +150,7 @@ export const fetchTools = async (page = 1, size = 10, filters: ToolFilters = {})
 };
 
 const Tools = () => {
+  const { t } = useTranslation('common');
   const [page, setPage] = React.useState(1);
   const [size, setSize] = React.useState(10);
   const [filters, setFilters] = React.useState<ToolFilters>({});
@@ -174,10 +177,10 @@ const Tools = () => {
   const deleteTool = async (id: string) => {
     try {
       await axios.delete(`/api/router?path=api/tools/${id}`);
-      toast.success("Successfully deleted tool");
+      toast.success(t('tool.deleteSuccess'));
       refetch();
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to delete tool");
+      toast.error(error?.response?.data?.message || t('tool.deleteFailed'));
     }
   };
 
@@ -185,7 +188,7 @@ const Tools = () => {
     <Layout>
 
       {isLoading || !tools ? (
-        "Loading..."
+        t('common.loading')
       ) : (
         <TruckIndex
           toolApidata={tools}
@@ -201,5 +204,11 @@ const Tools = () => {
     </Layout>
   )
 }
+
+export const getStaticProps = async ({ locale }: { locale: string }) => ({
+  props: {
+    ...(await serverSideTranslations(locale, ['common'])),
+  },
+});
 
 export default withLogin(Tools)

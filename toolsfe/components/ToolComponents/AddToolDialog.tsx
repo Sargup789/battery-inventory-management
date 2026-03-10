@@ -22,6 +22,7 @@ import AutorenewIcon from "@mui/icons-material/Autorenew";
 import { Field, Form } from "react-final-form";
 import { QrReader } from "react-qr-reader";
 import axios from "axios";
+import { useTranslation } from 'next-i18next';
 import { DropdownMaster } from "../types";
 
 type ToolFormValues = {
@@ -94,6 +95,7 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
     toolDialogData,
     onSubmit,
 }) => {
+    const { t } = useTranslation('common');
     const isEditMode = useMemo(() => Object.keys(toolDialogData || {}).length > 0, [toolDialogData]);
     const [isScanning, setIsScanning] = useState(false);
     const [dropdowns, setDropdowns] = useState<DropdownMaster[]>([]);
@@ -183,11 +185,11 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
 
     const validate = (values: ToolFormValues) => {
         const errors: Partial<Record<keyof ToolFormValues, string>> = {};
-        if (!values.qrCodeId) errors.qrCodeId = "Required";
-        if (!values.toolId) errors.toolId = "Required";
-        if (!values.partNumber) errors.partNumber = "Required";
-        if (!values.toolName) errors.toolName = "Required";
-        if (!values.supplier) errors.supplier = "Required";
+        if (!values.qrCodeId) errors.qrCodeId = t('common.required');
+        if (!values.toolId) errors.toolId = t('common.required');
+        if (!values.partNumber) errors.partNumber = t('common.required');
+        if (!values.toolName) errors.toolName = t('common.required');
+        if (!values.supplier) errors.supplier = t('common.required');
         return errors;
     };
 
@@ -201,7 +203,7 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
                 }}
             >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
-                    {isEditMode ? "Edit" : "Add"} Tool
+                    {isEditMode ? t('common.edit') : t('common.add')} {t('tool.tool')}
                 </Box>
                 <IconButton
                     children={<HighlightOff />}
@@ -233,13 +235,13 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
                                 <Field<string> name="qrCodeId">
                                     {({ input, meta }) => (
                                         <Box>
-                                            <Typography className="label">Scanned QR Code</Typography>
+                                            <Typography className="label">{t('tool.scannedQrCode')}</Typography>
                                             <TextField
                                                 {...input}
                                                 fullWidth
                                                 size="small"
                                                 disabled={isViewMode || isEditMode}
-                                                placeholder="Scan QR Code"
+                                                placeholder={t('tool.scanQrCode')}
                                                 error={meta.touched && !!meta.error}
                                                 helperText={meta.touched && meta.error ? meta.error : " "}
                                                 InputProps={{
@@ -249,7 +251,7 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
                                                                 <IconButton
                                                                     onClick={() => setIsScanning((s) => !s)}
                                                                     disabled={isViewMode || isEditMode}
-                                                                    title="Scan QR"
+                                                                    title={t('tool.scanQr')}
                                                                 >
                                                                     <QrCodeScannerIcon />
                                                                 </IconButton>
@@ -258,7 +260,7 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
                                                                 <IconButton
                                                                     onClick={() => form.change("qrCodeId", "")}
                                                                     disabled={isViewMode || isEditMode}
-                                                                    title="Clear"
+                                                                    title={t('common.clear')}
                                                                 >
                                                                     <ClearIcon />
                                                                 </IconButton>
@@ -270,7 +272,7 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
                                             {isScanning && (
                                                 <Box sx={{ mt: 2 }}>
                                                     <Typography variant="body2" sx={{ mb: 1 }}>
-                                                        Scan QR Code to fill Scanned QR Code
+                                                        {t('tool.scanQrToFill')}
                                                     </Typography>
                                                     <QrReader
                                                         onResult={handleScanResult}
@@ -278,7 +280,7 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
                                                         containerStyle={{ width: "100%" }}
                                                     />
                                                     <Button sx={{ mt: 1 }} onClick={() => setIsScanning(false)}>
-                                                        Close Scanner
+                                                        {t('tool.closeScanner')}
                                                     </Button>
                                                 </Box>
                                             )}
@@ -289,15 +291,15 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
                                 <Field<string> name="toolId">
                                     {({ input, meta }) => (
                                         <Box>
-                                            <Typography className="label">Tool ID</Typography>
+                                            <Typography className="label">{t('tool.toolId')}</Typography>
                                             <TextField
                                                 {...input}
                                                 fullWidth
                                                 size="small"
                                                 disabled
-                                                placeholder="Auto-generated"
+                                                placeholder={t('tool.autoGenerated')}
                                                 error={meta.touched && !!meta.error}
-                                                helperText={meta.touched && meta.error ? meta.error : "6-character alphanumeric"}
+                                                helperText={meta.touched && meta.error ? meta.error : t('tool.sixCharAlphanumeric')}
                                                 InputProps={{
                                                     endAdornment: (
                                                         <>
@@ -305,7 +307,7 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
                                                                 <IconButton
                                                                     onClick={() => form.change("toolId", generateToolId())}
                                                                     disabled={isViewMode || isEditMode}
-                                                                    title="Generate new Tool ID"
+                                                                    title={t('tool.generateNewToolId')}
                                                                 >
                                                                     <AutorenewIcon />
                                                                 </IconButton>
@@ -314,7 +316,7 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
                                                                 <IconButton
                                                                     onClick={() => form.change("toolId", "")}
                                                                     disabled={isViewMode || isEditMode}
-                                                                    title="Clear"
+                                                                    title={t('common.clear')}
                                                                 >
                                                                     <ClearIcon />
                                                                 </IconButton>
@@ -330,13 +332,13 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
                                 <Field<string> name="partNumber">
                                     {({ input, meta }) => (
                                         <Box>
-                                            <Typography className="label">Part Number</Typography>
+                                            <Typography className="label">{t('tool.partNumber')}</Typography>
                                             <TextField
                                                 {...input}
                                                 fullWidth
                                                 size="small"
                                                 disabled={isViewMode}
-                                                placeholder="Enter part number"
+                                                placeholder={t('tool.enterPartNumber')}
                                                 error={meta.touched && !!meta.error}
                                                 helperText={meta.touched && meta.error ? meta.error : " "}
                                             />
@@ -347,13 +349,13 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
                                 <Field<string> name="toolName">
                                     {({ input, meta }) => (
                                         <Box>
-                                            <Typography className="label">Tool Name</Typography>
+                                            <Typography className="label">{t('tool.toolName')}</Typography>
                                             <TextField
                                                 {...input}
                                                 fullWidth
                                                 size="small"
                                                 disabled={isViewMode}
-                                                placeholder="Enter tool name"
+                                                placeholder={t('tool.enterToolName')}
                                                 error={meta.touched && !!meta.error}
                                                 helperText={meta.touched && meta.error ? meta.error : " "}
                                             />
@@ -364,7 +366,7 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
                                 <Field<string> name="supplier">
                                     {({ input, meta }) => (
                                         <Box>
-                                            <Typography className="label">Supplier</Typography>
+                                            <Typography className="label">{t('tool.supplier')}</Typography>
                                             <FormControl fullWidth size="small" error={meta.touched && !!meta.error}>
                                                 <Select
                                                     {...input}
@@ -373,11 +375,11 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
                                                     renderValue={(selected) =>
                                                         selected
                                                             ? getOptionLabel(supplierDropdown?.options, selected as string)
-                                                            : "Select supplier"
+                                                            : t('tool.selectSupplier')
                                                     }
                                                 >
                                                     <MenuItem value="">
-                                                        <em>Select supplier</em>
+                                                        <em>{t('tool.selectSupplier')}</em>
                                                     </MenuItem>
                                                     {(supplierDropdown?.options ?? []).map((opt) => (
                                                         <MenuItem key={opt.key} value={opt.key}>
@@ -392,7 +394,7 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
                                                 </Typography>
                                             ) : (
                                                 <Typography variant="caption" color="text.secondary">
-                                                    From Dropdown Master
+                                                    {t('tool.fromDropdownMaster')}
                                                 </Typography>
                                             )}
                                         </Box>
@@ -403,13 +405,13 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
                                     <Field<string> name="toolDescription">
                                         {({ input }) => (
                                             <Box>
-                                                <Typography className="label">Tool Description</Typography>
+                                                <Typography className="label">{t('tool.toolDescription')}</Typography>
                                                 <TextField
                                                     {...input}
                                                     fullWidth
                                                     size="small"
                                                     disabled={isViewMode}
-                                                    placeholder="Enter tool description"
+                                                    placeholder={t('tool.enterToolDescription')}
                                                     multiline
                                                     minRows={3}
                                                 />
@@ -431,7 +433,7 @@ const AddToolDialog: React.FC<ToolDialogProps> = ({
                                         type="submit"
                                         disabled={submitting}
                                     >
-                                        Save
+                                        {t('common.save')}
                                     </Button>
                                 )}
                             </DialogActions>

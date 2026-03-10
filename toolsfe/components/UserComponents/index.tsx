@@ -1,5 +1,6 @@
 import { Button } from "@mui/material"
 import { useState } from "react";
+import { useTranslation } from 'next-i18next';
 import AddUserDialog from "./AddUserDialog";
 import UserTable from "./Usertable"
 import { UserApiResponse, UserData } from "@/pages/user";
@@ -19,6 +20,7 @@ type Props = {
 const queryClient = new QueryClient();
 
 const UserIndex = ({ userApiData, deleteUser, refetch, setPage, setSize, page, size }: Props) => {
+  const { t } = useTranslation('common');
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
   const [userDialogData, setUserDialogData] = useState<UserData | {}>({});
 
@@ -61,7 +63,7 @@ const UserIndex = ({ userApiData, deleteUser, refetch, setPage, setSize, page, s
             variant="contained"
             onClick={() => setAddUserDialogOpen(true)}
           >
-            Add User
+            {t('user.addUser')}
           </Button>
         </div>
         <UserTable

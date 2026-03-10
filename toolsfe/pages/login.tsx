@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, TextField, Button, DialogActions, Typography, Box } from "@mui/material";
 import axios from 'axios';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { setTokenCookie } from '@/lib/auth-cookie';
 import { toast } from 'react-toastify';
@@ -13,6 +15,7 @@ export interface PasswordData {
 }
 
 const LoginModal: React.FC = () => {
+    const { t } = useTranslation('common');
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
@@ -32,7 +35,7 @@ const LoginModal: React.FC = () => {
             setPassword(data.newPassword)
             handleLogin()
         } catch (error: any) {
-            toast.error(error.response?.data?.message || 'Reset password failed');
+            toast.error(error.response?.data?.message || t('login.resetFailed'));
             console.error(error);
         }
         finally {
@@ -60,7 +63,7 @@ const LoginModal: React.FC = () => {
                 router.push('/');
             }
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Login failed');
+            setError(err.response?.data?.message || t('login.loginFailed'));
         }
     };
 
@@ -70,17 +73,17 @@ const LoginModal: React.FC = () => {
                 <DialogTitle>
                     <img
                         src={"/images/ttcm.jpeg"}
-                        alt="Logo"
+                        alt={t('login.logo')}
                         style={{  width: '100%', height: '150px', display: 'flex', alignItems: 'center' }}
                     />
-                    <h2>Login</h2>
-                    <p>Sign In to your account</p>
+                    <h2>{t('login.title')}</h2>
+                    <p>{t('login.subtitle')}</p>
                 </DialogTitle>
                 <DialogContent>
                     <TextField
                         autoFocus
                         margin="dense"
-                        label="Username"
+                        label={t('login.username')}
                         type="text"
                         fullWidth
                         value={username}
@@ -88,7 +91,7 @@ const LoginModal: React.FC = () => {
                     />
                     <TextField
                         margin="dense"
-                        label="Password"
+                        label={t('login.password')}
                         type="password"
                         fullWidth
                         value={password}
@@ -107,7 +110,7 @@ const LoginModal: React.FC = () => {
                             }}
                             variant="contained"
                         >
-                            Reset Password
+                            {t('login.resetPassword')}
                         </Button>
                         <Button
                             style={{
@@ -118,7 +121,7 @@ const LoginModal: React.FC = () => {
                             onClick={handleLogin}
                             variant="contained"
                         >
-                            Login
+                            {t('login.loginButton')}
                         </Button>
                     </Box>
                 </DialogActions>
@@ -132,5 +135,11 @@ const LoginModal: React.FC = () => {
         </>
     );
 }
+
+export const getStaticProps = async ({ locale }: { locale: string }) => ({
+  props: {
+    ...(await serverSideTranslations(locale, ['common'])),
+  },
+});
 
 export default LoginModal;

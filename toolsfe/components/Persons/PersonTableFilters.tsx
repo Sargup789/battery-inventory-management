@@ -2,6 +2,7 @@ import { Box, FormControl, IconButton, InputLabel, MenuItem, Select } from '@mui
 import axios from 'axios';
 import ClearIcon from '@mui/icons-material/Clear';
 import React from 'react';
+import { useTranslation } from 'next-i18next';
 import { UseQueryResult, useQuery } from 'react-query';
 import { PersonFilters } from '@/pages/persons';
 
@@ -59,6 +60,7 @@ const FilterFormControl = ({ label, values, selectedValue, onFilterChange, onCle
 )
 
 const PersonTableFilters = ({ filtersState, setFilterState }: Props) => {
+    const { t } = useTranslation('common');
 
     const {
         data: filters,
@@ -83,28 +85,28 @@ const PersonTableFilters = ({ filtersState, setFilterState }: Props) => {
         <div style={{ padding: '10px' }}>
             <Box sx={{ display: 'flex', width: '100%' }}>
                 <FilterFormControl
-                    label="Name"
+                    label={t('common.name')}
                     values={filters?.names}
                     selectedValue={filtersState?.name}
                     onFilterChange={(value) => handleFilterStateChange('name', value)}
                     onClearClick={() => handleClearClick('name')}
                 />
                 <FilterFormControl
-                    label="Employee ID"
+                    label={t('person.employeeId')}
                     values={filters?.employeeIds}
                     selectedValue={filtersState?.employeeId}
                     onFilterChange={(value) => handleFilterStateChange('employeeId', value)}
                     onClearClick={() => handleClearClick('employeeId')}
                 />
                 <FilterFormControl
-                    label="Designation"
+                    label={t('person.designation')}
                     values={filters?.designations?.length ? filters.designations : filters?.designationDropdown}
                     selectedValue={filtersState?.designation}
                     onFilterChange={(value) => handleFilterStateChange('designation', value)}
                     onClearClick={() => handleClearClick('designation')}
                 />
                 <FilterFormControl
-                    label="Email"
+                    label={t('person.emailId')}
                     values={filters?.emails}
                     selectedValue={filtersState?.email}
                     onFilterChange={(value) => handleFilterStateChange('email', value)}
@@ -114,14 +116,14 @@ const PersonTableFilters = ({ filtersState, setFilterState }: Props) => {
             <br />
             <Box sx={{ display: 'flex', width: '100%' }}>
                 <FilterFormControl
-                    label="Phone Number"
+                    label={t('person.phoneNumber')}
                     values={filters?.phoneNumbers}
                     selectedValue={filtersState?.phoneNumber}
                     onFilterChange={(value) => handleFilterStateChange('phoneNumber', value)}
                     onClearClick={() => handleClearClick('phoneNumber')}
                 />
                 <FilterFormControl
-                    label="Immediate Boss"
+                    label={t('person.immediateBoss')}
                     values={filters?.immediateBosses?.length ? filters.immediateBosses : filters?.immediateBossDropdown}
                     selectedValue={filtersState?.immediateBoss}
                     onFilterChange={(value) => handleFilterStateChange('immediateBoss', value)}

@@ -7,6 +7,7 @@ import {
   GridRenderCellParams,
 } from "@mui/x-data-grid";
 import * as React from "react";
+import { useTranslation } from 'next-i18next';
 
 interface Props {
   zoneData: ZoneData[];
@@ -27,10 +28,11 @@ const LocationTable: React.FC<Props> = ({
   page,
   size,
 }) => {
+  const { t } = useTranslation('common');
   const columns: GridColDef[] = [
     {
       field: "name",
-      headerName: "Name",
+      headerName: t('common.name'),
       flex: 1,
       align: 'center',
       headerAlign: 'center',
@@ -38,7 +40,7 @@ const LocationTable: React.FC<Props> = ({
     },
     {
       field: "type",
-      headerName: "Type",
+      headerName: t('common.type'),
       flex: 1,
       align: 'center',
       headerAlign: 'center',
@@ -46,7 +48,7 @@ const LocationTable: React.FC<Props> = ({
     },
     {
       field: "city",
-      headerName: "City",
+      headerName: t('common.city'),
       flex: 1,
       align: 'center',
       headerAlign: 'center',
@@ -54,7 +56,7 @@ const LocationTable: React.FC<Props> = ({
     },
     {
       field: "state",
-      headerName: "State",
+      headerName: t('common.state'),
       flex: 1,
       align: 'center',
       headerAlign: 'center',
@@ -62,7 +64,7 @@ const LocationTable: React.FC<Props> = ({
     },
     {
       field: "toolsCount",
-      headerName: "Tools Assigned",
+      headerName: t('location.toolsAssigned'),
       type: "number",
       flex: 1,  
       align: 'center',
@@ -71,7 +73,7 @@ const LocationTable: React.FC<Props> = ({
     },
     {
       field: "actions",
-      headerName: "Actions",
+      headerName: t('common.actions'),
       align: 'center',
       headerAlign: 'center',
       sortable: false,
@@ -79,12 +81,12 @@ const LocationTable: React.FC<Props> = ({
       minWidth: 130,
       renderCell: (params: GridRenderCellParams<ZoneData>) => (
         <>
-          <Tooltip title="Edit" followCursor>
+          <Tooltip title={t('common.edit')} followCursor>
             <IconButton size="small" onClick={() => editZone(params.row)}>
               <EditOutlined fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Delete" followCursor>
+          <Tooltip title={t('common.delete')} followCursor>
             <IconButton size="small" onClick={() => deleteZone(params.row.id)}>
               <DeleteOutline fontSize="small" />
             </IconButton>

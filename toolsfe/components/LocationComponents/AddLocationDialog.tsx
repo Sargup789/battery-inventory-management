@@ -15,6 +15,7 @@ import {
 import { Form, Field } from "react-final-form";
 import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from 'next-i18next';
 import { DropdownMaster } from "../types";
 
 interface ZoneDialogProps {
@@ -61,6 +62,7 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
   parentZones: _parentZones,
   onSubmit,
 }) => {
+  const { t } = useTranslation('common');
   const isEditMode = Object.keys(locationDialogData).length > 0;
   const [dropdowns, setDropdowns] = useState<DropdownMaster[]>([]);
 
@@ -146,7 +148,7 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
             alignItems: "center",
           }}
         >
-          {isEditMode ? "Edit" : "Add"} Location
+          {isEditMode ? t('common.edit') : t('common.add')} {t('location.location')}
         </Box>
         <IconButton
           children={<HighlightOff />}
@@ -166,10 +168,10 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
           }}
           validate={(values: LocationFormValues) => {
             const errors: Partial<Record<keyof LocationFormValues, string>> = {};
-            if (!values.name) errors.name = "Required";
-            if (!values.type) errors.type = "Required";
-            if (!values.city) errors.city = "Required";
-            if (!values.state) errors.state = "Required";
+            if (!values.name) errors.name = t('common.required');
+            if (!values.type) errors.type = t('common.required');
+            if (!values.city) errors.city = t('common.required');
+            if (!values.state) errors.state = t('common.required');
             return errors;
           }}
           onSubmit={(values: any) => onSubmit(getDefaultPayload(values as LocationFormValues))}
@@ -194,7 +196,7 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
                 <Field name="name">
                   {({ input, meta }) => (
                     <Box>
-                      <Typography className="label">Name</Typography>
+                      <Typography className="label">{t('common.name')}</Typography>
                       <Select
                         {...input}
                         fullWidth
@@ -204,11 +206,11 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
                         renderValue={(selected) =>
                           selected
                             ? String(selected)
-                            : "Select Name"
+                            : t('location.selectName')
                         }
                       >
                         <MenuItem value="">
-                          <em>Select Name</em>
+                          <em>{t('location.selectName')}</em>
                         </MenuItem>
                         {(locationNameDropdown?.options ?? []).map((opt) => (
                           <MenuItem key={opt.key} value={opt.key}>
@@ -228,7 +230,7 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
                 <Field name="type">
                   {({ input, meta }) => (
                     <Box>
-                      <Typography className="label">Type</Typography>
+                      <Typography className="label">{t('common.type')}</Typography>
                       <Select
                         {...input}
                         fullWidth
@@ -238,11 +240,11 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
                         renderValue={(selected) =>
                           selected
                             ? getOptionLabel(locationTypeDropdown?.options, selected as string)
-                            : "Select Type"
+                            : t('location.selectType')
                         }
                       >
                         <MenuItem value="">
-                          <em>Select Type</em>
+                          <em>{t('location.selectType')}</em>
                         </MenuItem>
                         {(locationTypeDropdown?.options ?? []).map((opt) => (
                           <MenuItem key={opt.key} value={opt.key}>
@@ -262,7 +264,7 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
                 <Field name="city">
                   {({ input, meta }) => (
                     <Box>
-                      <Typography className="label">City</Typography>
+                      <Typography className="label">{t('common.city')}</Typography>
                       <Select
                         {...input}
                         fullWidth
@@ -272,11 +274,11 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
                         renderValue={(selected) =>
                           selected
                             ? getOptionLabel(cityDropdown?.options, selected as string)
-                            : "Select City"
+                            : t('location.selectCity')
                         }
                       >
                         <MenuItem value="">
-                          <em>Select City</em>
+                          <em>{t('location.selectCity')}</em>
                         </MenuItem>
                         {(cityDropdown?.options ?? []).map((opt) => (
                           <MenuItem key={opt.key} value={opt.key}>
@@ -296,7 +298,7 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
                 <Field name="state">
                   {({ input, meta }) => (
                     <Box>
-                      <Typography className="label">State</Typography>
+                      <Typography className="label">{t('common.state')}</Typography>
                       <Select
                         {...input}
                         fullWidth
@@ -306,11 +308,11 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
                         renderValue={(selected) =>
                           selected
                             ? getOptionLabel(stateDropdown?.options, selected as string)
-                            : "Select State"
+                            : t('location.selectState')
                         }
                       >
                         <MenuItem value="">
-                          <em>Select State</em>
+                          <em>{t('location.selectState')}</em>
                         </MenuItem>
                         {(stateDropdown?.options ?? []).map((opt) => (
                           <MenuItem key={opt.key} value={opt.key}>
@@ -337,7 +339,7 @@ const AddLocationDialog: React.FC<ZoneDialogProps> = ({
                   variant="contained"
                   type="submit"
                 >
-                  Save
+                  {t('common.save')}
                 </Button>
               </DialogActions>
             </form>

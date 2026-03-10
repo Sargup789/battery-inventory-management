@@ -13,22 +13,23 @@ import { Box, CssBaseline, Divider, Drawer, IconButton, List, ListItem, ListItem
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import LogoutButton from './withLogout';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
 import React, { ReactNode } from 'react';
 import withLogin, { DecodedToken } from '@/components/general/withLogin';
 
 type Props = { children: ReactNode }
 
 const drawerItems = [
-  { name: 'Dashboard', path: '/', icon: <DashboardIcon /> },
-  { name: 'Tools', path: '/tools', icon: <HandymanIcon /> },
-  { name: 'Locations', path: '/location', icon: <CabinIcon /> },
-  { name: 'Persons', path: '/persons', icon: <PersonAddIcon /> },
-  { name: 'Assign Tools', path: '/assign', icon: <AssignmentIndIcon /> },
-  { name: 'Check-out Tool', path: '/checkout', icon: <KeyboardDoubleArrowUpRoundedIcon /> },
-  { name: 'Check-in Tool', path: '/checkin', icon: <KeyboardDoubleArrowDownRoundedIcon /> },
-  { name: 'Check Tool Status', path: '/checkstatus', icon: <ManageSearchIcon /> },
-  { name: 'Dropdown Master', path: '/dropdownmaster', icon: <ArrowDropDownCircleOutlinedIcon /> },
-  { name: 'Users', path: '/user', icon: <PeopleIcon /> },
+  { nameKey: 'nav.dashboard', path: '/', icon: <DashboardIcon /> },
+  { nameKey: 'nav.tools', path: '/tools', icon: <HandymanIcon /> },
+  { nameKey: 'nav.locations', path: '/location', icon: <CabinIcon /> },
+  { nameKey: 'nav.persons', path: '/persons', icon: <PersonAddIcon /> },
+  { nameKey: 'nav.assignTools', path: '/assign', icon: <AssignmentIndIcon /> },
+  { nameKey: 'nav.checkoutTool', path: '/checkout', icon: <KeyboardDoubleArrowUpRoundedIcon /> },
+  { nameKey: 'nav.checkinTool', path: '/checkin', icon: <KeyboardDoubleArrowDownRoundedIcon /> },
+  { nameKey: 'nav.checkToolStatus', path: '/checkstatus', icon: <ManageSearchIcon /> },
+  { nameKey: 'nav.dropdownMaster', path: '/dropdownmaster', icon: <ArrowDropDownCircleOutlinedIcon /> },
+  { nameKey: 'nav.users', path: '/user', icon: <PeopleIcon /> },
 ]
 
 const drawerWidth = 275;
@@ -86,6 +87,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 const Layout = ({ children }: Props & DecodedToken) => {
   const [open, setOpen] = React.useState(true);
   const router = useRouter()
+  const { t } = useTranslation('common');
 
   const togggleDrawer = () => {
     setOpen((open) => !open)
@@ -108,7 +110,7 @@ const Layout = ({ children }: Props & DecodedToken) => {
         >
           <IconButton
             color="inherit"
-            aria-label="open drawer"
+            aria-label={t('nav.openDrawer')}
             onClick={togggleDrawer}
             edge="start"
             sx={{ mr: 2 }}
@@ -120,7 +122,7 @@ const Layout = ({ children }: Props & DecodedToken) => {
             noWrap
             component="div"
             style={{ display: 'flex', justifyContent: 'space-between', width: "100%" }}>
-            Home
+            {t('nav.home')}
             <div>
               <LogoutButton />
             </div>
@@ -163,12 +165,12 @@ const Layout = ({ children }: Props & DecodedToken) => {
           }}
         >
           {drawerItems.map((item) => (
-            <ListItem key={item.name} disablePadding onClick={() => router.push(item.path)}>
+            <ListItem key={item.nameKey} disablePadding onClick={() => router.push(item.path)}>
               <ListItemButton>
                 <ListItemIcon>
                   {item.icon}
                 </ListItemIcon>
-                <ListItemText primary={item.name} />
+                <ListItemText primary={t(item.nameKey)} />
               </ListItemButton>
             </ListItem>
           ))

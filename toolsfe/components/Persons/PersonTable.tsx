@@ -7,6 +7,7 @@ import {
   GridRenderCellParams,
 } from "@mui/x-data-grid";
 import * as React from "react";
+import { useTranslation } from 'next-i18next';
 
 interface Props {
   personData: PersonData[];
@@ -27,10 +28,11 @@ const PersonTable: React.FC<Props> = ({
   page,
   size,
 }) => {
+  const { t } = useTranslation('common');
   const columns: GridColDef[] = [
     {
       field: "employeeId",
-      headerName: "Employee ID",
+      headerName: t('person.employeeId'),
       flex: 1,
       align: 'center',
       headerAlign: 'center',
@@ -38,7 +40,7 @@ const PersonTable: React.FC<Props> = ({
     },
     {
       field: "name",
-      headerName: "Name",
+      headerName: t('common.name'),
       flex: 1,
       align: 'center',
       headerAlign: 'center',
@@ -46,7 +48,7 @@ const PersonTable: React.FC<Props> = ({
     },
     {
       field: "designation",
-      headerName: "Designation",
+      headerName: t('person.designation'),
       flex: 1,
       align: 'center',
       headerAlign: 'center',
@@ -54,7 +56,7 @@ const PersonTable: React.FC<Props> = ({
     },
     {
       field: "emailId",
-      headerName: "Email ID",
+      headerName: t('person.emailId'),
       flex: 1,
       align: 'center',
       headerAlign: 'center',
@@ -62,7 +64,7 @@ const PersonTable: React.FC<Props> = ({
     },
     {
       field: "phoneNumber",
-      headerName: "Phone Number",
+      headerName: t('person.phoneNumber'),
       flex: 1,
       align: 'center',
       headerAlign: 'center',
@@ -70,16 +72,16 @@ const PersonTable: React.FC<Props> = ({
     },
     {
       field: "immediateBoss",
-      headerName: "Immediate Boss",
+      headerName: t('person.immediateBoss'),
       flex: 1,  
       align: 'center',
       headerAlign: 'center',
       minWidth: 180,
-      valueFormatter: (params) => params.value || "N/A",
+      valueFormatter: (params) => params.value || t('common.na'),
     },
     {
       field: "toolsCount",
-      headerName: "Tools Assigned",
+      headerName: t('person.toolsAssigned'),
       type: "number",
       flex: 1,
       align: 'center',
@@ -88,7 +90,7 @@ const PersonTable: React.FC<Props> = ({
     },
     {
       field: "actions",
-      headerName: "Actions",
+      headerName: t('common.actions'),
       align: 'center',
       headerAlign: 'center',
       sortable: false,
@@ -96,12 +98,12 @@ const PersonTable: React.FC<Props> = ({
       minWidth: 130,
       renderCell: (params: GridRenderCellParams<PersonData>) => (
         <>
-          <Tooltip title="Edit" followCursor>
+          <Tooltip title={t('common.edit')} followCursor>
             <IconButton size="small" onClick={() => editPerson(params.row)}>
               <EditOutlined fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Delete" followCursor>
+          <Tooltip title={t('common.delete')} followCursor>
             <IconButton
               size="small"
               onClick={() => deletePerson((params.row.id as string) || "")}

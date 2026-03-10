@@ -1,5 +1,6 @@
 import { Box, Button, Typography } from "@mui/material";
 import { useState } from "react";
+import { useTranslation } from 'next-i18next';
 import { QueryClient, QueryClientProvider } from "react-query";
 import AddLocationDialog from "./AddLocationDialog";
 import LocationTable from "./LocationTable";
@@ -23,6 +24,7 @@ type Props = {
 const queryClient = new QueryClient();
 
 const LocationIndex = ({ locationApiData, deleteZone, refetch, setPage, setSize, page, size, filters, onFiltersChange }: Props) => {
+  const { t } = useTranslation('common');
   const [addLocationDialogOpen, setAddLocationDialogOpen] = useState(false);
   const [locationDialogData, setLocationDialogData] = useState<ZoneData | {}>({});
   const [showFilters, setShowFilters] = useState(false);
@@ -60,7 +62,7 @@ const LocationIndex = ({ locationApiData, deleteZone, refetch, setPage, setSize,
         await axios.post(`/api/router?path=api/locations`, payload);
       } catch (error: any) {
         if (error?.response?.status === 409) {
-          toast.error("This location is already created");
+          toast.error(t('location.alreadyCreated'));
           return;
         }
         console.error(error);
@@ -85,7 +87,7 @@ const LocationIndex = ({ locationApiData, deleteZone, refetch, setPage, setSize,
             variant="contained"
             onClick={() => setShowFilters(prev => !prev)}
           >
-            {showFilters ? "Hide Filters" : "Show Filters"}
+            {showFilters ? t('common.hideFilters') : t('common.showFilters')}
           </Button>
           <Typography align='left' style={{ display: 'flex', alignItems: 'center' }}>
             <Button
@@ -97,7 +99,7 @@ const LocationIndex = ({ locationApiData, deleteZone, refetch, setPage, setSize,
               variant="contained"
               onClick={() => setAddLocationDialogOpen(true)}
             >
-              Add Location
+              {t('location.addLocation')}
             </Button>
           </Typography>
         </Box>

@@ -1,8 +1,10 @@
 import React from 'react';
 import { removeTokenCookie } from '@/lib/auth-cookie';
 import { Button } from '@mui/material';
+import { useTranslation } from 'next-i18next';
 
 const LogoutButton: React.FC = () => {
+    const { t } = useTranslation('common');
     const handleLogout = () => {
         removeTokenCookie(null);
         window.location.href = '/login';
@@ -16,7 +18,7 @@ const LogoutButton: React.FC = () => {
             }}
             variant="contained"
             onClick={handleLogout}
-        >Logout
+        >{t('nav.logout')}
         </Button>
     );
 }

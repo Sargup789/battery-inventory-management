@@ -2,6 +2,7 @@ import { Box, FormControl, IconButton, InputLabel, MenuItem, Select } from '@mui
 import axios from 'axios';
 import ClearIcon from '@mui/icons-material/Clear';
 import React from 'react';
+import { useTranslation } from 'next-i18next';
 import { UseQueryResult, useQuery } from 'react-query';
 import { LocationFilters } from '@/pages/location';
 
@@ -59,6 +60,7 @@ const FilterFormControl = ({ label, values, selectedValue, onFilterChange, onCle
 )
 
 const LocationTableFilters = ({ filtersState, setFilterState }: Props) => {
+    const { t } = useTranslation('common');
 
     const {
         data: filters,
@@ -83,28 +85,28 @@ const LocationTableFilters = ({ filtersState, setFilterState }: Props) => {
         <div style={{ padding: '10px' }}>
             <Box sx={{ display: 'flex', width: '100%' }}>
                 <FilterFormControl
-                    label="Name"
+                    label={t('common.name')}
                     values={filters?.names?.length ? filters.names : filters?.locationNameDropdown}
                     selectedValue={filtersState?.name}
                     onFilterChange={(value) => handleFilterStateChange('name', value)}
                     onClearClick={() => handleClearClick('name')}
                 />
                 <FilterFormControl
-                    label="Type"
+                    label={t('common.type')}
                     values={filters?.types?.length ? filters.types : filters?.locationTypeDropdown}
                     selectedValue={filtersState?.type}
                     onFilterChange={(value) => handleFilterStateChange('type', value)}
                     onClearClick={() => handleClearClick('type')}
                 />
                 <FilterFormControl
-                    label="City"
+                    label={t('common.city')}
                     values={filters?.cities?.length ? filters.cities : filters?.cityDropdown}
                     selectedValue={filtersState?.city}
                     onFilterChange={(value) => handleFilterStateChange('city', value)}
                     onClearClick={() => handleClearClick('city')}
                 />
                 <FilterFormControl
-                    label="State"
+                    label={t('common.state')}
                     values={filters?.states?.length ? filters.states : filters?.stateDropdown}
                     selectedValue={filtersState?.state}
                     onFilterChange={(value) => handleFilterStateChange('state', value)}

@@ -3,6 +3,7 @@ import { UserData } from "@/pages/user";
 import { HighlightOff } from "@mui/icons-material";
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, TextField, Typography } from "@mui/material";
 import { Field, Form } from "react-final-form";
+import { useTranslation } from 'next-i18next';
 
 interface UserDialogProps {
     open: boolean;
@@ -16,6 +17,7 @@ const AddPasswordDialog: React.FC<UserDialogProps> = ({
     userDialogData,
     onSubmit,
 }) => {
+    const { t } = useTranslation('common');
     return (
         <Dialog maxWidth="sm" fullWidth open={open} onClose={handleClose}>
             <DialogTitle
@@ -35,7 +37,7 @@ const AddPasswordDialog: React.FC<UserDialogProps> = ({
                         },
                     }}
                 >
-                    Reset Password
+                    {t('user.resetPassword')}
                 </Box>
                 <IconButton
                     children={<HighlightOff />}
@@ -62,12 +64,12 @@ const AddPasswordDialog: React.FC<UserDialogProps> = ({
                                 <Field name="username">
                                     {({ input }) => (
                                         <Box>
-                                            <Typography className="label">Username</Typography>
+                                            <Typography className="label">{t('user.username')}</Typography>
                                             <TextField
                                                 {...input}
                                                 fullWidth
                                                 size="small"
-                                                placeholder="Enter username"
+                                                placeholder={t('user.enterUsername')}
                                             />
                                         </Box>
                                     )}
@@ -75,13 +77,13 @@ const AddPasswordDialog: React.FC<UserDialogProps> = ({
                                 <Field name="oldPassword">
                                     {({ input }) => (
                                         <Box>
-                                            <Typography className="label">Old-Password</Typography>
+                                            <Typography className="label">{t('user.oldPassword')}</Typography>
                                             <TextField
                                                 {...input}
                                                 type="password"
                                                 fullWidth
                                                 size="small"
-                                                placeholder="Enter old-password"
+                                                placeholder={t('user.enterOldPassword')}
                                             />
                                         </Box>
                                     )}
@@ -89,13 +91,13 @@ const AddPasswordDialog: React.FC<UserDialogProps> = ({
                                 <Field name="newPassword">
                                     {({ input }) => (
                                         <Box>
-                                            <Typography className="label">New-Password</Typography>
+                                            <Typography className="label">{t('user.newPassword')}</Typography>
                                             <TextField
                                                 {...input}
                                                 type="password"
                                                 fullWidth
                                                 size="small"
-                                                placeholder="Enter new-password"
+                                                placeholder={t('user.enterNewPassword')}
                                             />
                                         </Box>
                                     )}
@@ -111,7 +113,7 @@ const AddPasswordDialog: React.FC<UserDialogProps> = ({
                                     variant="contained"
                                     type="submit"
                                 >
-                                    Save
+                                    {t('common.save')}
                                 </Button>
                             </DialogActions>
                         </form>

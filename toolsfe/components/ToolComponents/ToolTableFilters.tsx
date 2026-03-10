@@ -2,6 +2,7 @@ import { Box, FormControl, IconButton, InputLabel, MenuItem, Select } from '@mui
 import axios from 'axios';
 import ClearIcon from '@mui/icons-material/Clear';
 import React from 'react';
+import { useTranslation } from 'next-i18next';
 import { UseQueryResult, useQuery } from 'react-query';
 import { ToolFilters } from '@/pages/tools';
 
@@ -58,6 +59,7 @@ const FilterFormControl = ({ label, values, selectedValue, onFilterChange, onCle
 )
 
 const ToolTableFilters = ({ filtersState, setFilterState }: Props) => {
+  const { t } = useTranslation('common');
 
   const {
     data: filters,
@@ -82,21 +84,21 @@ const ToolTableFilters = ({ filtersState, setFilterState }: Props) => {
     <div style={{ padding: '10px' }}>
       <Box sx={{ display: 'flex', width: '100%' }}>
         <FilterFormControl
-          label="Status"
+          label={t('common.status')}
           values={filters?.statusData}
           selectedValue={filtersState?.status}
           onFilterChange={(value) => handleFilterStateChange('status', value)}
           onClearClick={() => handleClearClick('status')}
         />
         <FilterFormControl
-          label="Supplier"
+          label={t('tool.supplier')}
           values={filters?.suppliers?.length ? filters.suppliers : filters?.supplierDropdown}
           selectedValue={filtersState?.supplier}
           onFilterChange={(value) => handleFilterStateChange('supplier', value)}
           onClearClick={() => handleClearClick('supplier')}
         />
         <FilterFormControl
-          label="Assigned Location"
+          label={t('tool.assignedLocation')}
           values={filters?.assignedLocations}
           selectedValue={filtersState?.assignedLocation}
           onFilterChange={(value) => handleFilterStateChange('assignedLocation', value)}
@@ -106,21 +108,21 @@ const ToolTableFilters = ({ filtersState, setFilterState }: Props) => {
       <br />
       <Box sx={{ display: 'flex', width: '100%' }}>
         <FilterFormControl
-          label="Assigned Person"
+          label={t('tool.assignedPerson')}
           values={filters?.assignedPersons}
           selectedValue={filtersState?.assignedPerson}
           onFilterChange={(value) => handleFilterStateChange('assignedPerson', value)}
           onClearClick={() => handleClearClick('assignedPerson')}
         />
         <FilterFormControl
-          label="Part Number"
+          label={t('tool.partNumber')}
           values={filters?.partNumbers}
           selectedValue={filtersState?.partNumber}
           onFilterChange={(value) => handleFilterStateChange('partNumber', value)}
           onClearClick={() => handleClearClick('partNumber')}
         />
         <FilterFormControl
-          label="Tool Name"
+          label={t('tool.toolName')}
           values={filters?.toolNames}
           selectedValue={filtersState?.toolName}
           onFilterChange={(value) => handleFilterStateChange('toolName', value)}

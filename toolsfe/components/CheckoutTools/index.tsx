@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'next-i18next';
 import { QrReader } from 'react-qr-reader';
 import { TextField, Button, Box, Typography, IconButton, InputAdornment, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { toast } from 'react-toastify';
@@ -9,6 +10,7 @@ import moment from 'moment';
 import { PersonData } from '../Persons/AddPersonDialog';
 
 const CheckoutForm: React.FC = () => {
+  const { t } = useTranslation('common');
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [toolDetails, setToolDetails] = useState<ToolData | null>(null);
@@ -36,7 +38,7 @@ const CheckoutForm: React.FC = () => {
           }))
         );
       })
-      .catch(() => toast.error('Error fetching persons.'));
+      .catch(() => toast.error(t('checkout.fetchPersonError')));
   }, []);
 
   const handleScan = async (result: any) => {
@@ -50,31 +52,31 @@ const CheckoutForm: React.FC = () => {
         setSelectedPersonId(response.data?.assignedPersonId || '');
       } catch (error: any) {
         const errmsg = error?.response?.data?.message;
-        toast.error(errmsg || "Something went wrong");
+        toast.error(errmsg || t('checkout.somethingWrong'));
       }
     }
   };
 
   const handleCheckout = async () => {
     if (!selectedPersonId) {
-      toast.error('Please select person.');
+      toast.error(t('checkout.selectPersonError'));
       return;
     }
     try {
       await axios.post(`/api/router?path=api/tools/check-out`, { toolId: toolDetails?.id, personId: selectedPersonId });
-      toast.success('Tool checked out successfully.');
+      toast.success(t('checkout.checkoutSuccess'));
       setToolDetails(null)
       setQrCode(null)
       setSelectedPersonId('')
     } catch (error: any) {
       const errmsg = error?.response?.data?.message;
-      toast.error(errmsg || 'Error during checkout.');
+      toast.error(errmsg || t('checkout.checkoutError'));
     }
   };
 
   return (
     <Box p={3} bgcolor="white" boxShadow={2}>
-      <Typography variant="h5">Checkout Tool</Typography>
+      <Typography variant="h5">{t('checkout.checkoutTool')}</Typography>
       {isScanning ? (
         <div>
           <QrReader
@@ -83,18 +85,18 @@ const CheckoutForm: React.FC = () => {
             //@ts-ignore
             style={{ width: "40%", height: "40%" }}
           />
-          <Button onClick={() => setIsScanning(false)}>Close Scanner</Button>
+          <Button onClick={() => setIsScanning(false)}>{t('checkout.closeScanner')}</Button>
         </div>
       ) : (
         <TextField
-          label="Scan QR Code"
+          label={t('checkout.scanQrCode')}
           value={qrCode || ''}
           margin='normal'
           InputProps={{
 
             endAdornment: (
               <>
-                <InputAdornment position="end"><Button onClick={() => setIsScanning(true)}>Scan</Button></InputAdornment>
+                <InputAdornment position="end"><Button onClick={() => setIsScanning(true)}>{t('common.scan')}</Button></InputAdornment>
                 <InputAdornment position="end"><IconButton onClick={() => { setQrCode(null); setToolDetails(null) }}><ClearIcon /></IconButton></InputAdornment>
               </>
             )
@@ -104,25 +106,25 @@ const CheckoutForm: React.FC = () => {
       )}
       {toolDetails && (
         <Box mt={2} display="flex" flexDirection="column">
-          <Typography variant="h4">Tool Details:</Typography>
+          <Typography variant="h4">{t('checkout.toolDetails')}</Typography>
           <br />
-          <Typography variant="body1">QR Code ID: {toolDetails.qrCodeId}</Typography>
-          <Typography variant="body1">Tool ID: {toolDetails.toolId}</Typography>
-          <Typography variant="body1">Part Number: {toolDetails.partNumber}</Typography>
-          <Typography variant="body1">Tool Name: {toolDetails.toolName}</Typography>
-          <Typography variant="body1">Description: {toolDetails.toolDescription}</Typography>
-          <Typography variant="body1">Supplier: {toolDetails.supplier}</Typography>
-          <Typography variant="body1">Status: {toolDetails.status}</Typography>
-          <Typography variant="body1">Assigned Person: {toolDetails.assignedPerson || 'N/A'}</Typography>
-          <Typography variant="body1">Assigned Location: {toolDetails.assignedLocation || 'N/A'}</Typography>
-          <Typography variant="body1">Created At: {toolDetails.createdAt ? moment(toolDetails.createdAt).format("MMM DD, YYYY") : 'N/A'}</Typography>
-          <Typography variant="body1">Updated At: {toolDetails.updatedAt ? moment(toolDetails.updatedAt).format("MMM DD, YYYY") : 'N/A'}</Typography>
+          <Typography variant="body1">{t('checkout.qrCodeId')}: {toolDetails.qrCodeId}</Typography>
+          <Typography variant="body1">{t('tool.toolId')}: {toolDetails.toolId}</Typography>
+          <Typography variant="body1">{t('tool.partNumber')}: {toolDetails.partNumber}</Typography>
+          <Typography variant="body1">{t('tool.toolName')}: {toolDetails.toolName}</Typography>
+          <Typography variant="body1">{t('checkout.description')}: {toolDetails.toolDescription}</Typography>
+          <Typography variant="body1">{t('tool.supplier')}: {toolDetails.supplier}</Typography>
+          <Typography variant="body1">{t('common.status')}: {toolDetails.status}</Typography>
+          <Typography variant="body1">{t('tool.assignedPerson')}: {toolDetails.assignedPerson || t('common.na')}</Typography>
+          <Typography variant="body1">{t('tool.assignedLocation')}: {toolDetails.assignedLocation || t('common.na')}</Typography>
+          <Typography variant="body1">{t('checkout.createdAt')}: {toolDetails.createdAt ? moment(toolDetails.createdAt).format("MMM DD, YYYY") : t('common.na')}</Typography>
+          <Typography variant="body1">{t('checkout.updatedAt')}: {toolDetails.updatedAt ? moment(toolDetails.updatedAt).format("MMM DD, YYYY") : t('common.na')}</Typography>
 
           <FormControl fullWidth margin="normal">
-            <InputLabel id="checkout-person-label">Select Person</InputLabel>
+            <InputLabel id="checkout-person-label">{t('checkout.selectPerson')}</InputLabel>
             <Select
               labelId="checkout-person-label"
-              label="Select Person"
+              label={t('checkout.selectPerson')}
               value={selectedPersonId}
               onChange={(e) => setSelectedPersonId(e.target.value as string)}
             >
@@ -135,8 +137,8 @@ const CheckoutForm: React.FC = () => {
           </FormControl>
 
           <br />
-          <Typography sx={{ fontWeight: 'bold' }}>Do you want to check-out this tool?</Typography>
-          <Button type="submit" variant="contained" color="primary" style={{ marginTop: '15px' }} onClick={handleCheckout}>Check-out Tool</Button>
+          <Typography sx={{ fontWeight: 'bold' }}>{t('checkout.confirmCheckout')}</Typography>
+          <Button type="submit" variant="contained" color="primary" style={{ marginTop: '15px' }} onClick={handleCheckout}>{t('checkout.checkoutButton')}</Button>
         </Box>
 
       )}

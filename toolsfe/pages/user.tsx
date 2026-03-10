@@ -1,6 +1,8 @@
 import Layout from "@/components/general/Layout"
 import withLogin, { DecodedToken } from "@/components/general/withLogin"
 import UserIndex from "@/components/UserComponents"
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 import axios from "axios";
 import React, { useEffect } from "react";
 import { useQuery, UseQueryResult } from "react-query";
@@ -61,7 +63,7 @@ const fetchUsers = async (page = 1, size = 10): Promise<UserApiResponse> => {
 };
 
 const Users = ({ roles }: DecodedToken) => {
-
+    const { t } = useTranslation('common');
     useEffect(() => {
         if (roles && roles !== "administrator") {
             // window.open('/', '_self')
@@ -87,17 +89,17 @@ const Users = ({ roles }: DecodedToken) => {
     const deleteUser = async (id: string) => {
         try {
             await axios.delete(`/api/router?path=api/auth/${id}`);
-            toast.success("Successfully deleted user");
+            toast.success(t('user.deleteSuccess'));
             refetch();
         } catch (error: any) {
-            toast.error(error?.response?.data?.message || "Failed to delete user");
+            toast.error(error?.response?.data?.message || t('user.deleteFailed'));
         }
     };
 
     return (
         <Layout>
             {isLoading || !users ? (
-                "Loading..."
+                t('common.loading')
             ) : (
                 <UserIndex
                     userApiData={users}
@@ -111,5 +113,11 @@ const Users = ({ roles }: DecodedToken) => {
         </Layout>
     )
 }
+
+export const getStaticProps = async ({ locale }: { locale: string }) => ({
+  props: {
+    ...(await serverSideTranslations(locale, ['common'])),
+  },
+});
 
 export default withLogin(Users)

@@ -6,10 +6,12 @@ import { ToastContainer } from 'react-toastify';
 import { getTokenCookie } from '@/lib/auth-cookie';
 import jwtDecode from 'jwt-decode';
 import { DecodedToken } from '@/components/general/withLogin';
+import { appWithTranslation } from 'next-i18next';
+
 const queryClient = new QueryClient();
 
 
-export default function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps }: AppProps) {
   const token = getTokenCookie(null);
   let userRoles;
 
@@ -37,3 +39,5 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     </QueryClientProvider>
   );
 }
+
+export default appWithTranslation(MyApp);

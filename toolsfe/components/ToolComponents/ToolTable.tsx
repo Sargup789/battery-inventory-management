@@ -4,6 +4,7 @@ import { IconButton, Tooltip, Chip } from '@mui/material';
 import { DataGrid, GridColDef, GridCellParams } from '@mui/x-data-grid';
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'next-i18next';
 import PrintDialog from '../QRCodeComponents/PrintDialog';
 import QRCode from 'react-qr-code';
 import { green, amber } from '@mui/material/colors';
@@ -23,27 +24,28 @@ interface Props {
 const Tool = ({
   roles, toolApidata, deleteTool, editTool, setPage, setSize, page, size, viewTool, onRowSelect = () => { }
 }: Props & DecodedToken) => {
+  const { t } = useTranslation('common');
   const [printDialogOpen, setPrintDialogOpen] = useState(false);
   const [printCode, setPrintCode] = useState('');
 
 
   const renderActionButton = (params: GridCellParams) => (
     <>
-      <Tooltip title="View" followCursor>
+      <Tooltip title={t('common.view')} followCursor>
         <IconButton
           size="small"
           onClick={() => viewTool(params.row as ToolData)}
           children={<RemoveRedEyeOutlined fontSize="small" />}
         />
       </Tooltip>
-       <Tooltip title="Edit" followCursor>
+       <Tooltip title={t('common.edit')} followCursor>
         <IconButton
           size="small"
           onClick={() => editTool(params.row as ToolData)}
           children={<EditOutlined fontSize="small" />}
         />
       </Tooltip>
-     <Tooltip title="Delete" followCursor>
+     <Tooltip title={t('common.delete')} followCursor>
         <IconButton
           size="small"
           onClick={() => deleteTool(params.row.id as string)}
@@ -56,14 +58,14 @@ const Tool = ({
   const columns: GridColDef[] = [
     {
       field: 'qrCodeId',
-      headerName: 'QR Code',
+      headerName: t('tool.qrCode'),
       width: 150,
       sortable: false,
       headerAlign: 'center',
       align: 'center',
       renderCell: (params: GridCellParams) => {
         const code = params.value as string;
-        if (!code) return 'N/A';
+        if (!code) return t('common.na');
         return (
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <QRCode value={code} size={40} level="H" 
@@ -78,7 +80,7 @@ const Tool = ({
     },
     {
       field: 'toolId',
-      headerName: 'Tool ID',
+      headerName: t('tool.toolId'),
       width: 120,
       align: 'center',
       sortable: true,
@@ -86,7 +88,7 @@ const Tool = ({
     },
     {
       field: 'partNumber',
-      headerName: 'Part Number',
+      headerName: t('tool.partNumber'),
       width: 150,
       align: 'center',
       sortable: true,
@@ -94,7 +96,7 @@ const Tool = ({
     },
     {
       field: 'toolName',
-      headerName: 'Tool Name',
+      headerName: t('tool.toolName'),
       width: 180,
       align: 'center',
       sortable: true,
@@ -102,7 +104,7 @@ const Tool = ({
     },
     {
       field: 'toolDescription',
-      headerName: 'Tool Description',
+      headerName: t('tool.toolDescription'),
       width: 250,
       align: 'left',
       sortable: true,
@@ -110,7 +112,7 @@ const Tool = ({
     },
     {
       field: 'supplier',
-      headerName: 'Supplier',
+      headerName: t('tool.supplier'),
       width: 150,
       align: 'center',
       sortable: true,
@@ -118,7 +120,7 @@ const Tool = ({
     },
     {
       field: 'status',
-      headerName: 'Status',
+      headerName: t('common.status'),
       width: 150,
       align: 'center',
       sortable: true,
@@ -141,87 +143,94 @@ const Tool = ({
           default:
             color = '#9e9e9e';
         }
-        return <Chip label={params.value as string} style={{ backgroundColor: color, color: 'white' }} />;
+        const statusLabels: Record<string, string> = {
+          'Created': t('tool.statusCreated'),
+          'Assigned': t('tool.statusAssigned'),
+          'Checked-in': t('tool.statusCheckedIn'),
+          'In-transit': t('tool.statusInTransit'),
+        };
+        const label = statusLabels[params.value as string] || (params.value as string);
+        return <Chip label={label} style={{ backgroundColor: color, color: 'white' }} />;
       },
     },
     {
       field: 'assignedPerson',
-      headerName: 'Assigned Person',
+      headerName: t('tool.assignedPerson'),
       width: 180,
       align: 'center',
       sortable: true,
       headerAlign: 'center',
-      valueFormatter: (params) => params.value || 'N/A',
+      valueFormatter: (params) => params.value || t('common.na'),
     },
     {
       field: 'assignedPersonDesignation',
-      headerName: 'Person Designation',
+      headerName: t('tool.personDesignation'),
       width: 180,
       align: 'center',
       headerAlign: 'center',
-      valueFormatter: (params) => params.value || 'N/A',
+      valueFormatter: (params) => params.value || t('common.na'),
     },
     {
       field: 'assignedPersonEmail',
-      headerName: 'Person Email',
+      headerName: t('tool.personEmail'),
       width: 220,
       align: 'center',
       headerAlign: 'center',
-      valueFormatter: (params) => params.value || 'N/A',
+      valueFormatter: (params) => params.value || t('common.na'),
     },
     {
       field: 'assignedPersonPhoneNumber',
-      headerName: 'Person Phone',
+      headerName: t('tool.personPhone'),
       width: 180,
       align: 'center',
       headerAlign: 'center',
-      valueFormatter: (params) => params.value || 'N/A',
+      valueFormatter: (params) => params.value || t('common.na'),
     },
     {
       field: 'assignedLocation',
-      headerName: 'Assigned Location',
+      headerName: t('tool.assignedLocation'),
       width: 180,
       align: 'center',
       sortable: true,
       headerAlign: 'center',
-      valueFormatter: (params) => params.value || 'N/A',
+      valueFormatter: (params) => params.value || t('common.na'),
     },
     {
       field: 'assignedLocationType',
-      headerName: 'Location Type',
+      headerName: t('tool.locationType'),
       width: 160,
       align: 'center',
       headerAlign: 'center',
-      valueFormatter: (params) => params.value || 'N/A',
+      valueFormatter: (params) => params.value || t('common.na'),
     },
     {
       field: 'assignedLocationCity',
-      headerName: 'Location City',
+      headerName: t('tool.locationCity'),
       width: 160,
       align: 'center',
       headerAlign: 'center',
-      valueFormatter: (params) => params.value || 'N/A',
+      valueFormatter: (params) => params.value || t('common.na'),
     },
     {
       field: 'assignedLocationState',
-      headerName: 'Location State',
+      headerName: t('tool.locationState'),
       width: 160,
       align: 'center',
       headerAlign: 'center',
-      valueFormatter: (params) => params.value || 'N/A',
+      valueFormatter: (params) => params.value || t('common.na'),
     },
     {
       field: 'lastUpdatedBy',
-      headerName: 'Last Updated By',
+      headerName: t('tool.lastUpdatedBy'),
       width: 150,
       align: 'center',
       sortable: true,
       headerAlign: 'center',
-      valueFormatter: (params) => params.value || 'N/A',
+      valueFormatter: (params) => params.value || t('common.na'),
     },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: t('common.actions'),
       width: 150,
       sortable: false,
       renderCell: renderActionButton,

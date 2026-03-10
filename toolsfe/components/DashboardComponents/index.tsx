@@ -1,5 +1,6 @@
 import { Box, Button, Grid, Typography } from "@mui/material";
 import { useRouter } from "next/router";
+import { useTranslation } from 'next-i18next';
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ZoneData } from "@/pages/location";
 import BuildIcon from "@mui/icons-material/Build";
@@ -16,6 +17,7 @@ type Props = {
 const queryClient = new QueryClient();
 const DashboardIndex = ({ dashboardData, setSize, setPage, page, size }: Props) => {
   const router = useRouter();
+  const { t } = useTranslation('common');
   return (
     <QueryClientProvider client={queryClient}>
       <div className="m-6">
@@ -29,7 +31,7 @@ const DashboardIndex = ({ dashboardData, setSize, setPage, page, size }: Props) 
             variant="contained"
             onClick={() => router.push("/generate-qr")}
           >
-            Generate QR Code
+            {t('dashboard.generateQrCode')}
           </Button>
         </Typography>
 
@@ -62,13 +64,13 @@ const DashboardIndex = ({ dashboardData, setSize, setPage, page, size }: Props) 
                   </Box>
 
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                    <strong>Type:</strong> {location.type || "—"}
+                    <strong>{t('dashboard.type')}</strong> {location.type || "—"}
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                    <strong>City:</strong> {location.city || "—"}
+                    <strong>{t('dashboard.city')}</strong> {location.city || "—"}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    <strong>State:</strong> {location.state || "—"}
+                    <strong>{t('dashboard.state')}</strong> {location.state || "—"}
                   </Typography>
                 </Box>
 
@@ -85,7 +87,7 @@ const DashboardIndex = ({ dashboardData, setSize, setPage, page, size }: Props) 
                   <Box sx={{ display: "flex", alignItems: "center" }}>
                     <BuildIcon sx={{ color: "#9B2735", mr: 0.5, fontSize: 20 }} />
                     <Typography variant="body2" color="text.secondary">
-                      Tools Assigned
+                      {t('dashboard.toolsAssigned')}
                     </Typography>
                   </Box>
                   <Typography variant="h4" fontWeight={800} color="#9B2735">

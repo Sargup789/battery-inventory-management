@@ -6,6 +6,8 @@ import PersonIndex from "@/components/Persons";
 import withLogin, { DecodedToken } from "@/components/general/withLogin";
 import { PersonData } from "@/components/Persons/AddPersonDialog";
 import { toast } from "react-toastify";
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 
 const getEntityId = (item: any): string => {
   const candidate = item?.id ?? item?._id;
@@ -72,6 +74,7 @@ const fetchPersons = async (page = 1, size = 10, filters: PersonFilters = {}): P
 };
 
 const Persons = ({ roles }: DecodedToken) => {
+  const { t } = useTranslation('common');
   useEffect(() => {
     if (roles && roles !== "administrator") {
       // window.open('/', '_self');
@@ -104,16 +107,16 @@ const Persons = ({ roles }: DecodedToken) => {
   const deletePerson = async (id: string) => {
     try {
       await axios.delete(`/api/router?path=api/persons/${id}`);
-      toast.success("Successfully deleted person");
+      toast.success(t('person.deleteSuccess'));
       refetch();
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to delete person");
+      toast.error(error?.response?.data?.message || t('person.deleteFailed'));
     }
   };
 
   return (
     <Layout>
-      {isLoading || !persons ? "Loading..." : (
+      {isLoading || !persons ? t('common.loading') : (
       <PersonIndex
         personApiData={persons}
         deletePerson={deletePerson}
@@ -129,5 +132,11 @@ const Persons = ({ roles }: DecodedToken) => {
     </Layout>
   );
 };
+
+export const getStaticProps = async ({ locale }: { locale: string }) => ({
+  props: {
+    ...(await serverSideTranslations(locale, ['common'])),
+  },
+});
 
 export default withLogin(Persons);

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useTranslation } from 'next-i18next';
 import { QrReader } from "react-qr-reader";
 import {
   Box,
@@ -29,6 +30,7 @@ const getEntityId = (item: any): string => {
 };
 
 const AssignToolsForm: React.FC = () => {
+  const { t } = useTranslation('common');
   const [qrCode, setQrCode] = useState("");
   const [isScanning, setIsScanning] = useState(false);
   const [tool, setTool] = useState<ToolData | null>(null);
@@ -66,7 +68,7 @@ const AssignToolsForm: React.FC = () => {
           }))
         );
       })
-      .catch(() => toast.error("Error fetching locations."));
+      .catch(() => toast.error(t('assign.fetchLocationError')));
 
     axios
       .get("/api/router?path=api/persons")
@@ -84,7 +86,7 @@ const AssignToolsForm: React.FC = () => {
           }))
         );
       })
-      .catch(() => toast.error("Error fetching persons."));
+      .catch(() => toast.error(t('assign.fetchPersonError')));
   }, []);
 
   const handleScan = async (result: any) => {
@@ -104,11 +106,11 @@ const AssignToolsForm: React.FC = () => {
 
   const handleAssign = async () => {
     if (!tool?.id) {
-      toast.error("Scan a tool first.");
+      toast.error(t('assign.scanFirst'));
       return;
     }
     if (!locationId || !personId) {
-      toast.error("Select both location and person.");
+      toast.error(t('assign.selectBoth'));
       return;
     }
     try {
@@ -117,19 +119,19 @@ const AssignToolsForm: React.FC = () => {
         locationId,
         personId,
       });
-      toast.success("Tool assigned successfully.");
+      toast.success(t('assign.assignSuccess'));
       setQrCode("");
       setTool(null);
       setLocationId("");
       setPersonId("");
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Assign failed.");
+      toast.error(error?.response?.data?.message || t('assign.assignFailed'));
     }
   };
 
   return (
     <Box p={3} bgcolor="white" boxShadow={2}>
-      <Typography variant="h5">Assign Tools</Typography>
+      <Typography variant="h5">{t('assign.assignTools')}</Typography>
 
       {isScanning ? (
         <div>
@@ -139,11 +141,11 @@ const AssignToolsForm: React.FC = () => {
             // @ts-ignore
             style={{ width: "40%", height: "40%" }}
           />
-          <Button onClick={() => setIsScanning(false)}>Close Scanner</Button>
+          <Button onClick={() => setIsScanning(false)}>{t('assign.closeScanner')}</Button>
         </div>
       ) : (
         <TextField
-          label="Scan QR Code"
+          label={t('assign.scanQrCode')}
           value={qrCode}
           margin="normal"
           fullWidth
@@ -151,7 +153,7 @@ const AssignToolsForm: React.FC = () => {
             endAdornment: (
               <>
                 <InputAdornment position="end">
-                  <Button onClick={() => setIsScanning(true)}>Scan</Button>
+                  <Button onClick={() => setIsScanning(true)}>{t('common.scan')}</Button>
                 </InputAdornment>
                 <InputAdornment position="end">
                   <IconButton
@@ -173,15 +175,15 @@ const AssignToolsForm: React.FC = () => {
 
       {tool && (
         <Box mt={2}>
-          <Typography variant="body1">Tool ID: {tool.toolId}</Typography>
-          <Typography variant="body1">Tool Name: {tool.toolName}</Typography>
-          <Typography variant="body1">Status: {tool.status}</Typography>
+          <Typography variant="body1">{t('tool.toolId')}: {tool.toolId}</Typography>
+          <Typography variant="body1">{t('tool.toolName')}: {tool.toolName}</Typography>
+          <Typography variant="body1">{t('common.status')}: {tool.status}</Typography>
 
           <FormControl fullWidth margin="normal">
-            <InputLabel id="assign-location-label">Select Location</InputLabel>
+            <InputLabel id="assign-location-label">{t('assign.selectLocation')}</InputLabel>
             <Select
               labelId="assign-location-label"
-              label="Select Location"
+              label={t('assign.selectLocation')}
               value={locationId}
               onChange={(e) => setLocationId(e.target.value as string)}
             >
@@ -194,10 +196,10 @@ const AssignToolsForm: React.FC = () => {
           </FormControl>
 
           <FormControl fullWidth margin="normal">
-            <InputLabel id="assign-person-label">Select Person</InputLabel>
+            <InputLabel id="assign-person-label">{t('assign.selectPerson')}</InputLabel>
             <Select
               labelId="assign-person-label"
-              label="Select Person"
+              label={t('assign.selectPerson')}
               value={personId}
               onChange={(e) => setPersonId(e.target.value as string)}
             >
@@ -215,7 +217,7 @@ const AssignToolsForm: React.FC = () => {
             onClick={handleAssign}
             style={{ marginTop: "16px" }}
           >
-            Assign Tool
+            {t('assign.assignTool')}
           </Button>
         </Box>
       )}

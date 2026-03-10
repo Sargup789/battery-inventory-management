@@ -1,5 +1,6 @@
 import { Box, Button, Typography } from "@mui/material"
 import { useState } from "react";
+import { useTranslation } from 'next-i18next';
 import AddToolDialog from "./AddToolDialog";
 import ToolTable from "./ToolTable"
 import { ToolApiResponse, ToolData, ToolFilters } from "@/pages/tools";
@@ -22,6 +23,7 @@ type Props = {
 const queryClient = new QueryClient();
 
 const ToolIndex = ({ toolApidata, deleteTool, refetch, setPage, setSize, page, size, filters, onFiltersChange }: Props) => {
+  const { t } = useTranslation('common');
   const [addToolDialogOpen, setAddToolDialogOpen] = useState(false);
   const [toolDialogData, setToolDialogData] = useState<ToolData | {}>({});
   const [showFilters, setShowFilters] = useState(false);
@@ -85,7 +87,7 @@ const ToolIndex = ({ toolApidata, deleteTool, refetch, setPage, setSize, page, s
             variant="contained"
             onClick={() => setShowFilters(prev => !prev)}
           >
-            {showFilters ? "Hide Filters" : "Show Filters"}
+            {showFilters ? t('common.hideFilters') : t('common.showFilters')}
           </Button>
           <Typography align='left' style={{ display: 'flex', alignItems: 'center' }}>
             <Button
@@ -97,7 +99,7 @@ const ToolIndex = ({ toolApidata, deleteTool, refetch, setPage, setSize, page, s
               variant="contained"
               onClick={() => setAddToolDialogOpen(true)}
             >
-              Add Tool
+              {t('tool.addTool')}
             </Button>
           </Typography>
         </Box>

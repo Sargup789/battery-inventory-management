@@ -1,6 +1,8 @@
 import DashboardIndex from "@/components/DashboardComponents"
 import Layout from '@/components/general/Layout'
 import axios from "axios";
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 import { UseQueryResult, useQuery } from "react-query";
 import { ZoneData } from "./location";
 import { useState } from "react";
@@ -50,7 +52,7 @@ const fetchZones = async (page = 1, size = 10) => {
 
 
 const index = () => {
-
+  const { t } = useTranslation('common');
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(10);
 
@@ -67,7 +69,7 @@ const index = () => {
   return (
     <Layout>
       {isLoading || !zones ? (
-        "Loading..."
+        t('common.loading')
       ) : (
         <DashboardIndex dashboardData={zones} setPage={setPage}
           setSize={setSize}
@@ -76,5 +78,11 @@ const index = () => {
       )}    </Layout>
   )
 }
+
+export const getStaticProps = async ({ locale }: { locale: string }) => ({
+  props: {
+    ...(await serverSideTranslations(locale, ['common'])),
+  },
+});
 
 export default withLogin(index)

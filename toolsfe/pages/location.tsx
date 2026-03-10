@@ -5,6 +5,8 @@ import Layout from "@/components/general/Layout";
 import LocationIndex from "@/components/LocationComponents";
 import withLogin, { DecodedToken } from "@/components/general/withLogin";
 import { toast } from "react-toastify";
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 
 export interface ZoneData {
   id: string;
@@ -101,6 +103,7 @@ const fetchLocations = async (page = 1, size = 10, filters: LocationFilters = {}
 };
 
 const Zone = ({ roles }: DecodedToken) => {
+  const { t } = useTranslation('common');
   useEffect(() => {
     if (roles && roles !== "administrator") {
       // window.open('/', '_self')
@@ -132,17 +135,17 @@ const Zone = ({ roles }: DecodedToken) => {
   const deleteZone = async (id: string) => {
     try {
       await axios.delete(`/api/router?path=api/locations/${id}`);
-      toast.success("Successfully deleted location");
+      toast.success(t('location.deleteSuccess'));
       refetch();
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to delete location");
+      toast.error(error?.response?.data?.message || t('location.deleteFailed'));
     }
   };
 
   return (
     <Layout>
       {isLoading || !zones ? (
-        "Loading..."
+        t('common.loading')
       ) : (
         <LocationIndex
           locationApiData={zones}
@@ -159,5 +162,11 @@ const Zone = ({ roles }: DecodedToken) => {
     </Layout>
   );
 };
+
+export const getStaticProps = async ({ locale }: { locale: string }) => ({
+  props: {
+    ...(await serverSideTranslations(locale, ['common'])),
+  },
+});
 
 export default withLogin(Zone);
