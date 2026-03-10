@@ -1,7 +1,6 @@
 import { Box, Button, Grid, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import { useTranslation } from 'next-i18next';
-import { QueryClient, QueryClientProvider } from "react-query";
 import { ZoneData } from "@/pages/location";
 import BuildIcon from "@mui/icons-material/Build";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
@@ -14,12 +13,11 @@ type Props = {
   size: number;
 };
 
-const queryClient = new QueryClient();
 const DashboardIndex = ({ dashboardData, setSize, setPage, page, size }: Props) => {
   const router = useRouter();
   const { t } = useTranslation('common');
   return (
-    <QueryClientProvider client={queryClient}>
+    <>
       <div className="m-6">
         <Typography align="right">
           <Button
@@ -99,7 +97,7 @@ const DashboardIndex = ({ dashboardData, setSize, setPage, page, size }: Props) 
           ))}
         </Grid>
       </div>
-    </QueryClientProvider>
+    </>
   );
 };
 
