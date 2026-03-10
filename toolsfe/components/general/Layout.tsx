@@ -9,7 +9,8 @@ import ArrowDropDownCircleOutlinedIcon from '@mui/icons-material/ArrowDropDownCi
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
-import { Box, CssBaseline, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, styled, Toolbar, Typography } from '@mui/material';
+import LanguageIcon from '@mui/icons-material/Language';
+import { Box, Button, CssBaseline, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, styled, Toolbar, Typography } from '@mui/material';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import LogoutButton from './withLogout';
 import { useRouter } from 'next/router';
@@ -97,6 +98,11 @@ const Layout = ({ children }: Props & DecodedToken) => {
     setOpen(false);
   };
 
+  const toggleLanguage = () => {
+    const newLocale = router.locale === 'es' ? 'en' : 'es';
+    router.push(router.pathname, router.asPath, { locale: newLocale });
+  };
+
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
@@ -123,7 +129,22 @@ const Layout = ({ children }: Props & DecodedToken) => {
             component="div"
             style={{ display: 'flex', justifyContent: 'space-between', width: "100%" }}>
             {t('nav.home')}
-            <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Button
+                onClick={toggleLanguage}
+                variant="outlined"
+                size="small"
+                startIcon={<LanguageIcon />}
+                sx={{
+                  color: '#fff',
+                  borderColor: '#fff',
+                  textTransform: 'none',
+                  fontSize: '13px',
+                  '&:hover': { borderColor: '#fff', backgroundColor: 'rgba(255,255,255,0.1)' },
+                }}
+              >
+                {router.locale === 'es' ? 'EN' : 'ES'}
+              </Button>
               <LogoutButton />
             </div>
           </Typography>
