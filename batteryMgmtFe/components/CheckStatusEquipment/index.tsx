@@ -53,7 +53,9 @@ const CheckStatusEquipment: React.FC = () => {
 
       {isScanning ? (
         <Box>
-          <QrReader onResult={handleScan} constraints={{ facingMode: "environment" }} style={{ width: "40%" }} />
+          <div style={{ width: "40%" }}>
+            <QrReader onResult={handleScan} constraints={{ facingMode: "environment" }} />
+          </div>
           <Button onClick={() => setIsScanning(false)}>Close Scanner</Button>
         </Box>
       ) : (
