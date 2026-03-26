@@ -1,137 +1,242 @@
-import React, { useState } from "react";
-import { Box, Typography, Paper, List, ListItem, ListItemText, IconButton, Button, TextField, Divider, Chip } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AddIcon from "@mui/icons-material/Add";
-import axios from "axios";
-import { toast } from "react-toastify";
-import { useQuery } from "react-query";
+import React, { useEffect, useState } from 'react';
+import Box from '@mui/material/Box';
+import { Tab, Tabs, Button, Table, TableBody, TableCell, TableHead, TableRow, Dialog, DialogActions, DialogContent, DialogTitle, TextField, IconButton, Tooltip, Grid } from '@mui/material';
+import axios from 'axios';
+import { EditOutlined, DeleteOutline, Add, HighlightOff } from '@mui/icons-material';
+import { DropdownMaster, DropdownOption } from '../types';
+import { toast } from 'react-toastify';
 
-const DropdownMasterIndex: React.FC = () => {
-  const [selectedDropdown, setSelectedDropdown] = useState<any | null>(null);
-  const [newOptionKey, setNewOptionKey] = useState("");
-  const [newOptionLabel, setNewOptionLabel] = useState("");
+const DropdownMasterComponent = () => {
+    const [dropdowns, setDropdowns] = useState<DropdownMaster[]>([]);
+    const [currentTab, setCurrentTab] = useState(0);
+    const [optionModalOpen, setOptionModalOpen] = useState(false);
+    const [keyValue, setKeyValue] = useState<DropdownOption>({ key: '', label: '' });
+    const [currentOption, setCurrentOption] = useState<DropdownOption | null>(null);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [currentDropdownName, setCurrentDropdownName] = useState<string>('');
 
-  const { data: dropdowns = [], refetch } = useQuery("allDropdowns", async () => {
-    const res = await axios.get(`/api/router?path=api/dropdownmaster`);
-    return Array.isArray(res.data) ? res.data : [];
-  }, { refetchOnWindowFocus: false });
+    const handleEditOption = (dropdownName: string, option: DropdownOption) => {
+        setCurrentDropdownName(dropdownName);
+        setKeyValue(option)
+        setCurrentOption(option)
+        setOptionModalOpen(true);
+    };
 
-  const handleSelect = (dropdown: any) => setSelectedDropdown(dropdown);
+    const handleAddOption = (dropdownName: string) => {
+        setCurrentDropdownName(dropdownName);
+        setKeyValue({ key: '', label: '' })
+        setCurrentOption(null);
+        setOptionModalOpen(true);
+    };
 
-  const handleAddOption = async () => {
-    if (!newOptionKey.trim()) {
-      toast.error("Key is required.");
-      return;
+    const handleDeleteOption = async () => {
+        if (currentDropdownName && currentOption) {
+            const url = `/api/router?path=api/dropdownmaster/${currentDropdownName}`;
+            const updatedDropdown = dropdowns.find(d => d.dropdownName === currentDropdownName);
+            if (updatedDropdown) {
+                updatedDropdown.options = updatedDropdown.options.filter(opt => opt.key !== currentOption.key);
+                try {
+                    await axios.put(url, { options: updatedDropdown.options });
+                    fetchDropdowns();
+                } catch (error) {
+                    console.error("Failed to delete option:", error);
+                }
+            }
+        }
+        setDeleteModalOpen(false);
+    };
+
+    useEffect(() => {
+        fetchDropdowns();
+    }, []);
+
+    const fetchDropdowns = () => {
+        axios.get('/api/router?path=api/dropdownmaster')
+            .then(response => {
+                setDropdowns(response.data);
+            })
+            .catch((error: any) => {
+                toast.error(`Failed to fetch dropdowns: ${error.message}`);
+            });
     }
-    try {
-      const updatedOptions = [
-        ...(selectedDropdown.options || []),
-        { key: newOptionKey.trim(), label: newOptionLabel.trim() || newOptionKey.trim() },
-      ];
-      await axios.put(`/api/router?path=api/dropdownmaster/${selectedDropdown.dropdownName}`, {
-        options: updatedOptions,
-      });
-      toast.success("Option added.");
-      setNewOptionKey("");
-      setNewOptionLabel("");
-      refetch().then(() => {
-        // refresh selected
-        const updated = dropdowns.find((d: any) => d.dropdownName === selectedDropdown.dropdownName);
-        if (updated) setSelectedDropdown({ ...updated, options: updatedOptions });
-      });
-    } catch (error: any) {
-      toast.error(error?.response?.data?.error || "Failed to add option.");
-    }
-  };
 
-  const handleRemoveOption = async (key: string) => {
-    try {
-      const updatedOptions = (selectedDropdown.options || []).filter((o: any) => o.key !== key);
-      await axios.put(`/api/router?path=api/dropdownmaster/${selectedDropdown.dropdownName}`, {
-        options: updatedOptions,
-      });
-      toast.success("Option removed.");
-      setSelectedDropdown({ ...selectedDropdown, options: updatedOptions });
-      refetch();
-    } catch (error: any) {
-      toast.error(error?.response?.data?.error || "Failed to remove option.");
-    }
-  };
+    const handleSaveOption = async () => {
+        if (currentDropdownName) {
+            const url = `/api/router?path=api/dropdownmaster/${currentDropdownName}`;
+            const updatedDropdown = dropdowns.find(d => d.dropdownName === currentDropdownName);
+            if (updatedDropdown) {
+                const safeKey = (keyValue.key || "").trim();
+                const safeLabel = (keyValue.label || "").trim();
+                if (!safeKey || !safeLabel) {
+                    toast.error("Both label and value are required");
+                    return;
+                }
+                const existingOptions = Array.isArray(updatedDropdown.options)
+                    ? [...updatedDropdown.options]
+                    : [];
+                const normalizedOption = { key: safeKey, label: safeLabel };
 
-  return (
-    <Box display="flex" gap={3} height="80vh">
-      <Paper sx={{ width: 280, p: 2, overflowY: "auto" }}>
-        <Typography variant="h6" fontWeight={700} mb={2}>Dropdown Lists</Typography>
-        <List dense>
-          {dropdowns.map((dd: any) => (
-            <ListItem
-              key={dd.dropdownName}
-              button
-              selected={selectedDropdown?.dropdownName === dd.dropdownName}
-              onClick={() => handleSelect(dd)}
-              sx={{ borderRadius: 1, mb: 0.5 }}
-            >
-              <ListItemText primary={dd.dropdownLabel} secondary={`${(dd.options || []).length} options`} />
-            </ListItem>
-          ))}
-        </List>
-      </Paper>
+                if (currentOption) {
+                    const optionIndex = existingOptions.findIndex(
+                        opt => opt.key === currentOption.key
+                    );
+                    if (optionIndex === -1) {
+                        toast.error("Option not found");
+                        return;
+                    }
+                    existingOptions[optionIndex] = normalizedOption;
+                } else {
+                    const duplicateIndex = existingOptions.findIndex(opt => opt.key === safeKey);
+                    if (duplicateIndex !== -1) {
+                        toast.error("Key already exists");
+                        return;
+                    }
+                    existingOptions.push(normalizedOption);
+                }
+                try {
+                    await axios.put(url, { options: existingOptions });
+                    fetchDropdowns();
+                } catch (error: any) {
+                    toast.error(`Failed to update: ${error.message}`);
+                }
+            }
+        }
+        setOptionModalOpen(false);
+        setCurrentOption(null);
+    };
 
-      <Paper sx={{ flex: 1, p: 3, overflowY: "auto" }}>
-        {selectedDropdown ? (
-          <Box>
-            <Typography variant="h6" fontWeight={700} mb={1}>{selectedDropdown.dropdownLabel}</Typography>
-            <Typography variant="caption" color="text.secondary" mb={2} display="block">
-              Key: {selectedDropdown.dropdownName}
-            </Typography>
+    const currentTable = dropdowns[currentTab]
 
-            <Box display="flex" gap={2} mb={2}>
-              <TextField
-                label="Key"
-                size="small"
-                value={newOptionKey}
-                onChange={(e) => setNewOptionKey(e.target.value)}
-              />
-              <TextField
-                label="Label (optional)"
-                size="small"
-                value={newOptionLabel}
-                onChange={(e) => setNewOptionLabel(e.target.value)}
-              />
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={handleAddOption}
-                style={{ backgroundColor: "#9B2735" }}
-              >
-                Add
-              </Button>
-            </Box>
 
-            <Divider sx={{ mb: 2 }} />
+    return (
+        <Box p={3} bgcolor="white" boxShadow={2}>
+            <Tabs value={currentTab} onChange={(event, newValue) => setCurrentTab(newValue)}>
+                {dropdowns.map((dropdown, index) => (
+                    <Tab key={index} label={dropdown?.dropdownName} />
+                ))}
+            </Tabs>
 
-            <Box display="flex" flexWrap="wrap" gap={1}>
-              {(selectedDropdown.options || []).map((option: any) => (
-                <Chip
-                  key={option.key}
-                  label={`${option.label || option.key} (${option.key})`}
-                  onDelete={() => handleRemoveOption(option.key)}
-                  deleteIcon={<DeleteIcon />}
-                />
-              ))}
-              {(!selectedDropdown.options || selectedDropdown.options.length === 0) && (
-                <Typography color="text.secondary">No options yet. Add one above.</Typography>
-              )}
-            </Box>
-          </Box>
-        ) : (
-          <Box display="flex" alignItems="center" justifyContent="center" height="100%">
-            <Typography color="text.secondary">Select a dropdown list to manage its options.</Typography>
-          </Box>
-        )}
-      </Paper>
-    </Box>
-  );
-};
+            <Grid container justifyContent="space-between" alignItems="center" marginBottom={2}>
+                <Grid item>
+                    <strong>Options list for {currentTable?.dropdownLabel}</strong>
+                </Grid>
+                <Grid item>
+                    <Button
+                        startIcon={<Add />}
+                        variant="contained"
+                        style={{
+                            borderRadius: 15,
+                            backgroundColor: "#9B2735",
+                            fontSize: "13px"
+                        }}
+                        onClick={() => currentTable?.dropdownName && handleAddOption(currentTable.dropdownName)}
+                        disabled={!currentTable?.dropdownName}
+                    >
+                        Add Record
+                    </Button>
+                </Grid>
+            </Grid>
 
-export default DropdownMasterIndex;
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableCell>Index</TableCell>
+                        <TableCell>Label</TableCell>
+                        <TableCell>Value</TableCell>
+                        <TableCell>Actions</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {currentTable?.options?.map((option, idx) => (
+                        <TableRow key={option.key}>
+                            <TableCell>{idx + 1}</TableCell>
+                            <TableCell>{option.key}</TableCell>
+                            <TableCell>{option.label}</TableCell>
+                            <TableCell>
+                                <Tooltip title="Edit">
+                                    <IconButton size="small" onClick={() => handleEditOption(currentTable.dropdownName, option)}>
+                                        <EditOutlined fontSize="small" />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Delete">
+                                    <IconButton size="small" onClick={() => { setDeleteModalOpen(true); setCurrentDropdownName(currentTable.dropdownName); setCurrentOption(option) }}>
+                                        <DeleteOutline fontSize="small" />
+                                    </IconButton>
+                                </Tooltip>
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+
+
+            <Dialog open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
+                <DialogTitle>Delete Option</DialogTitle>
+                <DialogContent>
+                    Are you sure you want to delete this option?
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteModalOpen(false)}>Cancel</Button>
+                    <Button
+                        variant='contained'
+                        style={{
+                            borderRadius: 15,
+                            backgroundColor: "#9B2735",
+                            fontSize: "13px"
+                        }}
+                        onClick={handleDeleteOption}
+                    >
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog open={optionModalOpen} onClose={() => setOptionModalOpen(false)}>
+                <DialogTitle
+                    sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "start",
+                    }}
+                >
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                        }}
+                    >
+                        {currentOption ? 'Edit Option' : 'Add Option'}
+                    </Box>
+                    <IconButton
+                        children={<HighlightOff />}
+                        color="inherit"
+                        onClick={() => { setOptionModalOpen(false); setCurrentOption(null) }}
+                        sx={{ transform: "translate(8px, -8px)" }}
+                    />
+                </DialogTitle>
+                <DialogContent sx={{ flexDirection: 'column', display: 'flex' }}>
+                    <TextField
+                        label="Label"
+                        value={keyValue.key}
+                        sx={{ margin: "6px 3px" }}
+                        onChange={e => setKeyValue({ ...keyValue, key: e.target.value })}
+                    />
+                    <TextField
+                        label="Value"
+                        value={keyValue.label}
+                        sx={{ margin: "6px 3px" }}
+                        onChange={e => setKeyValue({ ...keyValue, label: e.target.value })}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button variant='contained' style={{
+                        borderRadius: 15,
+                        backgroundColor: "#9B2735",
+                        fontSize: "13px"
+                    }} onClick={() => handleSaveOption()}>Save</Button>
+                </DialogActions>
+            </Dialog>
+        </Box>
+    );
+}
+
+export default DropdownMasterComponent
