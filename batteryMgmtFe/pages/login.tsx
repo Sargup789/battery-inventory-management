@@ -59,7 +59,7 @@ const LoginPage: React.FC = () => {
       <DialogActions>
         <Box style={{ display: 'flex', width: '95%', justifyContent: 'flex-end', mb: 1 }}>
           <Button
-            style={{ borderRadius: 15, backgroundColor: "#1565C0", fontSize: "13px" }}
+            style={{ borderRadius: 15, backgroundColor: "#9B2735", fontSize: "13px" }}
             onClick={handleLogin}
             variant="contained"
           >

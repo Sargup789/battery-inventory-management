@@ -102,7 +102,7 @@ const DropdownMasterIndex: React.FC = () => {
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={handleAddOption}
-                style={{ backgroundColor: "#1565C0" }}
+                style={{ backgroundColor: "#9B2735" }}
               >
                 Add
               </Button>

@@ -48,7 +48,7 @@ const PowerEquipmentIndex = ({
           </Button>
           <Button
             variant="contained"
-            style={{ borderRadius: 15, backgroundColor: "#1565C0", fontSize: "13px" }}
+            style={{ borderRadius: 15, backgroundColor: "#9B2735", fontSize: "13px" }}
             onClick={() => setDialogOpen(true)}
           >
             Add Power Equipment

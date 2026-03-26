@@ -61,8 +61,8 @@ const index = () => {
 
   return (
     <Layout>
-      {isLoading || !zones ? "Loading..." : (
-        <DashboardIndex dashboardData={zones} setPage={setPage} setSize={setSize} page={page} size={size} />
+      {isLoading ? "Loading..." : (
+        <DashboardIndex dashboardData={zones || []} setPage={setPage} setSize={setSize} page={page} size={size} />
       )}
     </Layout>
   );

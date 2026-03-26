@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import {
   Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField,
-  Grid, FormControl, InputLabel, Select, MenuItem, Typography
+  Grid, FormControl, InputLabel, Select, MenuItem, Typography, IconButton, Box
 } from "@mui/material";
+import { HighlightOff } from "@mui/icons-material";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { EquipmentData } from "@/pages/power-equipment";
@@ -32,18 +33,30 @@ const AddEquipmentDialog = ({ open, editData, handleClose, onSuccess }: Props) =
     }
   }, [editData, open]);
 
-  const fetchDropdown = (name: string) =>
-    useQuery(["dropdown", name], async () => {
-      const res = await axios.get(`/api/router?path=api/dropdownmaster/${name}`);
-      return res.data?.options || [];
-    }, { refetchOnWindowFocus: false });
-
-  const { data: itemTypes = [] } = fetchDropdown("itemType");
-  const { data: manufacturers = [] } = fetchDropdown("manufacturer");
-  const { data: statuses = [] } = fetchDropdown("powerEquipmentStatus");
-  const { data: assignationTypes = [] } = fetchDropdown("assignationType");
-  const { data: inboundDocTypes = [] } = fetchDropdown("inboundDocumentType");
-  const { data: outboundDocTypes = [] } = fetchDropdown("outboundDocumentType");
+  const { data: itemTypes = [] } = useQuery(["dropdown", "itemType"], async () => {
+    const res = await axios.get(`/api/router?path=api/dropdownmaster/itemType`);
+    return res.data?.options || [];
+  }, { refetchOnWindowFocus: false });
+  const { data: manufacturers = [] } = useQuery(["dropdown", "manufacturer"], async () => {
+    const res = await axios.get(`/api/router?path=api/dropdownmaster/manufacturer`);
+    return res.data?.options || [];
+  }, { refetchOnWindowFocus: false });
+  const { data: statuses = [] } = useQuery(["dropdown", "powerEquipmentStatus"], async () => {
+    const res = await axios.get(`/api/router?path=api/dropdownmaster/powerEquipmentStatus`);
+    return res.data?.options || [];
+  }, { refetchOnWindowFocus: false });
+  const { data: assignationTypes = [] } = useQuery(["dropdown", "assignationType"], async () => {
+    const res = await axios.get(`/api/router?path=api/dropdownmaster/assignationType`);
+    return res.data?.options || [];
+  }, { refetchOnWindowFocus: false });
+  const { data: inboundDocTypes = [] } = useQuery(["dropdown", "inboundDocumentType"], async () => {
+    const res = await axios.get(`/api/router?path=api/dropdownmaster/inboundDocumentType`);
+    return res.data?.options || [];
+  }, { refetchOnWindowFocus: false });
+  const { data: outboundDocTypes = [] } = useQuery(["dropdown", "outboundDocumentType"], async () => {
+    const res = await axios.get(`/api/router?path=api/dropdownmaster/outboundDocumentType`);
+    return res.data?.options || [];
+  }, { refetchOnWindowFocus: false });
 
   const { data: qrCodes = [] } = useQuery("qrCodes", async () => {
     const res = await axios.get(`/api/router?path=api/qr-code`);
@@ -94,7 +107,28 @@ const AddEquipmentDialog = ({ open, editData, handleClose, onSuccess }: Props) =
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-      <DialogTitle>{isEdit ? "Edit Power Equipment" : "Add Power Equipment"}</DialogTitle>
+      <DialogTitle
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "start",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          {isEdit ? "Edit Power Equipment" : "Add Power Equipment"}
+        </Box>
+        <IconButton
+          children={<HighlightOff />}
+          color="inherit"
+          onClick={handleClose}
+          sx={{ transform: "translate(8px, -8px)" }}
+        />
+      </DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 0.5 }}>
           <Grid item xs={12} sm={6}>
@@ -177,8 +211,15 @@ const AddEquipmentDialog = ({ open, editData, handleClose, onSuccess }: Props) =
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button onClick={handleSubmit} variant="contained" style={{ backgroundColor: "#1565C0" }}>
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          style={{
+            borderRadius: 15,
+            backgroundColor: "#9B2735",
+            fontSize: "13px"
+          }}
+        >
           {isEdit ? "Update" : "Create"}
         </Button>
       </DialogActions>

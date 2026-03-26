@@ -22,7 +22,7 @@ const DashboardIndex = ({ dashboardData }: Props) => {
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h5" fontWeight={700}>Zone Overview</Typography>
         <Button
-          style={{ borderRadius: 15, backgroundColor: "#1565C0", fontSize: "13px" }}
+          style={{ borderRadius: 15, backgroundColor: "#9B2735", fontSize: "13px" }}
           variant="contained"
           onClick={() => router.push("/generate-qr")}
         >

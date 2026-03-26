@@ -140,7 +140,7 @@ const CheckoutEquipment: React.FC = () => {
           <Button
             variant="contained"
             color="primary"
-            style={{ marginTop: "15px", backgroundColor: "#1565C0" }}
+            style={{ marginTop: "15px", backgroundColor: "#9B2735" }}
             onClick={handleCheckout}
           >
             Check-out Power Equipment

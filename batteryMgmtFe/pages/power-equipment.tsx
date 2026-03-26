@@ -145,9 +145,9 @@ const PowerEquipmentPage = () => {
 
   return (
     <Layout>
-      {isLoading || !equipment ? "Loading..." : (
+      {isLoading ? "Loading..." : (
         <PowerEquipmentIndex
-          equipmentApiData={equipment}
+          equipmentApiData={equipment || { totalCount: 0, currentPage: 1, data: [] }}
           deleteEquipment={deleteEquipment}
           refetch={refetch}
           setPage={setPage}

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import {
   Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField,
-  FormControl, InputLabel, Select, MenuItem, Grid
+  FormControl, InputLabel, Select, MenuItem, Grid, IconButton, Box
 } from "@mui/material";
+import { HighlightOff } from "@mui/icons-material";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -51,7 +52,28 @@ const AddUserDialog = ({ open, editData, handleClose, onSuccess }: Props) => {
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>{isEdit ? "Edit User" : "Add User"}</DialogTitle>
+      <DialogTitle
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "start",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          {isEdit ? "Edit User" : "Add User"}
+        </Box>
+        <IconButton
+          children={<HighlightOff />}
+          color="inherit"
+          onClick={handleClose}
+          sx={{ transform: "translate(8px, -8px)" }}
+        />
+      </DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 0.5 }}>
           <Grid item xs={12}>
@@ -87,8 +109,15 @@ const AddUserDialog = ({ open, editData, handleClose, onSuccess }: Props) => {
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button onClick={handleSubmit} variant="contained" style={{ backgroundColor: "#1565C0" }}>
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          style={{
+            borderRadius: 15,
+            backgroundColor: "#9B2735",
+            fontSize: "13px"
+          }}
+        >
           {isEdit ? "Update" : "Create"}
         </Button>
       </DialogActions>

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import {
   Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField,
-  Grid, FormControl, InputLabel, Select, MenuItem
+  Grid, FormControl, InputLabel, Select, MenuItem, IconButton, Box
 } from "@mui/material";
+import { HighlightOff } from "@mui/icons-material";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { ZoneData } from "@/pages/index";
@@ -29,15 +30,20 @@ const AddZoneDialog = ({ open, editData, parentZoneId, allZones, handleClose, on
     }
   }, [editData, parentZoneId, open]);
 
-  const fetchDropdown = (name: string) =>
-    useQuery(["dropdown", name], async () => {
-      const res = await axios.get(`/api/router?path=api/dropdownmaster/${name}`);
-      return res.data?.options || [];
-    }, { refetchOnWindowFocus: false });
+  const { data: locationTypes = [] } = useQuery(["dropdown", "locationType"], async () => {
+    const res = await axios.get(`/api/router?path=api/dropdownmaster/locationType`);
+    return res.data?.options || [];
+  }, { refetchOnWindowFocus: false });
 
-  const { data: locationTypes = [] } = fetchDropdown("locationType");
-  const { data: cities = [] } = fetchDropdown("city");
-  const { data: states = [] } = fetchDropdown("state");
+  const { data: cities = [] } = useQuery(["dropdown", "city"], async () => {
+    const res = await axios.get(`/api/router?path=api/dropdownmaster/city`);
+    return res.data?.options || [];
+  }, { refetchOnWindowFocus: false });
+
+  const { data: states = [] } = useQuery(["dropdown", "state"], async () => {
+    const res = await axios.get(`/api/router?path=api/dropdownmaster/state`);
+    return res.data?.options || [];
+  }, { refetchOnWindowFocus: false });
 
   const set = (field: keyof ZoneData, value: any) => setFormData((prev) => ({ ...prev, [field]: value }));
 
@@ -61,7 +67,28 @@ const AddZoneDialog = ({ open, editData, parentZoneId, allZones, handleClose, on
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>{isEdit ? "Edit Zone" : parentZoneId ? "Add Sub-zone" : "Add Zone"}</DialogTitle>
+      <DialogTitle
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "start",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          {isEdit ? "Edit Zone" : parentZoneId ? "Add Sub-zone" : "Add Zone"}
+        </Box>
+        <IconButton
+          children={<HighlightOff />}
+          color="inherit"
+          onClick={handleClose}
+          sx={{ transform: "translate(8px, -8px)" }}
+        />
+      </DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 0.5 }}>
           <Grid item xs={12} sm={6}>
@@ -109,8 +136,15 @@ const AddZoneDialog = ({ open, editData, parentZoneId, allZones, handleClose, on
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button onClick={handleSubmit} variant="contained" style={{ backgroundColor: "#1565C0" }}>
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          style={{
+            borderRadius: 15,
+            backgroundColor: "#9B2735",
+            fontSize: "13px"
+          }}
+        >
           {isEdit ? "Update" : "Create"}
         </Button>
       </DialogActions>

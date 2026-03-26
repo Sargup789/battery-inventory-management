@@ -150,7 +150,7 @@ const CheckinEquipment: React.FC = () => {
 
           <Button
             variant="contained"
-            style={{ marginTop: "15px", backgroundColor: "#1565C0" }}
+            style={{ marginTop: "15px", backgroundColor: "#9B2735" }}
             onClick={handleCheckin}
           >
             Check-in Power Equipment

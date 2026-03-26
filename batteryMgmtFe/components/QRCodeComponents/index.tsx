@@ -56,7 +56,7 @@ const QRCodeComponents: React.FC = () => {
             size="small"
             sx={{ minWidth: 300 }}
           />
-          <Button variant="contained" onClick={handleCreate} style={{ backgroundColor: "#1565C0" }}>
+          <Button variant="contained" onClick={handleCreate} style={{ backgroundColor: "#9B2735" }}>
             Generate
           </Button>
         </Box>

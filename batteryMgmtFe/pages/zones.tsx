@@ -69,9 +69,9 @@ const ZonesPage = () => {
 
   return (
     <Layout>
-      {isLoading || !zones ? "Loading..." : (
+      {isLoading ? "Loading..." : (
         <ZonesIndex
-          zonesApiData={zones}
+          zonesApiData={zones || { totalCount: 0, currentPage: 1, data: [] }}
           deleteZone={deleteZone}
           refetch={refetch}
           setPage={setPage}

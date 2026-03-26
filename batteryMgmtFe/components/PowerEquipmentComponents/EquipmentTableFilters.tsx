@@ -71,7 +71,7 @@ const EquipmentTableFilters = ({ filters, onFiltersChange }: Props) => {
           ))}
         </Select>
       </FormControl>
-      <Button variant="contained" onClick={handleApply} style={{ backgroundColor: "#1565C0" }}>Apply</Button>
+      <Button variant="contained" onClick={handleApply} style={{ backgroundColor: "#9B2735" }}>Apply</Button>
       <Button variant="outlined" onClick={handleClear}>Clear</Button>
     </Box>
   );
