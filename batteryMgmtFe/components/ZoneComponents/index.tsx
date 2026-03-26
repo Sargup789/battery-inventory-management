@@ -64,7 +64,7 @@ const ZonesIndex = ({ zonesApiData, deleteZone, refetch, setPage, setSize, page,
         open={dialogOpen}
         editData={editData}
         parentZoneId={parentZoneId}
-        allZones={zonesApiData.data}
+        allZones={zonesApiData?.data || []}
         handleClose={handleDialogClose}
         onSuccess={refetch}
       />

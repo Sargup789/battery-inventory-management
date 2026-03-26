@@ -63,7 +63,7 @@ const AddZoneDialog = ({ open, editData, parentZoneId, allZones, handleClose, on
     }
   };
 
-  const topLevelZones = allZones.filter((z) => !z.parentZoneId && z.id !== editData?.id);
+  const topLevelZones = (allZones || []).filter((z) => !z.parentZoneId && z.id !== editData?.id);
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>

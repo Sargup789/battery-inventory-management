@@ -53,7 +53,7 @@ const DropdownMasterComponent = () => {
     const fetchDropdowns = () => {
         axios.get('/api/router?path=api/dropdownmaster')
             .then(response => {
-                setDropdowns(response.data);
+                setDropdowns(Array.isArray(response.data) ? response.data : []);
             })
             .catch((error: any) => {
                 toast.error(`Failed to fetch dropdowns: ${error.message}`);
