@@ -15,7 +15,7 @@ type Props = {
 const DashboardIndex = ({ dashboardData }: Props) => {
   const router = useRouter();
   // Only show top-level zones (no parent)
-  const topLevelZones = dashboardData.filter((z) => !z.parentZoneId);
+  const topLevelZones = (dashboardData || []).filter((z) => !z.parentZoneId);
 
   return (
     <div className="m-6">
@@ -49,7 +49,7 @@ const DashboardIndex = ({ dashboardData }: Props) => {
             >
               <Box>
                 <Box sx={{ display: "flex", alignItems: "center", mb: 1.5 }}>
-                  <LocationOnIcon sx={{ color: "#1565C0", mr: 1 }} />
+                  <LocationOnIcon sx={{ color: "#9B2735", mr: 1 }} />
                   <Typography variant="h6" fontWeight={700} noWrap>{zone.name}</Typography>
                 </Box>
                 {zone.identifier && (
@@ -70,10 +70,10 @@ const DashboardIndex = ({ dashboardData }: Props) => {
 
               <Box sx={{ mt: 2, pt: 2, borderTop: "1px solid #eee", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <BatteryChargingFullIcon sx={{ color: "#1565C0", mr: 0.5, fontSize: 20 }} />
+                  <BatteryChargingFullIcon sx={{ color: "#9B2735", mr: 0.5, fontSize: 20 }} />
                   <Typography variant="body2" color="text.secondary">Equipment</Typography>
                 </Box>
-                <Typography variant="h4" fontWeight={800} color="#1565C0">
+                <Typography variant="h4" fontWeight={800} color="#9B2735">
                   {zone.equipmentCount ?? 0}
                 </Typography>
               </Box>

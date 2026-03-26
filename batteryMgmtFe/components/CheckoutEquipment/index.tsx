@@ -75,7 +75,7 @@ const CheckoutEquipment: React.FC = () => {
 
   return (
     <Box p={3} bgcolor="white" boxShadow={2} borderRadius={2}>
-      <Typography variant="h5" fontWeight={700} mb={2}>Check-out Power Equipment</Typography>
+      <Typography variant="h5" fontWeight={700} mb={2}/>
 
       {isScanning ? (
         <Box>

@@ -71,7 +71,7 @@ const QRCodeComponents: React.FC = () => {
                 p: 2,
                 textAlign: "center",
                 cursor: "pointer",
-                border: selectedCode === qr.code ? "2px solid #1565C0" : "1px solid #eee",
+                border: selectedCode === qr.code ? "2px solid #9B2735" : "1px solid #eee",
                 opacity: qr.inUse ? 0.7 : 1,
               }}
               onClick={() => setSelectedCode(qr.code)}

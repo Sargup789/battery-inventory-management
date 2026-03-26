@@ -7,7 +7,6 @@ import KeyboardDoubleArrowDownRoundedIcon from '@mui/icons-material/KeyboardDoub
 import KeyboardDoubleArrowUpRoundedIcon from '@mui/icons-material/KeyboardDoubleArrowUpRounded';
 import ArrowDropDownCircleOutlinedIcon from '@mui/icons-material/ArrowDropDownCircleOutlined';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
-import QrCodeIcon from '@mui/icons-material/QrCode';
 import { Box, CssBaseline, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, styled, Toolbar, Typography } from '@mui/material';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import LogoutButton from './withLogout';
@@ -24,7 +23,6 @@ const drawerItems = [
   { name: 'Check-out Equipment', path: '/checkout', icon: <KeyboardDoubleArrowUpRoundedIcon /> },
   { name: 'Check-in Equipment', path: '/checkin', icon: <KeyboardDoubleArrowDownRoundedIcon /> },
   { name: 'Check Status', path: '/checkstatus', icon: <ManageSearchIcon /> },
-  { name: 'Generate QR Code', path: '/generate-qr', icon: <QrCodeIcon /> },
   { name: 'Dropdown Master', path: '/dropdownmaster', icon: <ArrowDropDownCircleOutlinedIcon /> },
   { name: 'Users', path: '/user', icon: <PeopleIcon /> },
 ]
@@ -89,7 +87,7 @@ const Layout = ({ children }: Props & DecodedToken) => {
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppBar position="fixed" open={open}>
-        <Toolbar style={{ backgroundColor: "#1565C0", fontSize: "13px" }}>
+        <Toolbar style={{ backgroundColor: "#9B2735", fontSize: "13px" }}>
           <IconButton color="inherit" aria-label="open drawer" onClick={toggleDrawer} edge="start" sx={{ mr: 2 }}>
             <MenuIcon />
           </IconButton>
@@ -119,9 +117,7 @@ const Layout = ({ children }: Props & DecodedToken) => {
       >
         <DrawerHeader>
           <IconButton sx={{ width: '100%' }} onClick={handleDrawerClose}>
-            <Typography variant="h6" color="primary" fontWeight={700}>
-              Battery IMS
-            </Typography>
+            <img src="/images/ttcm.jpeg" alt="Logo" style={{ width: '80%', height: '40px', marginRight: '10px' }} />
           </IconButton>
         </DrawerHeader>
         <Divider />
@@ -136,7 +132,7 @@ const Layout = ({ children }: Props & DecodedToken) => {
           ))}
         </List>
       </Drawer>
-      <Main open={open} sx={{ backgroundColor: '#f0f4f8', minHeight: '100vh' }}>
+      <Main open={open} sx={{ backgroundColor: '#a9a8a9', minHeight: '100vh' }}>
         <DrawerHeader />
         {children}
       </Main>

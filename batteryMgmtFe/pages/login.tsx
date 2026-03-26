@@ -28,8 +28,8 @@ const LoginPage: React.FC = () => {
   return (
     <Dialog open={true} onClose={() => {}}>
       <DialogTitle>
-        <Box display="flex" alignItems="center" gap={1}>
-          <Typography variant="h5" color="primary" fontWeight={700}>Battery IMS</Typography>
+        <Box display="flex" alignItems="center" sx={{ width: '100%', height: '150px' }}>
+          <img src="/images/ttcm.jpeg" alt="Logo" style={{ width: '100%' }} />
         </Box>
         <Typography variant="h6">Login</Typography>
         <Typography variant="body2" color="text.secondary">Sign in to your account</Typography>

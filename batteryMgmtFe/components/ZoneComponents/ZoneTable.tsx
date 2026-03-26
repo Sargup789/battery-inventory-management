@@ -1,9 +1,7 @@
 import React from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, IconButton, Tooltip, Chip } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AddIcon from "@mui/icons-material/Add";
+import { EditOutlined, DeleteOutline, Add } from "@mui/icons-material";
 import { ZoneApiResponse } from "@/pages/zones";
 import { ZoneData } from "@/pages/index";
 
@@ -20,15 +18,17 @@ type Props = {
 
 const ZoneTable = ({ zonesApiData, deleteZone, onEdit, onAddSubZone, setPage, setSize, page, size }: Props) => {
   const columns: GridColDef[] = [
-    { field: "name", headerName: "Name", width: 180 },
-    { field: "identifier", headerName: "Identifier", width: 130 },
-    { field: "locationType", headerName: "Location Type", width: 150 },
-    { field: "city", headerName: "City", width: 130 },
-    { field: "state", headerName: "State", width: 130 },
+    { field: "name", headerName: "Name", width: 180, headerAlign: "center", align: "center", sortable: true },
+    { field: "identifier", headerName: "Identifier", width: 130, headerAlign: "center", align: "center", sortable: true },
+    { field: "locationType", headerName: "Location Type", width: 150, headerAlign: "center", align: "center", sortable: true },
+    { field: "city", headerName: "City", width: 130, headerAlign: "center", align: "center", sortable: true },
+    { field: "state", headerName: "State", width: 130, headerAlign: "center", align: "center", sortable: true },
     {
       field: "parentZoneId",
       headerName: "Type",
       width: 120,
+      headerAlign: "center",
+      align: "center",
       renderCell: (params) => (
         <Chip
           label={params.value ? "Sub-zone" : "Zone"}
@@ -43,27 +43,31 @@ const ZoneTable = ({ zonesApiData, deleteZone, onEdit, onAddSubZone, setPage, se
       headerName: "Equipment Count",
       width: 160,
       type: "number",
+      headerAlign: "center",
+      align: "center",
     },
     {
       field: "actions",
       headerName: "Actions",
       width: 160,
       sortable: false,
+      headerAlign: "center",
+      align: "center",
       renderCell: (params) => (
         <Box>
-          <Tooltip title="Add Sub-zone">
+          <Tooltip title="Add Sub-zone" followCursor>
             <IconButton size="small" color="primary" onClick={() => onAddSubZone(params.row.id)}>
-              <AddIcon fontSize="small" />
+              <Add fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Edit">
+          <Tooltip title="Edit" followCursor>
             <IconButton size="small" onClick={() => onEdit(params.row)}>
-              <EditIcon fontSize="small" />
+              <EditOutlined fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Delete">
+          <Tooltip title="Delete" followCursor>
             <IconButton size="small" color="error" onClick={() => deleteZone(params.row.id)}>
-              <DeleteIcon fontSize="small" />
+              <DeleteOutline fontSize="small" />
             </IconButton>
           </Tooltip>
         </Box>
@@ -72,7 +76,7 @@ const ZoneTable = ({ zonesApiData, deleteZone, onEdit, onAddSubZone, setPage, se
   ];
 
   return (
-    <Box sx={{ height: 600, bgcolor: "white", borderRadius: 2, boxShadow: 1 }}>
+    <div style={{ height: 450, width: '100%', backgroundColor: 'white' }}>
       <DataGrid
         rows={zonesApiData.data}
         columns={columns}
@@ -82,11 +86,24 @@ const ZoneTable = ({ zonesApiData, deleteZone, onEdit, onAddSubZone, setPage, se
         pageSize={size}
         onPageChange={(newPage) => setPage(newPage + 1)}
         onPageSizeChange={(newSize) => setSize(newSize)}
-        rowsPerPageOptions={[25, 50, 100]}
+        rowsPerPageOptions={[10, 25, 100]}
         disableSelectionOnClick
-        sx={{ border: "none" }}
+        sx={{
+          border: "none",
+          '& .MuiDataGrid-cell': {
+            textAlign: 'center',
+            justifyContent: 'center',
+            display: 'flex',
+          },
+          '& .MuiDataGrid-columnHeaderTitle': {
+            fontWeight: '700',
+          },
+          '& .MuiDataGrid-columnHeaderTitleContainer': {
+            justifyContent: 'center',
+          },
+        }}
       />
-    </Box>
+    </div>
   );
 };
 

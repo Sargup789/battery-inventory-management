@@ -37,7 +37,7 @@ const PowerEquipmentIndex = ({
   return (
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h5" fontWeight={700}>Power Equipment</Typography>
+        <Typography variant="h5" fontWeight={700}/>
         <Box display="flex" gap={2}>
           <Button
             variant="outlined"

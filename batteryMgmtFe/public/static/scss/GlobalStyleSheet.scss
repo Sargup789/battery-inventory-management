@@ -5,5 +5,39 @@
 }
 
 body {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Inter', 'Roboto', sans-serif;
+}
+
+.react-datepicker {
+  font-family: 'Inter', sans-serif;
+}
+
+.react-datepicker__header {
+  background-color: white;
+  border-bottom: 1px solid var(--light);
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: var(--dark) !important;
+  color: var(--white) !important;
+}
+
+.react-datepicker__day--today {
+  border: 1px solid var(--brand);
+}
+
+.react-datepicker__day:hover {
+  background-color: var(--brand);
+  color: white;
+}
+
+.react-datepicker__current-month {
+  color: var(--dark);
+}
+
+.print-hide {
+  @media print {
+    display: none !important;
+  }
 }

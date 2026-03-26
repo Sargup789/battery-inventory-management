@@ -39,7 +39,7 @@ const ZonesIndex = ({ zonesApiData, deleteZone, refetch, setPage, setSize, page,
   return (
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h5" fontWeight={700}>Zones</Typography>
+        <Typography variant="h5" fontWeight={700}/>
         <Button
           variant="contained"
           style={{ borderRadius: 15, backgroundColor: "#9B2735", fontSize: "13px" }}
