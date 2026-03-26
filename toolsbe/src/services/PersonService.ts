@@ -32,7 +32,7 @@ export const updatePerson = async (
   const person = await PersonRepository.findOne({
     where: { _id: new ObjectId(id) } as any,
   });
-  if (!person) throw new Error("Person not found");
+  if (!person) throw new Error("Persona no encontrada");
   const updatedPerson = Object.assign(person, personData);
   updatedPerson.updatedAt = new Date();
   return await PersonRepository.save(updatedPerson);

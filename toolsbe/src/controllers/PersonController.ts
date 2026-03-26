@@ -14,7 +14,7 @@ export const getPerson = async (req: Request, res: Response) => {
   try {
     const person = await personService.getPerson(req.params.id);
     if (!person) {
-      return res.status(404).json({ error: "Person not found" });
+      return res.status(404).json({ error: "Persona no encontrada" });
     }
     res.json(person);
   } catch (err) {
@@ -68,7 +68,7 @@ export const updatePerson = async (req: Request, res: Response) => {
 export const deletePerson = async (req: Request, res: Response) => {
   try {
     await personService.deletePerson(req.params.id);
-    res.json({ message: "Person deleted successfully" });
+    res.json({ message: "Persona eliminada correctamente" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
