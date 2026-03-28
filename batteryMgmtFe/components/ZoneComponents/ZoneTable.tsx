@@ -78,10 +78,10 @@ const ZoneTable = ({ zonesApiData, deleteZone, onEdit, onAddSubZone, setPage, se
   return (
     <div style={{ height: 450, width: '100%', backgroundColor: 'white' }}>
       <DataGrid
-        rows={zonesApiData.data}
+        rows={zonesApiData?.data || []}
         columns={columns}
         paginationMode="server"
-        rowCount={zonesApiData.totalCount}
+        rowCount={zonesApiData?.totalCount || 0}
         page={page - 1}
         pageSize={size}
         onPageChange={(newPage) => setPage(newPage + 1)}
