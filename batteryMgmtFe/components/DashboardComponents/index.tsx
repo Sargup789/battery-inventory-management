@@ -15,7 +15,8 @@ type Props = {
 const DashboardIndex = ({ dashboardData }: Props) => {
   const router = useRouter();
   // Only show top-level zones (no parent)
-  const topLevelZones = (dashboardData || []).filter((z) => !z.parentZoneId);
+  const safeData = Array.isArray(dashboardData) ? dashboardData : Array.isArray((dashboardData as any)?.data) ? (dashboardData as any).data : [];
+  const topLevelZones = safeData.filter((z: ZoneData) => !z.parentZoneId);
 
   return (
     <div className="m-6">
