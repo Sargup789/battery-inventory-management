@@ -53,7 +53,11 @@ const DropdownMasterComponent = () => {
     const fetchDropdowns = () => {
         axios.get('/api/router?path=api/dropdownmaster')
             .then(response => {
-                setDropdowns(Array.isArray(response.data) ? response.data : []);
+                const data = Array.isArray(response.data) ? response.data : [];
+                setDropdowns(data);
+                if (currentTab >= data.length) {
+                    setCurrentTab(0);
+                }
             })
             .catch((error: any) => {
                 toast.error(`Failed to fetch dropdowns: ${error.message}`);
@@ -110,13 +114,13 @@ const DropdownMasterComponent = () => {
 
     return (
         <Box p={3} bgcolor="white" boxShadow={2}>
-            {dropdowns.length > 0 && (
-                <Tabs value={currentTab} onChange={(_event, newValue) => setCurrentTab(newValue)}>
+            {dropdowns.length > 0 ? (
+                <Tabs value={Math.min(currentTab, dropdowns.length - 1)} onChange={(_event, newValue) => setCurrentTab(newValue)}>
                     {dropdowns.map((dropdown, index) => (
                         <Tab key={index} label={dropdown?.dropdownName} />
                     ))}
                 </Tabs>
-            )}
+            ) : null}
 
             <Grid container justifyContent="space-between" alignItems="center" marginBottom={2}>
                 <Grid item>
