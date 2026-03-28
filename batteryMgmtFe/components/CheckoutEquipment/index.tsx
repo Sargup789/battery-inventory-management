@@ -34,16 +34,6 @@ const CheckoutEquipment: React.FC = () => {
     }
   };
 
-  const handleManualLookup = async () => {
-    if (!qrCode) return;
-    try {
-      const response = await axios.get(`/api/router?path=api/power-equipment/qr-code/${qrCode}`);
-      setEquipmentDetails(response.data);
-    } catch (error: any) {
-      toast.error(error?.response?.data?.error || "Equipment not found.");
-    }
-  };
-
   const handleCheckout = async () => {
     if (!equipmentDetails?.equipmentId) {
       toast.error("No equipment selected.");
@@ -96,9 +86,6 @@ const CheckoutEquipment: React.FC = () => {
               <>
                 <InputAdornment position="end">
                   <Button onClick={() => setIsScanning(true)}>Scan</Button>
-                </InputAdornment>
-                <InputAdornment position="end">
-                  <Button onClick={handleManualLookup}>Lookup</Button>
                 </InputAdornment>
                 <InputAdornment position="end">
                   <IconButton onClick={handleClear}><ClearIcon /></IconButton>

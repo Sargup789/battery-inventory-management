@@ -73,9 +73,6 @@ const CheckStatusEquipment: React.FC = () => {
                   <Button onClick={() => setIsScanning(true)}>Scan</Button>
                 </InputAdornment>
                 <InputAdornment position="end">
-                  <Button onClick={() => handleLookup()}>Lookup</Button>
-                </InputAdornment>
-                <InputAdornment position="end">
                   <IconButton onClick={handleClear}><ClearIcon /></IconButton>
                 </InputAdornment>
               </>
