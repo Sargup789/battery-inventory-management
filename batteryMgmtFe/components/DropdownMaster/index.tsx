@@ -110,11 +110,13 @@ const DropdownMasterComponent = () => {
 
     return (
         <Box p={3} bgcolor="white" boxShadow={2}>
-            <Tabs value={currentTab} onChange={(event, newValue) => setCurrentTab(newValue)}>
-                {dropdowns.map((dropdown, index) => (
-                    <Tab key={index} label={dropdown?.dropdownName} />
-                ))}
-            </Tabs>
+            {dropdowns.length > 0 && (
+                <Tabs value={currentTab} onChange={(_event, newValue) => setCurrentTab(newValue)}>
+                    {dropdowns.map((dropdown, index) => (
+                        <Tab key={index} label={dropdown?.dropdownName} />
+                    ))}
+                </Tabs>
+            )}
 
             <Grid container justifyContent="space-between" alignItems="center" marginBottom={2}>
                 <Grid item>
