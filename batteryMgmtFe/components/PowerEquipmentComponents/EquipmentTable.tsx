@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { DataGrid, GridColDef, GridCellParams, GridValueGetterParams } from "@mui/x-data-grid";
 import { Box, Chip, IconButton, Tooltip } from "@mui/material";
 import { EditOutlined, DeleteOutline } from "@mui/icons-material";
 import { EquipmentApiResponse, EquipmentData } from "@/pages/power-equipment";
 import QRCode from "react-qr-code";
+import PrintDialog from "../QRCodeComponents/PrintDialog";
 import moment from "moment";
 
 type Props = {
@@ -39,6 +40,9 @@ const getStatusLabel = (status: string): string => {
 };
 
 const EquipmentTable = ({ equipmentApiData, deleteEquipment, onEdit, setPage, setSize, page, size }: Props) => {
+  const [printDialogOpen, setPrintDialogOpen] = useState(false);
+  const [printCode, setPrintCode] = useState("");
+
   const columns: GridColDef[] = [
     {
       field: "qrCodeId",
@@ -51,8 +55,13 @@ const EquipmentTable = ({ equipmentApiData, deleteEquipment, onEdit, setPage, se
         const code = params.value as string;
         if (!code) return "N/A";
         return (
-          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <QRCode value={code} size={40} level="H" />
+          <div style={{ display: "flex", alignItems: "center", gap: 4, cursor: "pointer" }}>
+            <QRCode value={code} size={40} level="H"
+              onClick={() => {
+                setPrintCode(code);
+                setPrintDialogOpen(true);
+              }}
+            />
           </div>
         );
       },
@@ -147,6 +156,9 @@ const EquipmentTable = ({ equipmentApiData, deleteEquipment, onEdit, setPage, se
           },
         }}
       />
+      {printDialogOpen && (
+        <PrintDialog open={printDialogOpen} handleClose={() => setPrintDialogOpen(false)} code={printCode} />
+      )}
     </div>
   );
 };

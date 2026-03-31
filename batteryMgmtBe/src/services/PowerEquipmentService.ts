@@ -95,7 +95,7 @@ export const deleteEquipment = async (id: string): Promise<void> => {
 export const updateEquipment = async (id: string, data: Partial<PowerEquipment>): Promise<PowerEquipment> => {
   const equipment = await resolveEquipmentByRef(id);
   if (!equipment) throw new Error("Equipment not found");
-  const { equipmentId, ...safeData } = data as any;
+  const { equipmentId: _eqId, id: _docId, _id: _mongoId, createdAt: _created, ...safeData } = data as any;
   const updated = Object.assign(equipment, safeData);
   updated.updatedAt = new Date();
   return await PowerEquipmentRepository.save(updated);
