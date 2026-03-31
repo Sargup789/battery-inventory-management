@@ -208,7 +208,7 @@ const AddEquipmentDialog = ({ open, editData, handleClose, onSuccess }: Props) =
             {textField("Amp-hours", "ampHours")}
           </Grid>
           <Grid item xs={12} sm={6}>
-            {dropdownField("Power Equipment Status", "status", statuses)}
+            {dropdownField("Power Equipment Status", "powerEquipmentStatus", statuses)}
           </Grid>
           <Grid item xs={12} sm={6}>
             <Typography variant="caption" color="text.secondary">Date of Arrival</Typography>

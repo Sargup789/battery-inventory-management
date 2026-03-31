@@ -2,39 +2,32 @@ import React, { useState } from "react";
 import axios from "axios";
 import { QrReader } from "react-qr-reader";
 import {
-  TextField, Button, Box, Typography, IconButton, InputAdornment, Chip, Divider, Paper
+  Box, Typography, TextField, InputAdornment, Button, IconButton, Chip, Divider, Paper
 } from "@mui/material";
-import { toast } from "react-toastify";
 import ClearIcon from "@mui/icons-material/Clear";
+import { toast } from "react-toastify";
 import moment from "moment";
 
 const CheckStatusEquipment: React.FC = () => {
-  const [qrCode, setQrCode] = useState<string | null>(null);
+  const [qrCode, setQrCode] = useState("");
   const [isScanning, setIsScanning] = useState(false);
   const [result, setResult] = useState<any | null>(null);
 
-  const handleLookup = async (code?: string) => {
-    const lookupCode = code || qrCode;
-    if (!lookupCode) return;
+  const handleScan = async (scanResult: any) => {
+    const scannedCode = scanResult?.text;
+    if (!scannedCode) return;
+    setQrCode(scannedCode);
+    setIsScanning(false);
     try {
-      // First try by QR code
-      const response = await axios.get(`/api/router?path=api/power-equipment/status/${lookupCode}`);
+      const response = await axios.get(`/api/router?path=api/power-equipment/status/${scannedCode}`);
       setResult(response.data);
     } catch (error: any) {
       toast.error(error?.response?.data?.error || "Equipment not found.");
     }
   };
 
-  const handleScan = async (result: any) => {
-    const scannedCode = result?.text;
-    if (!scannedCode) return;
-    setQrCode(scannedCode);
-    setIsScanning(false);
-    await handleLookup(scannedCode);
-  };
-
   const handleClear = () => {
-    setQrCode(null);
+    setQrCode("");
     setResult(null);
   };
 
@@ -48,24 +41,25 @@ const CheckStatusEquipment: React.FC = () => {
   };
 
   return (
-    <Box p={3} bgcolor="white" boxShadow={2} borderRadius={2}>
-      <Typography variant="h5" fontWeight={700} mb={2}/>
-
+    <Box p={3} bgcolor="white" boxShadow={2}>
+      <Typography variant="h5">Check Equipment Status</Typography>
       {isScanning ? (
-        <Box>
-          <div style={{ width: "40%" }}>
-            <QrReader onResult={handleScan} constraints={{ facingMode: "environment" }} />
-          </div>
+        <div>
+          <QrReader
+            onResult={handleScan}
+            constraints={{ facingMode: "environment" }}
+            // @ts-ignore
+            style={{ width: "40%", height: "40%" }}
+          />
           <Button onClick={() => setIsScanning(false)}>Close Scanner</Button>
-        </Box>
+        </div>
       ) : (
         <TextField
-          label="Scan QR Code or Enter Equipment ID"
-          value={qrCode || ""}
+          label="Scan QR Code"
+          value={qrCode}
           margin="normal"
           fullWidth
           onChange={(e) => setQrCode(e.target.value)}
-          onKeyPress={(e) => e.key === "Enter" && handleLookup()}
           InputProps={{
             endAdornment: (
               <>
@@ -73,7 +67,9 @@ const CheckStatusEquipment: React.FC = () => {
                   <Button onClick={() => setIsScanning(true)}>Scan</Button>
                 </InputAdornment>
                 <InputAdornment position="end">
-                  <IconButton onClick={handleClear}><ClearIcon /></IconButton>
+                  <IconButton onClick={handleClear}>
+                    <ClearIcon />
+                  </IconButton>
                 </InputAdornment>
               </>
             ),
@@ -82,37 +78,46 @@ const CheckStatusEquipment: React.FC = () => {
       )}
 
       {eq && (
-        <Box mt={3}>
-          <Box display="flex" alignItems="center" gap={2} mb={2}>
-            <Typography variant="h6" fontWeight={700}>Equipment Details</Typography>
+        <Box mt={2} display="flex" flexDirection="column" gap={1}>
+          <Box display="flex" alignItems="center" gap={2}>
+            <Typography variant="h6">Equipment Details</Typography>
             <Chip label={eq.status} color={getStatusColor(eq.status) as any} />
           </Box>
 
           <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-            <Typography variant="body1"><strong>Equipment ID:</strong> {eq.equipmentId}</Typography>
-            <Typography variant="body1"><strong>Item Type:</strong> {eq.itemType || "—"}</Typography>
-            <Typography variant="body1"><strong>Manufacturer:</strong> {eq.manufacturer || "—"}</Typography>
-            <Typography variant="body1"><strong>Model Number:</strong> {eq.modelNumber || "—"}</Typography>
-            <Typography variant="body1"><strong>Serial Number:</strong> {eq.serialNumber || "—"}</Typography>
-            <Typography variant="body1"><strong>Voltage:</strong> {eq.voltage || "—"}</Typography>
-            <Typography variant="body1"><strong>Amp-hours:</strong> {eq.ampHours || "—"}</Typography>
-            <Typography variant="body1"><strong>Assignation Type:</strong> {eq.assignationType || "—"}</Typography>
-            <Typography variant="body1"><strong>Assigned To:</strong> {eq.assignedTo || "—"}</Typography>
-            <Typography variant="body1"><strong>Customer Name:</strong> {eq.customerName || "—"}</Typography>
-            <Typography variant="body1"><strong>Order Entry Number:</strong> {eq.orderEntryNumber || "—"}</Typography>
+            <Typography>QR Code: {eq.qrCodeId || "N/A"}</Typography>
+            <Typography>Equipment ID: {eq.equipmentId || "N/A"}</Typography>
+            <Typography>Item Type: {eq.itemType || "N/A"}</Typography>
+            <Typography>Manufacturer: {eq.manufacturer || "N/A"}</Typography>
+            <Typography>Model Number: {eq.modelNumber || "N/A"}</Typography>
+            <Typography>Serial Number: {eq.serialNumber || "N/A"}</Typography>
+            <Typography>Voltage: {eq.voltage || "N/A"}</Typography>
+            <Typography>Amp-hours: {eq.ampHours || "N/A"}</Typography>
+            <Typography>Power Equipment Status: {eq.powerEquipmentStatus || "N/A"}</Typography>
+            <Typography>Assignation Type: {eq.assignationType || "N/A"}</Typography>
+            <Typography>Assigned To: {eq.assignedTo || "N/A"}</Typography>
+            <Typography>Customer Name: {eq.customerName || "N/A"}</Typography>
+            <Typography>Order Entry Number: {eq.orderEntryNumber || "N/A"}</Typography>
             <Divider sx={{ my: 1 }} />
             {eq.status === "checked-in" && (
               <>
-                <Typography variant="body1"><strong>Zone:</strong> {eq.zoneName || "—"}</Typography>
-                <Typography variant="body1"><strong>Location Type:</strong> {eq.zoneLocationType || "—"}</Typography>
-                <Typography variant="body1"><strong>City:</strong> {eq.zoneCity || "—"}</Typography>
-                <Typography variant="body1"><strong>State:</strong> {eq.zoneState || "—"}</Typography>
-                <Typography variant="body1"><strong>Location:</strong> {eq.location || "—"}</Typography>
+                <Typography>Zone: {eq.zoneName || "N/A"}</Typography>
+                <Typography>Location Type: {eq.zoneLocationType || "N/A"}</Typography>
+                <Typography>City: {eq.zoneCity || "N/A"}</Typography>
+                <Typography>State: {eq.zoneState || "N/A"}</Typography>
+                <Typography>Location: {eq.location || "N/A"}</Typography>
               </>
             )}
             {eq.checkoutReason && (
-              <Typography variant="body1"><strong>Check-out Reason:</strong> {eq.checkoutReason}</Typography>
+              <Typography>Check-out Reason: {eq.checkoutReason}</Typography>
             )}
+            <Divider sx={{ my: 1 }} />
+            <Typography>
+              Created: {eq.createdAt ? moment(eq.createdAt).format("MMM DD, YYYY HH:mm") : "N/A"}
+            </Typography>
+            <Typography>
+              Updated: {eq.updatedAt ? moment(eq.updatedAt).format("MMM DD, YYYY HH:mm") : "N/A"}
+            </Typography>
           </Paper>
 
           {events.length > 0 && (

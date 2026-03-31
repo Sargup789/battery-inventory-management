@@ -17,6 +17,7 @@ export interface EquipmentData {
   voltage?: string;
   ampHours?: string;
   status: string;
+  powerEquipmentStatus?: string;
   dateOfArrival?: string;
   assignationType?: string;
   assignedTo?: string;

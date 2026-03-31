@@ -1,8 +1,9 @@
 import React from "react";
-import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridCellParams, GridValueGetterParams } from "@mui/x-data-grid";
 import { Box, Chip, IconButton, Tooltip } from "@mui/material";
 import { EditOutlined, DeleteOutline } from "@mui/icons-material";
 import { EquipmentApiResponse, EquipmentData } from "@/pages/power-equipment";
+import QRCode from "react-qr-code";
 import moment from "moment";
 
 type Props = {
@@ -19,13 +20,43 @@ const getStatusColor = (status: string): string => {
   switch (status) {
     case "created": return "#2196f3";
     case "checked-in": return "#4caf50";
+    case "checked-out": return "#ff9800";
     case "in-transit": return "#ff9800";
+    case "assigned": return "#ffc107";
     default: return "#9e9e9e";
+  }
+};
+
+const getStatusLabel = (status: string): string => {
+  switch (status) {
+    case "created": return "Created";
+    case "checked-in": return "Checked-in";
+    case "checked-out": return "Checked-out";
+    case "in-transit": return "In-transit";
+    case "assigned": return "Assigned";
+    default: return status || "N/A";
   }
 };
 
 const EquipmentTable = ({ equipmentApiData, deleteEquipment, onEdit, setPage, setSize, page, size }: Props) => {
   const columns: GridColDef[] = [
+    {
+      field: "qrCodeId",
+      headerName: "QR Code",
+      width: 150,
+      sortable: false,
+      headerAlign: "center",
+      align: "center",
+      renderCell: (params: GridCellParams) => {
+        const code = params.value as string;
+        if (!code) return "N/A";
+        return (
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <QRCode value={code} size={40} level="H" />
+          </div>
+        );
+      },
+    },
     { field: "equipmentId", headerName: "Equipment ID", width: 130, headerAlign: "center", align: "center", sortable: true },
     { field: "itemType", headerName: "Item Type", width: 130, headerAlign: "center", align: "center", sortable: true },
     { field: "manufacturer", headerName: "Manufacturer", width: 130, headerAlign: "center", align: "center", sortable: true },
@@ -42,12 +73,13 @@ const EquipmentTable = ({ equipmentApiData, deleteEquipment, onEdit, setPage, se
       sortable: true,
       renderCell: (params) => (
         <Chip
-          label={params.value}
+          label={getStatusLabel(params.value)}
           style={{ backgroundColor: getStatusColor(params.value), color: "white" }}
           size="small"
         />
       ),
     },
+    { field: "powerEquipmentStatus", headerName: "Equipment Status", width: 160, headerAlign: "center", align: "center", sortable: true },
     { field: "zoneName", headerName: "Zone", width: 130, headerAlign: "center", align: "center", sortable: true },
     { field: "location", headerName: "Location", width: 130, headerAlign: "center", align: "center", sortable: true },
     { field: "assignedTo", headerName: "Assigned To", width: 130, headerAlign: "center", align: "center", sortable: true },

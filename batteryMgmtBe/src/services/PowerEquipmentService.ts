@@ -3,13 +3,17 @@ import { PowerEquipment, EquipmentStatus } from "../entity/PowerEquipment";
 import { EquipmentEvent } from "../entity/EquipmentEvent";
 import { ObjectId } from "mongodb";
 
-const generateEquipmentId = (): string => {
+const generateEquipmentId = async (): Promise<string> => {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let result = "";
-  for (let i = 0; i < 6; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  for (let attempt = 0; attempt < 10; attempt++) {
+    let result = "";
+    for (let i = 0; i < 6; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    const existing = await PowerEquipmentRepository.findOne({ where: { equipmentId: result } });
+    if (!existing) return result;
   }
-  return result;
+  throw new Error("Failed to generate unique equipment ID");
 };
 
 const toEntityId = (value: any): string => {
@@ -62,7 +66,7 @@ const logEvent = async (equipmentId: string, eventType: string, data: Partial<Eq
 export const createEquipment = async (data: Partial<PowerEquipment>): Promise<PowerEquipment> => {
   const equipment = new PowerEquipment(data);
   const qr = await resolveQrCode(data.qrCodeId);
-  equipment.equipmentId = data.equipmentId || generateEquipmentId();
+  equipment.equipmentId = data.equipmentId || await generateEquipmentId();
   equipment.status = EquipmentStatus.Created;
   equipment.qrCodeId = qr?.code || data.qrCodeId || null;
   equipment.createdAt = new Date();
@@ -91,7 +95,8 @@ export const deleteEquipment = async (id: string): Promise<void> => {
 export const updateEquipment = async (id: string, data: Partial<PowerEquipment>): Promise<PowerEquipment> => {
   const equipment = await resolveEquipmentByRef(id);
   if (!equipment) throw new Error("Equipment not found");
-  const updated = Object.assign(equipment, data);
+  const { equipmentId, ...safeData } = data as any;
+  const updated = Object.assign(equipment, safeData);
   updated.updatedAt = new Date();
   return await PowerEquipmentRepository.save(updated);
 };

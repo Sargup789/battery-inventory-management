@@ -38,6 +38,9 @@ export class PowerEquipment {
   status: string; // created | checked-in | <checkoutReason>
 
   @Column({ nullable: true })
+  powerEquipmentStatus: string; // Reference to DropDownMaster (powerEquipmentStatus)
+
+  @Column({ nullable: true })
   dateOfArrival: Date;
 
   @Column({ nullable: true })

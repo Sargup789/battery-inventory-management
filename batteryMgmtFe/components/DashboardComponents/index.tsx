@@ -72,7 +72,7 @@ const DashboardIndex = ({ dashboardData }: Props) => {
               <Box sx={{ mt: 2, pt: 2, borderTop: "1px solid #eee", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <BatteryChargingFullIcon sx={{ color: "#9B2735", mr: 0.5, fontSize: 20 }} />
-                  <Typography variant="body2" color="text.secondary">Equipment</Typography>
+                  <Typography variant="body2" color="text.secondary">Count of Equipment</Typography>
                 </Box>
                 <Typography variant="h4" fontWeight={800} color="#9B2735">
                   {zone.equipmentCount ?? 0}
