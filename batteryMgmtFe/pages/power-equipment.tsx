@@ -75,6 +75,7 @@ const normalizeEquipment = (raw: any): EquipmentData => ({
   voltage: raw?.voltage || "",
   ampHours: raw?.ampHours || "",
   status: raw?.status || "created",
+  powerEquipmentStatus: raw?.powerEquipmentStatus || "",
   dateOfArrival: raw?.dateOfArrival,
   assignationType: raw?.assignationType || "",
   assignedTo: raw?.assignedTo || "",

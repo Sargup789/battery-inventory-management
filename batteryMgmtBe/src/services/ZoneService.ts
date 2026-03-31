@@ -19,7 +19,9 @@ export const createZone = async (zoneData: Partial<Zone>): Promise<Zone> => {
 };
 
 export const deleteZone = async (id: string): Promise<void> => {
-  await ZoneRepository.deleteOne({ _id: new ObjectId(id) });
+  const zone = await ZoneRepository.findOne({ where: { _id: new ObjectId(id) } as any });
+  if (!zone) throw new Error("Zone not found");
+  await ZoneRepository.remove(zone);
 };
 
 export const updateZone = async (id: string, zoneData: Partial<Zone>): Promise<Zone> => {

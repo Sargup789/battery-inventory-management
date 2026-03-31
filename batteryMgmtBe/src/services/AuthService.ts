@@ -15,7 +15,9 @@ export const registerUser = async (userData) => {
 
   const saltRounds = 10;
   userData.password = await bcrypt.hash(userData.password, saltRounds);
-  return UserRepository.save(new User(userData));
+  const saved = await UserRepository.save(new User(userData));
+  const { password: _pw, ...result } = saved as any;
+  return result;
 };
 
 export const loginUser = async (username, password) => {
@@ -94,8 +96,10 @@ export const getAllUsers = async (page: number, size: number) => {
 
   const totalCount = await UserRepository.count();
 
+  const sanitizedUsers = users.map(({ password, ...rest }) => rest);
+
   return {
-    users,
+    users: sanitizedUsers,
     totalCount,
     currentPage: page,
     pageSize: size,
@@ -106,7 +110,9 @@ export const deleteUser = async (id: string): Promise<void> => {
   if (!ObjectId.isValid(id)) {
     throw new Error("Invalid user id.");
   }
-  await UserRepository.deleteOne({ _id: new ObjectId(id) });
+  const user = await UserRepository.findOne({ where: { _id: new ObjectId(id) } as any });
+  if (!user) throw new Error("User not found.");
+  await UserRepository.remove(user);
 };
 
 export const updateUser = async (

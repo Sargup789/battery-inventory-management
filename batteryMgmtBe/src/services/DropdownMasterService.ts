@@ -7,7 +7,9 @@ export const createDropdown = async (dropdown: DropdownMaster): Promise<Dropdown
 };
 
 export const deleteDropdown = async (dropdownName: string): Promise<void> => {
-  await DropdownMasterRepository.deleteOne({ dropdownName });
+  const dropdown = await DropdownMasterRepository.findOne({ where: { dropdownName } });
+  if (!dropdown) throw new Error("Dropdown not found");
+  await DropdownMasterRepository.remove(dropdown);
 };
 
 export const updateDropdown = async (dropdownName: string, dropdownData: Partial<DropdownMaster>): Promise<DropdownMaster> => {

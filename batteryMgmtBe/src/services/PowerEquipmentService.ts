@@ -69,6 +69,7 @@ export const createEquipment = async (data: Partial<PowerEquipment>): Promise<Po
   equipment.equipmentId = data.equipmentId || await generateEquipmentId();
   equipment.status = EquipmentStatus.Created;
   equipment.qrCodeId = qr?.code || data.qrCodeId || null;
+  equipment.powerEquipmentStatus = data.powerEquipmentStatus || null;
   equipment.createdAt = new Date();
   equipment.updatedAt = new Date();
 
@@ -89,7 +90,7 @@ export const createEquipment = async (data: Partial<PowerEquipment>): Promise<Po
 export const deleteEquipment = async (id: string): Promise<void> => {
   const equipment = await resolveEquipmentByRef(id);
   if (!equipment) throw new Error("Equipment not found");
-  await PowerEquipmentRepository.deleteOne({ _id: (equipment as any)._id });
+  await PowerEquipmentRepository.remove(equipment);
 };
 
 export const updateEquipment = async (id: string, data: Partial<PowerEquipment>): Promise<PowerEquipment> => {

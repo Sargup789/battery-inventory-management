@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { v4 as uuidv4 } from "uuid";
 import { QRCodeRepository } from "..";
+import { QRCode } from "../entity/QRCode";
 
 const generateQrCode = () => uuidv4();
 
@@ -8,18 +9,13 @@ export const createQrCodes = async (quantity: number) => {
   const qrCodes = Array(quantity)
     .fill(0)
     .map(() => {
-      return {
-        code: generateQrCode(),
-        inUse: false,
-      };
+      const qr = new QRCode();
+      qr.code = generateQrCode();
+      qr.inUse = false;
+      qr.createdAt = new Date();
+      return qr;
     });
-  const insertResult = await QRCodeRepository.insertMany(qrCodes);
-  const insertedQrCodes = await QRCodeRepository.find({
-    where: {
-      _id: { $in: Object.values(insertResult.insertedIds) },
-    },
-  });
-  return insertedQrCodes;
+  return await QRCodeRepository.save(qrCodes);
 };
 
 export const updateQRCodeInUseStatus = async (code: string, inUse: boolean) => {
@@ -49,5 +45,7 @@ export const getAllQrCodes = async () => {
 };
 
 export const deleteQrCode = async (id: string) => {
-  await QRCodeRepository.deleteOne({ _id: new ObjectId(id) });
+  const qr = await QRCodeRepository.findOne({ where: { _id: new ObjectId(id) } as any });
+  if (!qr) throw new Error("QR Code not found");
+  await QRCodeRepository.remove(qr);
 };
