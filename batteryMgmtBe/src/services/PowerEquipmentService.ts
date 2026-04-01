@@ -228,7 +228,10 @@ export const checkInEquipment = async (
 };
 
 export const getEquipmentStatus = async (ref: string): Promise<{ equipment: PowerEquipment; events: EquipmentEvent[] } | null> => {
-  const equipment = await resolveEquipmentByRef(ref);
+  let equipment = await resolveEquipmentByRef(ref);
+  if (!equipment) {
+    equipment = await getEquipmentByQrCode(ref);
+  }
   if (!equipment) return null;
   const events = await EquipmentEventRepository.find({ where: { equipmentId: equipment.equipmentId } as any });
   return { equipment, events };

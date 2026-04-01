@@ -107,8 +107,25 @@ const CheckoutEquipment: React.FC = () => {
           <Typography variant="body1">Voltage: {equipmentDetails.voltage || "—"}</Typography>
           <Typography variant="body1">Amp-hours: {equipmentDetails.ampHours || "—"}</Typography>
           <Typography variant="body1">Status: {equipmentDetails.status || "—"}</Typography>
+          <Typography variant="body1">Equipment Status: {equipmentDetails.powerEquipmentStatus || "—"}</Typography>
+          <Typography variant="body1">Date of Arrival: {equipmentDetails.dateOfArrival ? moment(equipmentDetails.dateOfArrival).format("MMM DD, YYYY") : "—"}</Typography>
+          <Typography variant="body1">Assignation Type: {equipmentDetails.assignationType || "—"}</Typography>
+          <Typography variant="body1">Assigned To: {equipmentDetails.assignedTo || "—"}</Typography>
+          <Typography variant="body1">Truck Model #: {equipmentDetails.truckModelNumber || "—"}</Typography>
+          <Typography variant="body1">Truck Serial #: {equipmentDetails.truckSerialNumber || "—"}</Typography>
+          <Typography variant="body1">Checkout Reason: {equipmentDetails.checkoutReason || "—"}</Typography>
+          <Typography variant="body1">Inbound Doc Type: {equipmentDetails.inboundDocumentType || "—"}</Typography>
+          <Typography variant="body1">Inbound Doc #: {equipmentDetails.inboundDocumentNumber || "—"}</Typography>
+          <Typography variant="body1">Order Entry #: {equipmentDetails.orderEntryNumber || "—"}</Typography>
+          <Typography variant="body1">Outbound Doc Type: {equipmentDetails.outboundDocumentType || "—"}</Typography>
+          <Typography variant="body1">Outbound Doc #: {equipmentDetails.outboundDocumentNumber || "—"}</Typography>
+          <Typography variant="body1">Customer Name: {equipmentDetails.customerName || "—"}</Typography>
           <Typography variant="body1">Zone: {equipmentDetails.zoneName || "—"}</Typography>
+          <Typography variant="body1">Zone Location Type: {equipmentDetails.zoneLocationType || "—"}</Typography>
+          <Typography variant="body1">Zone City: {equipmentDetails.zoneCity || "—"}</Typography>
+          <Typography variant="body1">Zone State: {equipmentDetails.zoneState || "—"}</Typography>
           <Typography variant="body1">Location: {equipmentDetails.location || "—"}</Typography>
+          <Typography variant="body1">Last Updated By: {equipmentDetails.lastUpdatedBy || "—"}</Typography>
 
           <FormControl fullWidth margin="normal">
             <InputLabel>Check-out Reason *</InputLabel>

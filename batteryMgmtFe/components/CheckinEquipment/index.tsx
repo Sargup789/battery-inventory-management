@@ -7,6 +7,7 @@ import {
 } from "@mui/material";
 import { toast } from "react-toastify";
 import ClearIcon from "@mui/icons-material/Clear";
+import moment from "moment";
 import { useQuery } from "react-query";
 import { ZoneData } from "@/pages/index";
 
@@ -110,7 +111,31 @@ const CheckinEquipment: React.FC = () => {
           <Typography variant="h6" fontWeight={700} mb={1}>Equipment Details:</Typography>
           <Typography variant="body1">Equipment ID: {equipmentDetails.equipmentId}</Typography>
           <Typography variant="body1">Item Type: {equipmentDetails.itemType || "—"}</Typography>
+          <Typography variant="body1">Manufacturer: {equipmentDetails.manufacturer || "—"}</Typography>
+          <Typography variant="body1">Model Number: {equipmentDetails.modelNumber || "—"}</Typography>
+          <Typography variant="body1">Serial Number: {equipmentDetails.serialNumber || "—"}</Typography>
+          <Typography variant="body1">Voltage: {equipmentDetails.voltage || "—"}</Typography>
+          <Typography variant="body1">Amp-hours: {equipmentDetails.ampHours || "—"}</Typography>
           <Typography variant="body1">Status: {equipmentDetails.status || "—"}</Typography>
+          <Typography variant="body1">Equipment Status: {equipmentDetails.powerEquipmentStatus || "—"}</Typography>
+          <Typography variant="body1">Date of Arrival: {equipmentDetails.dateOfArrival ? moment(equipmentDetails.dateOfArrival).format("MMM DD, YYYY") : "—"}</Typography>
+          <Typography variant="body1">Assignation Type: {equipmentDetails.assignationType || "—"}</Typography>
+          <Typography variant="body1">Assigned To: {equipmentDetails.assignedTo || "—"}</Typography>
+          <Typography variant="body1">Truck Model #: {equipmentDetails.truckModelNumber || "—"}</Typography>
+          <Typography variant="body1">Truck Serial #: {equipmentDetails.truckSerialNumber || "—"}</Typography>
+          <Typography variant="body1">Checkout Reason: {equipmentDetails.checkoutReason || "—"}</Typography>
+          <Typography variant="body1">Inbound Doc Type: {equipmentDetails.inboundDocumentType || "—"}</Typography>
+          <Typography variant="body1">Inbound Doc #: {equipmentDetails.inboundDocumentNumber || "—"}</Typography>
+          <Typography variant="body1">Order Entry #: {equipmentDetails.orderEntryNumber || "—"}</Typography>
+          <Typography variant="body1">Outbound Doc Type: {equipmentDetails.outboundDocumentType || "—"}</Typography>
+          <Typography variant="body1">Outbound Doc #: {equipmentDetails.outboundDocumentNumber || "—"}</Typography>
+          <Typography variant="body1">Customer Name: {equipmentDetails.customerName || "—"}</Typography>
+          <Typography variant="body1">Zone: {equipmentDetails.zoneName || "—"}</Typography>
+          <Typography variant="body1">Zone Location Type: {equipmentDetails.zoneLocationType || "—"}</Typography>
+          <Typography variant="body1">Zone City: {equipmentDetails.zoneCity || "—"}</Typography>
+          <Typography variant="body1">Zone State: {equipmentDetails.zoneState || "—"}</Typography>
+          <Typography variant="body1">Location: {equipmentDetails.location || "—"}</Typography>
+          <Typography variant="body1">Last Updated By: {equipmentDetails.lastUpdatedBy || "—"}</Typography>
 
           <FormControl fullWidth margin="normal">
             <InputLabel>Select Zone *</InputLabel>

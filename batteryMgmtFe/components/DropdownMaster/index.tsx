@@ -115,9 +115,22 @@ const DropdownMasterComponent = () => {
     return (
         <Box p={3} bgcolor="white" boxShadow={2}>
             {dropdowns.length > 0 ? (
-                <Tabs value={Math.min(currentTab, dropdowns.length - 1)} onChange={(_event, newValue) => setCurrentTab(newValue)}>
+                <Tabs
+                    value={Math.min(currentTab, dropdowns.length - 1)}
+                    onChange={(_event, newValue) => setCurrentTab(newValue)}
+                    variant="scrollable"
+                    scrollButtons="auto"
+                    sx={{
+                        '& .MuiTabs-flexContainer': {
+                            flexWrap: 'wrap',
+                        },
+                        '& .MuiTabs-indicator': {
+                            display: 'none',
+                        },
+                    }}
+                >
                     {dropdowns.map((dropdown, index) => (
-                        <Tab key={index} label={dropdown?.dropdownName} />
+                        <Tab key={index} label={dropdown?.dropdownName} sx={{ minWidth: 'auto' }} />
                     ))}
                 </Tabs>
             ) : null}

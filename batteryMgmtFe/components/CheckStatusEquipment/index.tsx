@@ -19,9 +19,10 @@ const CheckStatusEquipment: React.FC = () => {
     setQrCode(scannedCode);
     setIsScanning(false);
     try {
-      const response = await axios.get(`/api/router?path=api/power-equipment/status/${scannedCode}`);
+      const response = await axios.get(`/api/router?path=api/power-equipment/status/${encodeURIComponent(scannedCode)}`);
       setResult(response.data);
     } catch (error: any) {
+      setResult(null);
       toast.error(error?.response?.data?.error || "Equipment not found.");
     }
   };
