@@ -7,25 +7,15 @@ import KeyboardDoubleArrowDownRoundedIcon from '@mui/icons-material/KeyboardDoub
 import KeyboardDoubleArrowUpRoundedIcon from '@mui/icons-material/KeyboardDoubleArrowUpRounded';
 import ArrowDropDownCircleOutlinedIcon from '@mui/icons-material/ArrowDropDownCircleOutlined';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
-import { Box, CssBaseline, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, styled, Toolbar, Typography } from '@mui/material';
+import { Box, Button, CssBaseline, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, styled, Toolbar, Typography } from '@mui/material';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import LogoutButton from './withLogout';
 import { useRouter } from 'next/router';
 import React, { ReactNode } from 'react';
 import withLogin, { DecodedToken } from '@/components/general/withLogin';
+import { useTranslation } from 'next-i18next';
 
 type Props = { children: ReactNode }
-
-const drawerItems = [
-  { name: 'Dashboard', path: '/', icon: <DashboardIcon /> },
-  { name: 'Power Equipment', path: '/power-equipment', icon: <BatteryChargingFullIcon /> },
-  { name: 'Zones', path: '/zones', icon: <LocationOnIcon /> },
-  { name: 'Check-out Equipment', path: '/checkout', icon: <KeyboardDoubleArrowUpRoundedIcon /> },
-  { name: 'Check-in Equipment', path: '/checkin', icon: <KeyboardDoubleArrowDownRoundedIcon /> },
-  { name: 'Check Status', path: '/checkstatus', icon: <ManageSearchIcon /> },
-  { name: 'Dropdown Master', path: '/dropdownmaster', icon: <ArrowDropDownCircleOutlinedIcon /> },
-  { name: 'Users', path: '/user', icon: <PeopleIcon /> },
-]
 
 const drawerWidth = 275;
 
@@ -79,21 +69,43 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 const Layout = ({ children }: Props & DecodedToken) => {
   const [open, setOpen] = React.useState(true);
   const router = useRouter();
+  const { t } = useTranslation('common');
 
-  const toggleDrawer = () => setOpen((open) => !open);
+  const drawerItems = [
+    { name: t('layout.dashboard'), path: '/', icon: <DashboardIcon /> },
+    { name: t('layout.powerEquipment'), path: '/power-equipment', icon: <BatteryChargingFullIcon /> },
+    { name: t('layout.zones'), path: '/zones', icon: <LocationOnIcon /> },
+    { name: t('layout.checkoutEquipment'), path: '/checkout', icon: <KeyboardDoubleArrowUpRoundedIcon /> },
+    { name: t('layout.checkinEquipment'), path: '/checkin', icon: <KeyboardDoubleArrowDownRoundedIcon /> },
+    { name: t('layout.checkStatus'), path: '/checkstatus', icon: <ManageSearchIcon /> },
+    { name: t('layout.dropdownMaster'), path: '/dropdownmaster', icon: <ArrowDropDownCircleOutlinedIcon /> },
+    { name: t('layout.users'), path: '/user', icon: <PeopleIcon /> },
+  ];
+
+  const toggleDrawer = () => setOpen((prev) => !prev);
   const handleDrawerClose = () => setOpen(false);
+
+  const handleLanguageToggle = () => {
+    const newLocale = router.locale === 'es' ? 'en' : 'es';
+    router.push(router.pathname, router.asPath, { locale: newLocale });
+  };
 
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppBar position="fixed" open={open}>
-        <Toolbar style={{ backgroundColor: "#9B2735", fontSize: "13px" }}>
+        <Toolbar style={{ backgroundColor: '#9B2735', fontSize: '13px' }}>
           <IconButton color="inherit" aria-label="open drawer" onClick={toggleDrawer} edge="start" sx={{ mr: 2 }}>
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" style={{ display: 'flex', justifyContent: 'space-between', width: "100%" }}>
-            Battery Inventory Management
-            <div><LogoutButton /></div>
+          <Typography variant="h6" noWrap component="div" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+            {t('layout.title')}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Button color="inherit" variant="outlined" size="small" onClick={handleLanguageToggle} sx={{ minWidth: '56px', borderColor: 'rgba(255,255,255,0.6)', color: 'white' }}>
+                {router.locale === 'es' ? 'EN' : 'ES'}
+              </Button>
+              <LogoutButton />
+            </Box>
           </Typography>
         </Toolbar>
       </AppBar>
@@ -123,7 +135,7 @@ const Layout = ({ children }: Props & DecodedToken) => {
         <Divider />
         <List sx={{ pb: 2, flex: 1, overflowY: 'auto' }}>
           {drawerItems.map((item) => (
-            <ListItem key={item.name} disablePadding onClick={() => router.push(item.path)}>
+            <ListItem key={item.path} disablePadding onClick={() => router.push(item.path)}>
               <ListItemButton>
                 <ListItemIcon>{item.icon}</ListItemIcon>
                 <ListItemText primary={item.name} />

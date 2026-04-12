@@ -1,27 +1,29 @@
 import React, { useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, TextField, Button, DialogActions, Typography, Box } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, TextField, Button, DialogActions, Typography, Box } from '@mui/material';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import { setTokenCookie } from '@/lib/auth-cookie';
-import { toast } from 'react-toastify';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { t } = useTranslation('common');
 
   const handleLogin = async () => {
     try {
       const response = await axios.post('/api/router?path=api/auth/login', {
         username,
         password,
-        applicationName: "battery",
+        applicationName: 'battery',
       });
       setTokenCookie(null, response.data.token);
       router.push('/');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.response?.data?.message || t('login.failed'));
     }
   };
 
@@ -31,14 +33,14 @@ const LoginPage: React.FC = () => {
         <Box display="flex" alignItems="center" sx={{ width: '100%', height: '150px' }}>
           <img src="/images/ttcm.jpeg" alt="Logo" style={{ width: '100%' }} />
         </Box>
-        <Typography variant="h6">Login</Typography>
-        <Typography variant="body2" color="text.secondary">Sign in to your account</Typography>
+        <Typography variant="h6">{t('login.title')}</Typography>
+        <Typography variant="body2" color="text.secondary">{t('login.subtitle')}</Typography>
       </DialogTitle>
       <DialogContent>
         <TextField
           autoFocus
           margin="dense"
-          label="Username"
+          label={t('login.username')}
           type="text"
           fullWidth
           value={username}
@@ -47,7 +49,7 @@ const LoginPage: React.FC = () => {
         />
         <TextField
           margin="dense"
-          label="Password"
+          label={t('login.password')}
           type="password"
           fullWidth
           value={password}
@@ -59,16 +61,22 @@ const LoginPage: React.FC = () => {
       <DialogActions>
         <Box style={{ display: 'flex', width: '95%', justifyContent: 'flex-end', mb: 1 }}>
           <Button
-            style={{ borderRadius: 15, backgroundColor: "#9B2735", fontSize: "13px" }}
+            style={{ borderRadius: 15, backgroundColor: '#9B2735', fontSize: '13px' }}
             onClick={handleLogin}
             variant="contained"
           >
-            Login
+            {t('login.button')}
           </Button>
         </Box>
       </DialogActions>
     </Dialog>
   );
 }
+
+export const getStaticProps = async ({ locale }: { locale: string }) => ({
+  props: {
+    ...(await serverSideTranslations(locale, ['common'])),
+  },
+});
 
 export default LoginPage;

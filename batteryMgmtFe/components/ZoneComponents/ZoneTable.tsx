@@ -1,9 +1,10 @@
-import React from "react";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Box, IconButton, Tooltip, Chip } from "@mui/material";
-import { EditOutlined, DeleteOutline, Add } from "@mui/icons-material";
-import { ZoneApiResponse } from "@/pages/zones";
-import { ZoneData } from "@/pages/index";
+import React from 'react';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { Box, IconButton, Tooltip, Chip } from '@mui/material';
+import { EditOutlined, DeleteOutline, Add } from '@mui/icons-material';
+import { ZoneApiResponse } from '@/pages/zones';
+import { ZoneData } from '@/pages/index';
+import { useTranslation } from 'next-i18next';
 
 type Props = {
   zonesApiData: ZoneApiResponse;
@@ -17,55 +18,57 @@ type Props = {
 };
 
 const ZoneTable = ({ zonesApiData, deleteZone, onEdit, onAddSubZone, setPage, setSize, page, size }: Props) => {
+  const { t } = useTranslation('common');
+
   const columns: GridColDef[] = [
-    { field: "name", headerName: "Name", width: 180, headerAlign: "center", align: "center", sortable: true },
-    { field: "identifier", headerName: "Identifier", width: 130, headerAlign: "center", align: "center", sortable: true },
-    { field: "locationType", headerName: "Location Type", width: 150, headerAlign: "center", align: "center", sortable: true },
-    { field: "city", headerName: "City", width: 130, headerAlign: "center", align: "center", sortable: true },
-    { field: "state", headerName: "State", width: 130, headerAlign: "center", align: "center", sortable: true },
+    { field: 'name', headerName: t('zone.name'), width: 180, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'identifier', headerName: t('zone.identifier'), width: 130, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'locationType', headerName: t('zone.locationType'), width: 150, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'city', headerName: t('zone.city'), width: 130, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'state', headerName: t('zone.state'), width: 130, headerAlign: 'center', align: 'center', sortable: true },
     {
-      field: "parentZoneId",
-      headerName: "Type",
+      field: 'parentZoneId',
+      headerName: t('zone.type'),
       width: 120,
-      headerAlign: "center",
-      align: "center",
+      headerAlign: 'center',
+      align: 'center',
       renderCell: (params) => (
         <Chip
-          label={params.value ? "Sub-zone" : "Zone"}
-          color={params.value ? "secondary" : "primary"}
+          label={params.value ? t('zone.subZone') : t('zone.zone')}
+          color={params.value ? 'secondary' : 'primary'}
           size="small"
           variant="outlined"
         />
       ),
     },
     {
-      field: "equipmentCount",
-      headerName: "Equipment Count",
+      field: 'equipmentCount',
+      headerName: t('zone.equipmentCount'),
       width: 160,
-      type: "number",
-      headerAlign: "center",
-      align: "center",
+      type: 'number',
+      headerAlign: 'center',
+      align: 'center',
     },
     {
-      field: "actions",
-      headerName: "Actions",
+      field: 'actions',
+      headerName: t('common.actions'),
       width: 160,
       sortable: false,
-      headerAlign: "center",
-      align: "center",
+      headerAlign: 'center',
+      align: 'center',
       renderCell: (params) => (
         <Box>
-          <Tooltip title="Add Sub-zone" followCursor>
+          <Tooltip title={t('zone.addSubZone')} followCursor>
             <IconButton size="small" color="primary" onClick={() => onAddSubZone(params.row.id)}>
               <Add fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Edit" followCursor>
+          <Tooltip title={t('common.edit')} followCursor>
             <IconButton size="small" onClick={() => onEdit(params.row)}>
               <EditOutlined fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Delete" followCursor>
+          <Tooltip title={t('common.delete')} followCursor>
             <IconButton size="small" color="error" onClick={() => deleteZone(params.row.id)}>
               <DeleteOutline fontSize="small" />
             </IconButton>
@@ -89,7 +92,7 @@ const ZoneTable = ({ zonesApiData, deleteZone, onEdit, onAddSubZone, setPage, se
         rowsPerPageOptions={[10, 25, 100]}
         disableSelectionOnClick
         sx={{
-          border: "none",
+          border: 'none',
           '& .MuiDataGrid-cell': {
             textAlign: 'center',
             justifyContent: 'center',

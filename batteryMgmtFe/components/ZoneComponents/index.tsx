@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import { Box, Button, Typography } from "@mui/material";
-import { ZoneApiResponse } from "@/pages/zones";
-import { ZoneData } from "@/pages/index";
-import ZoneTable from "./ZoneTable";
-import AddZoneDialog from "./AddZoneDialog";
+import React, { useState } from 'react';
+import { Box, Button, Typography } from '@mui/material';
+import { ZoneApiResponse } from '@/pages/zones';
+import { ZoneData } from '@/pages/index';
+import ZoneTable from './ZoneTable';
+import AddZoneDialog from './AddZoneDialog';
+import { useTranslation } from 'next-i18next';
 
 type Props = {
   zonesApiData: ZoneApiResponse;
@@ -19,6 +20,7 @@ const ZonesIndex = ({ zonesApiData, deleteZone, refetch, setPage, setSize, page,
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editData, setEditData] = useState<ZoneData | null>(null);
   const [parentZoneId, setParentZoneId] = useState<string | null>(null);
+  const { t } = useTranslation('common');
 
   const handleEdit = (zone: ZoneData) => {
     setEditData(zone);
@@ -39,13 +41,13 @@ const ZonesIndex = ({ zonesApiData, deleteZone, refetch, setPage, setSize, page,
   return (
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h5" fontWeight={700}/>
+        <Typography variant="h5" fontWeight={700} />
         <Button
           variant="contained"
-          style={{ borderRadius: 15, backgroundColor: "#9B2735", fontSize: "13px" }}
+          style={{ borderRadius: 15, backgroundColor: '#9B2735', fontSize: '13px' }}
           onClick={() => setDialogOpen(true)}
         >
-          Add Zone
+          {t('zone.addZone')}
         </Button>
       </Box>
 

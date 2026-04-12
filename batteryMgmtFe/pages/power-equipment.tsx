@@ -1,10 +1,12 @@
-import Layout from "@/components/general/Layout";
-import PowerEquipmentIndex from "@/components/PowerEquipmentComponents";
-import axios from "axios";
-import { UseQueryResult, useQuery } from "react-query";
-import React from "react";
-import withLogin from "@/components/general/withLogin";
-import { toast } from "react-toastify";
+import Layout from '@/components/general/Layout';
+import PowerEquipmentIndex from '@/components/PowerEquipmentComponents';
+import axios from 'axios';
+import { UseQueryResult, useQuery } from 'react-query';
+import React from 'react';
+import withLogin from '@/components/general/withLogin';
+import { toast } from 'react-toastify';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 
 export interface EquipmentData {
   id: string;
@@ -57,44 +59,44 @@ export interface EquipmentFilters {
 
 const getEntityId = (item: any): string => {
   const candidate = item?.id ?? item?._id;
-  if (typeof candidate === "string") return candidate;
-  if (candidate && typeof candidate?.toHexString === "function") return candidate.toHexString();
-  if (candidate && typeof candidate?.toString === "function") return candidate.toString();
-  if (candidate && typeof candidate?.$oid === "string") return candidate.$oid;
-  return "";
+  if (typeof candidate === 'string') return candidate;
+  if (candidate && typeof candidate?.toHexString === 'function') return candidate.toHexString();
+  if (candidate && typeof candidate?.toString === 'function') return candidate.toString();
+  if (candidate && typeof candidate?.$oid === 'string') return candidate.$oid;
+  return '';
 };
 
 const normalizeEquipment = (raw: any): EquipmentData => ({
   id: getEntityId(raw),
-  qrCodeId: raw?.qrCodeId || "",
-  equipmentId: raw?.equipmentId || "",
-  itemType: raw?.itemType || "",
-  manufacturer: raw?.manufacturer || "",
-  modelNumber: raw?.modelNumber || "",
-  serialNumber: raw?.serialNumber || "",
-  voltage: raw?.voltage || "",
-  ampHours: raw?.ampHours || "",
-  status: raw?.status || "created",
-  powerEquipmentStatus: raw?.powerEquipmentStatus || "",
+  qrCodeId: raw?.qrCodeId || '',
+  equipmentId: raw?.equipmentId || '',
+  itemType: raw?.itemType || '',
+  manufacturer: raw?.manufacturer || '',
+  modelNumber: raw?.modelNumber || '',
+  serialNumber: raw?.serialNumber || '',
+  voltage: raw?.voltage || '',
+  ampHours: raw?.ampHours || '',
+  status: raw?.status || 'created',
+  powerEquipmentStatus: raw?.powerEquipmentStatus || '',
   dateOfArrival: raw?.dateOfArrival,
-  assignationType: raw?.assignationType || "",
-  assignedTo: raw?.assignedTo || "",
-  truckModelNumber: raw?.truckModelNumber || "",
-  truckSerialNumber: raw?.truckSerialNumber || "",
-  inboundDocumentType: raw?.inboundDocumentType || "",
-  inboundDocumentNumber: raw?.inboundDocumentNumber || "",
-  orderEntryNumber: raw?.orderEntryNumber || "",
-  outboundDocumentType: raw?.outboundDocumentType || "",
-  outboundDocumentNumber: raw?.outboundDocumentNumber || "",
-  customerName: raw?.customerName || "",
-  zoneId: raw?.zoneId || "",
-  zoneName: raw?.zoneName || "",
-  zoneLocationType: raw?.zoneLocationType || "",
-  zoneCity: raw?.zoneCity || "",
-  zoneState: raw?.zoneState || "",
-  location: raw?.location || "",
-  checkoutReason: raw?.checkoutReason || "",
-  lastUpdatedBy: raw?.lastUpdatedBy || "",
+  assignationType: raw?.assignationType || '',
+  assignedTo: raw?.assignedTo || '',
+  truckModelNumber: raw?.truckModelNumber || '',
+  truckSerialNumber: raw?.truckSerialNumber || '',
+  inboundDocumentType: raw?.inboundDocumentType || '',
+  inboundDocumentNumber: raw?.inboundDocumentNumber || '',
+  orderEntryNumber: raw?.orderEntryNumber || '',
+  outboundDocumentType: raw?.outboundDocumentType || '',
+  outboundDocumentNumber: raw?.outboundDocumentNumber || '',
+  customerName: raw?.customerName || '',
+  zoneId: raw?.zoneId || '',
+  zoneName: raw?.zoneName || '',
+  zoneLocationType: raw?.zoneLocationType || '',
+  zoneCity: raw?.zoneCity || '',
+  zoneState: raw?.zoneState || '',
+  location: raw?.location || '',
+  checkoutReason: raw?.checkoutReason || '',
+  lastUpdatedBy: raw?.lastUpdatedBy || '',
   createdAt: raw?.createdAt,
   updatedAt: raw?.updatedAt,
 });
@@ -103,7 +105,7 @@ export const fetchEquipment = async (page = 1, size = 10, filters: EquipmentFilt
   const params: Record<string, any> = { page, size };
   Object.entries(filters).forEach(([key, value]) => { if (value) params[key] = value; });
 
-  const response = await axios.get(`/api/router?path=api/power-equipment`, { params });
+  const response = await axios.get('/api/router?path=api/power-equipment', { params });
   const raw = response.data;
 
   if (Array.isArray(raw)) {
@@ -123,9 +125,10 @@ const PowerEquipmentPage = () => {
   const [page, setPage] = React.useState(1);
   const [size, setSize] = React.useState(10);
   const [filters, setFilters] = React.useState<EquipmentFilters>({});
+  const { t } = useTranslation('common');
 
   const { data: equipment, isLoading, refetch }: UseQueryResult<EquipmentApiResponse, unknown> = useQuery(
-    ["equipment", page, size, filters],
+    ['equipment', page, size, filters],
     () => fetchEquipment(page, size, filters),
     { refetchOnWindowFocus: false, refetchOnReconnect: false, keepPreviousData: true }
   );
@@ -138,16 +141,16 @@ const PowerEquipmentPage = () => {
   const deleteEquipment = async (id: string) => {
     try {
       await axios.delete(`/api/router?path=api/power-equipment/${id}`);
-      toast.success("Equipment deleted successfully");
+      toast.success(t('equipment.deletedSuccess'));
       refetch();
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to delete equipment");
+      toast.error(error?.response?.data?.message || t('equipment.deleteFailed'));
     }
   };
 
   return (
     <Layout>
-      {isLoading ? "Loading..." : (
+      {isLoading ? t('common.loading') : (
         <PowerEquipmentIndex
           equipmentApiData={equipment || { totalCount: 0, currentPage: 1, data: [] }}
           deleteEquipment={deleteEquipment}
@@ -163,5 +166,11 @@ const PowerEquipmentPage = () => {
     </Layout>
   );
 };
+
+export const getStaticProps = async ({ locale }: { locale: string }) => ({
+  props: {
+    ...(await serverSideTranslations(locale, ['common'])),
+  },
+});
 
 export default withLogin(PowerEquipmentPage);

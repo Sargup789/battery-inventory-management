@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField,
   Grid, FormControl, InputLabel, Select, MenuItem, Typography, IconButton, Box, InputAdornment
-} from "@mui/material";
-import { HighlightOff } from "@mui/icons-material";
-import QrCodeScannerIcon from "@mui/icons-material/QrCodeScanner";
-import ClearIcon from "@mui/icons-material/Clear";
-import axios from "axios";
-import { toast } from "react-toastify";
-import { EquipmentData } from "@/pages/power-equipment";
-import { useQuery } from "react-query";
-import { QrReader } from "react-qr-reader";
-import ReactDatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+} from '@mui/material';
+import { HighlightOff } from '@mui/icons-material';
+import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
+import ClearIcon from '@mui/icons-material/Clear';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { EquipmentData } from '@/pages/power-equipment';
+import { useQuery } from 'react-query';
+import { QrReader } from 'react-qr-reader';
+import ReactDatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { useTranslation } from 'next-i18next';
 
 type Props = {
   open: boolean;
@@ -26,6 +27,7 @@ const AddEquipmentDialog = ({ open, editData, handleClose, onSuccess }: Props) =
   const [formData, setFormData] = useState<Partial<EquipmentData>>({});
   const [dateOfArrival, setDateOfArrival] = useState<Date | null>(null);
   const [isScanning, setIsScanning] = useState(false);
+  const { t } = useTranslation('common');
 
   useEffect(() => {
     if (editData) {
@@ -42,38 +44,37 @@ const AddEquipmentDialog = ({ open, editData, handleClose, onSuccess }: Props) =
   }, [open]);
 
   const handleScanResult = (result: any) => {
-    const text = typeof result?.getText === "function" ? result.getText() : result?.text;
+    const text = typeof result?.getText === 'function' ? result.getText() : result?.text;
     if (text) {
-      set("qrCodeId", text.trim());
+      set('qrCodeId', text.trim());
       setIsScanning(false);
     }
   };
 
-  const { data: itemTypes = [] } = useQuery(["dropdown", "itemType"], async () => {
-    const res = await axios.get(`/api/router?path=api/dropdownmaster/itemType`);
+  const { data: itemTypes = [] } = useQuery(['dropdown', 'itemType'], async () => {
+    const res = await axios.get('/api/router?path=api/dropdownmaster/itemType');
     return res.data?.options || [];
   }, { refetchOnWindowFocus: false });
-  const { data: manufacturers = [] } = useQuery(["dropdown", "manufacturer"], async () => {
-    const res = await axios.get(`/api/router?path=api/dropdownmaster/manufacturer`);
+  const { data: manufacturers = [] } = useQuery(['dropdown', 'manufacturer'], async () => {
+    const res = await axios.get('/api/router?path=api/dropdownmaster/manufacturer');
     return res.data?.options || [];
   }, { refetchOnWindowFocus: false });
-  const { data: statuses = [] } = useQuery(["dropdown", "powerEquipmentStatus"], async () => {
-    const res = await axios.get(`/api/router?path=api/dropdownmaster/powerEquipmentStatus`);
+  const { data: statuses = [] } = useQuery(['dropdown', 'powerEquipmentStatus'], async () => {
+    const res = await axios.get('/api/router?path=api/dropdownmaster/powerEquipmentStatus');
     return res.data?.options || [];
   }, { refetchOnWindowFocus: false });
-  const { data: assignationTypes = [] } = useQuery(["dropdown", "assignationType"], async () => {
-    const res = await axios.get(`/api/router?path=api/dropdownmaster/assignationType`);
+  const { data: assignationTypes = [] } = useQuery(['dropdown', 'assignationType'], async () => {
+    const res = await axios.get('/api/router?path=api/dropdownmaster/assignationType');
     return res.data?.options || [];
   }, { refetchOnWindowFocus: false });
-  const { data: inboundDocTypes = [] } = useQuery(["dropdown", "inboundDocumentType"], async () => {
-    const res = await axios.get(`/api/router?path=api/dropdownmaster/inboundDocumentType`);
+  const { data: inboundDocTypes = [] } = useQuery(['dropdown', 'inboundDocumentType'], async () => {
+    const res = await axios.get('/api/router?path=api/dropdownmaster/inboundDocumentType');
     return res.data?.options || [];
   }, { refetchOnWindowFocus: false });
-  const { data: outboundDocTypes = [] } = useQuery(["dropdown", "outboundDocumentType"], async () => {
-    const res = await axios.get(`/api/router?path=api/dropdownmaster/outboundDocumentType`);
+  const { data: outboundDocTypes = [] } = useQuery(['dropdown', 'outboundDocumentType'], async () => {
+    const res = await axios.get('/api/router?path=api/dropdownmaster/outboundDocumentType');
     return res.data?.options || [];
   }, { refetchOnWindowFocus: false });
-
 
   const set = (field: keyof EquipmentData, value: any) => setFormData((prev) => ({ ...prev, [field]: value }));
 
@@ -81,24 +82,24 @@ const AddEquipmentDialog = ({ open, editData, handleClose, onSuccess }: Props) =
     try {
       const payload = { ...formData, dateOfArrival: dateOfArrival || undefined };
       if (isEdit) {
-        await axios.put(`/api/router?path=api/power-equipment/${editData.id}`, payload);
-        toast.success("Equipment updated successfully");
+        await axios.put(`/api/router?path=api/power-equipment/${editData?.id}`, payload);
+        toast.success(t('equipment.updatedSuccess'));
       } else {
-        await axios.post(`/api/router?path=api/power-equipment`, payload);
-        toast.success("Equipment created successfully");
+        await axios.post('/api/router?path=api/power-equipment', payload);
+        toast.success(t('equipment.createdSuccess'));
       }
       onSuccess();
       handleClose();
     } catch (error: any) {
-      toast.error(error?.response?.data?.error || "An error occurred");
+      toast.error(error?.response?.data?.error || t('equipment.errorOccurred'));
     }
   };
 
   const dropdownField = (label: string, field: keyof EquipmentData, options: any[]) => (
     <FormControl fullWidth size="small">
       <InputLabel>{label}</InputLabel>
-      <Select value={(formData[field] as string) || ""} label={label} onChange={(e) => set(field, e.target.value)}>
-        <MenuItem value=""><em>None</em></MenuItem>
+      <Select value={(formData[field] as string) || ''} label={label} onChange={(e) => set(field, e.target.value)}>
+        <MenuItem value=""><em>{t('common.none')}</em></MenuItem>
         {options.map((o: any) => (
           <MenuItem key={o.key} value={o.key}>{o.label || o.key}</MenuItem>
         ))}
@@ -111,46 +112,35 @@ const AddEquipmentDialog = ({ open, editData, handleClose, onSuccess }: Props) =
       label={label}
       size="small"
       fullWidth
-      value={(formData[field] as string) || ""}
+      value={(formData[field] as string) || ''}
       onChange={(e) => set(field, e.target.value)}
     />
   );
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-      <DialogTitle
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "start",
-        }}
-      >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          {isEdit ? "Edit Power Equipment" : "Add Power Equipment"}
+      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          {isEdit ? t('equipment.editPowerEquipment') : t('equipment.addPowerEquipment')}
         </Box>
         <IconButton
           children={<HighlightOff />}
           color="inherit"
           onClick={handleClose}
-          sx={{ transform: "translate(8px, -8px)" }}
+          sx={{ transform: 'translate(8px, -8px)' }}
         />
       </DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 0.5 }}>
           <Grid item xs={12} sm={6}>
             <TextField
-              label="QR Code"
+              label={t('equipment.qrCode')}
               size="small"
               fullWidth
-              value={(formData.qrCodeId as string) || ""}
-              onChange={(e) => set("qrCodeId", e.target.value)}
+              value={(formData.qrCodeId as string) || ''}
+              onChange={(e) => set('qrCodeId', e.target.value)}
               disabled={isEdit}
-              placeholder="Scan or enter QR code"
+              placeholder={t('equipment.scanOrEnterQr')}
               InputProps={{
                 endAdornment: (
                   <>
@@ -158,16 +148,16 @@ const AddEquipmentDialog = ({ open, editData, handleClose, onSuccess }: Props) =
                       <IconButton
                         onClick={() => setIsScanning((s) => !s)}
                         disabled={isEdit}
-                        title="Scan QR"
+                        title={t('equipment.scanQr')}
                       >
                         <QrCodeScannerIcon />
                       </IconButton>
                     </InputAdornment>
                     <InputAdornment position="end">
                       <IconButton
-                        onClick={() => set("qrCodeId", "")}
+                        onClick={() => set('qrCodeId', '')}
                         disabled={isEdit}
-                        title="Clear"
+                        title={t('common.clear')}
                       >
                         <ClearIcon />
                       </IconButton>
@@ -180,90 +170,48 @@ const AddEquipmentDialog = ({ open, editData, handleClose, onSuccess }: Props) =
               <Box sx={{ mt: 1 }}>
                 <QrReader
                   onResult={handleScanResult}
-                  constraints={{ facingMode: "environment" }}
-                  containerStyle={{ width: "100%" }}
+                  constraints={{ facingMode: 'environment' }}
+                  containerStyle={{ width: '100%' }}
                 />
                 <Button size="small" sx={{ mt: 1 }} onClick={() => setIsScanning(false)}>
-                  Close Scanner
+                  {t('common.closeScanner')}
                 </Button>
               </Box>
             )}
           </Grid>
+          <Grid item xs={12} sm={6}>{dropdownField(t('equipment.itemType'), 'itemType', itemTypes)}</Grid>
+          <Grid item xs={12} sm={6}>{dropdownField(t('equipment.manufacturer'), 'manufacturer', manufacturers)}</Grid>
+          <Grid item xs={12} sm={6}>{textField(t('equipment.modelNumber'), 'modelNumber')}</Grid>
+          <Grid item xs={12} sm={6}>{textField(t('equipment.serialNumber'), 'serialNumber')}</Grid>
+          <Grid item xs={12} sm={6}>{textField(t('equipment.voltage'), 'voltage')}</Grid>
+          <Grid item xs={12} sm={6}>{textField(t('equipment.ampHours'), 'ampHours')}</Grid>
+          <Grid item xs={12} sm={6}>{dropdownField(t('equipment.powerEquipmentStatus'), 'powerEquipmentStatus', statuses)}</Grid>
           <Grid item xs={12} sm={6}>
-            {dropdownField("Item Type", "itemType", itemTypes)}
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            {dropdownField("Manufacturer", "manufacturer", manufacturers)}
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            {textField("Model Number", "modelNumber")}
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            {textField("Serial Number", "serialNumber")}
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            {textField("Voltage", "voltage")}
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            {textField("Amp-hours", "ampHours")}
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            {dropdownField("Power Equipment Status", "powerEquipmentStatus", statuses)}
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Typography variant="caption" color="text.secondary">Date of Arrival</Typography>
+            <Typography variant="caption" color="text.secondary">{t('equipment.dateOfArrival')}</Typography>
             <br />
             <ReactDatePicker
               selected={dateOfArrival}
               onChange={(date) => setDateOfArrival(date)}
               dateFormat="MMM dd, yyyy"
-              placeholderText="Select date"
+              placeholderText={t('equipment.selectDate')}
               customInput={<TextField size="small" fullWidth />}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
-            {dropdownField("Assignation Type", "assignationType", assignationTypes)}
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            {textField("Assigned To", "assignedTo")}
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            {textField("Truck Model Number", "truckModelNumber")}
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            {textField("Truck Serial Number", "truckSerialNumber")}
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            {dropdownField("In-bound Document Type", "inboundDocumentType", inboundDocTypes)}
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            {textField("In-bound Document Number", "inboundDocumentNumber")}
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            {textField("Order Entry Number", "orderEntryNumber")}
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            {dropdownField("Out-bound Document Type", "outboundDocumentType", outboundDocTypes)}
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            {textField("Out-bound Document Number", "outboundDocumentNumber")}
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            {textField("Customer Name", "customerName")}
-          </Grid>
+          <Grid item xs={12} sm={6}>{dropdownField(t('equipment.assignationType'), 'assignationType', assignationTypes)}</Grid>
+          <Grid item xs={12} sm={6}>{textField(t('equipment.assignedTo'), 'assignedTo')}</Grid>
+          <Grid item xs={12} sm={6}>{textField(t('equipment.truckModelNumber'), 'truckModelNumber')}</Grid>
+          <Grid item xs={12} sm={6}>{textField(t('equipment.truckSerialNumber'), 'truckSerialNumber')}</Grid>
+          <Grid item xs={12} sm={6}>{dropdownField(t('equipment.inboundDocumentType'), 'inboundDocumentType', inboundDocTypes)}</Grid>
+          <Grid item xs={12} sm={6}>{textField(t('equipment.inboundDocumentNumber'), 'inboundDocumentNumber')}</Grid>
+          <Grid item xs={12} sm={6}>{textField(t('equipment.orderEntryNumber'), 'orderEntryNumber')}</Grid>
+          <Grid item xs={12} sm={6}>{dropdownField(t('equipment.outboundDocumentType'), 'outboundDocumentType', outboundDocTypes)}</Grid>
+          <Grid item xs={12} sm={6}>{textField(t('equipment.outboundDocumentNumber'), 'outboundDocumentNumber')}</Grid>
+          <Grid item xs={12} sm={6}>{textField(t('equipment.customerName'), 'customerName')}</Grid>
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={handleSubmit}
-          variant="contained"
-          style={{
-            borderRadius: 15,
-            backgroundColor: "#9B2735",
-            fontSize: "13px"
-          }}
-        >
-          {isEdit ? "Update" : "Create"}
+        <Button onClick={handleSubmit} variant="contained" style={{ borderRadius: 15, backgroundColor: '#9B2735', fontSize: '13px' }}>
+          {isEdit ? t('common.update') : t('common.create')}
         </Button>
       </DialogActions>
     </Dialog>

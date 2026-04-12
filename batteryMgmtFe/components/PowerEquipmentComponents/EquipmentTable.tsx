@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import { DataGrid, GridColDef, GridCellParams, GridValueGetterParams } from "@mui/x-data-grid";
-import { Box, Chip, IconButton, Tooltip } from "@mui/material";
-import { EditOutlined, DeleteOutline } from "@mui/icons-material";
-import { EquipmentApiResponse, EquipmentData } from "@/pages/power-equipment";
-import QRCode from "react-qr-code";
-import PrintDialog from "../QRCodeComponents/PrintDialog";
-import moment from "moment";
+import React, { useState } from 'react';
+import { DataGrid, GridColDef, GridCellParams, GridValueGetterParams } from '@mui/x-data-grid';
+import { Box, Chip, IconButton, Tooltip } from '@mui/material';
+import { EditOutlined, DeleteOutline } from '@mui/icons-material';
+import { EquipmentApiResponse, EquipmentData } from '@/pages/power-equipment';
+import QRCode from 'react-qr-code';
+import PrintDialog from '../QRCodeComponents/PrintDialog';
+import moment from 'moment';
+import { useTranslation } from 'next-i18next';
 
 type Props = {
   equipmentApiData: EquipmentApiResponse;
@@ -19,43 +20,44 @@ type Props = {
 
 const getStatusColor = (status: string): string => {
   switch (status) {
-    case "created": return "#2196f3";
-    case "checked-in": return "#4caf50";
-    case "checked-out": return "#ff9800";
-    case "in-transit": return "#ff9800";
-    case "assigned": return "#ffc107";
-    default: return "#9e9e9e";
-  }
-};
-
-const getStatusLabel = (status: string): string => {
-  switch (status) {
-    case "created": return "Created";
-    case "checked-in": return "Checked-in";
-    case "checked-out": return "Checked-out";
-    case "in-transit": return "In-transit";
-    case "assigned": return "Assigned";
-    default: return status || "N/A";
+    case 'created': return '#2196f3';
+    case 'checked-in': return '#4caf50';
+    case 'checked-out': return '#ff9800';
+    case 'in-transit': return '#ff9800';
+    case 'assigned': return '#ffc107';
+    default: return '#9e9e9e';
   }
 };
 
 const EquipmentTable = ({ equipmentApiData, deleteEquipment, onEdit, setPage, setSize, page, size }: Props) => {
   const [printDialogOpen, setPrintDialogOpen] = useState(false);
-  const [printCode, setPrintCode] = useState("");
+  const [printCode, setPrintCode] = useState('');
+  const { t } = useTranslation('common');
+
+  const getStatusLabel = (status: string): string => {
+    switch (status) {
+      case 'created': return t('equipment.created');
+      case 'checked-in': return t('equipment.checkedIn');
+      case 'checked-out': return t('equipment.checkedOut');
+      case 'in-transit': return t('equipment.inTransit');
+      case 'assigned': return t('equipment.assigned');
+      default: return status || t('common.na');
+    }
+  };
 
   const columns: GridColDef[] = [
     {
-      field: "qrCodeId",
-      headerName: "QR Code",
+      field: 'qrCodeId',
+      headerName: t('equipment.qrCode'),
       width: 150,
       sortable: false,
-      headerAlign: "center",
-      align: "center",
+      headerAlign: 'center',
+      align: 'center',
       renderCell: (params: GridCellParams) => {
         const code = params.value as string;
-        if (!code) return "N/A";
+        if (!code) return t('common.na');
         return (
-          <div style={{ display: "flex", alignItems: "center", gap: 4, cursor: "pointer" }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
             <QRCode value={code} size={40} level="H"
               onClick={() => {
                 setPrintCode(code);
@@ -66,71 +68,71 @@ const EquipmentTable = ({ equipmentApiData, deleteEquipment, onEdit, setPage, se
         );
       },
     },
-    { field: "equipmentId", headerName: "Equipment ID", width: 130, headerAlign: "center", align: "center", sortable: true },
-    { field: "itemType", headerName: "Item Type", width: 130, headerAlign: "center", align: "center", sortable: true },
-    { field: "manufacturer", headerName: "Manufacturer", width: 130, headerAlign: "center", align: "center", sortable: true },
-    { field: "modelNumber", headerName: "Model Number", width: 130, headerAlign: "center", align: "center", sortable: true },
-    { field: "serialNumber", headerName: "Serial Number", width: 130, headerAlign: "center", align: "center", sortable: true },
-    { field: "voltage", headerName: "Voltage", width: 100, headerAlign: "center", align: "center", sortable: true },
-    { field: "ampHours", headerName: "Amp-hours", width: 110, headerAlign: "center", align: "center", sortable: true },
+    { field: 'equipmentId', headerName: t('equipment.equipmentId'), width: 130, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'itemType', headerName: t('equipment.itemType'), width: 130, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'manufacturer', headerName: t('equipment.manufacturer'), width: 130, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'modelNumber', headerName: t('equipment.modelNumber'), width: 130, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'serialNumber', headerName: t('equipment.serialNumber'), width: 130, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'voltage', headerName: t('equipment.voltage'), width: 100, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'ampHours', headerName: t('equipment.ampHours'), width: 110, headerAlign: 'center', align: 'center', sortable: true },
     {
-      field: "status",
-      headerName: "Status",
+      field: 'status',
+      headerName: t('equipment.status'),
       width: 150,
-      headerAlign: "center",
-      align: "center",
+      headerAlign: 'center',
+      align: 'center',
       sortable: true,
       renderCell: (params) => (
         <Chip
           label={getStatusLabel(params.value)}
-          style={{ backgroundColor: getStatusColor(params.value), color: "white" }}
+          style={{ backgroundColor: getStatusColor(params.value), color: 'white' }}
           size="small"
         />
       ),
     },
-    { field: "powerEquipmentStatus", headerName: "Equipment Status", width: 160, headerAlign: "center", align: "center", sortable: true },
-    { field: "zoneName", headerName: "Zone", width: 130, headerAlign: "center", align: "center", sortable: true },
-    { field: "location", headerName: "Location", width: 130, headerAlign: "center", align: "center", sortable: true },
-    { field: "assignedTo", headerName: "Assigned To", width: 130, headerAlign: "center", align: "center", sortable: true },
-    { field: "assignationType", headerName: "Assignation Type", width: 150, headerAlign: "center", align: "center", sortable: true },
-    { field: "truckModelNumber", headerName: "Truck Model #", width: 140, headerAlign: "center", align: "center", sortable: true },
-    { field: "truckSerialNumber", headerName: "Truck Serial #", width: 140, headerAlign: "center", align: "center", sortable: true },
-    { field: "checkoutReason", headerName: "Checkout Reason", width: 150, headerAlign: "center", align: "center", sortable: true },
-    { field: "inboundDocumentType", headerName: "Inbound Doc Type", width: 160, headerAlign: "center", align: "center", sortable: true },
-    { field: "inboundDocumentNumber", headerName: "Inbound Doc #", width: 150, headerAlign: "center", align: "center", sortable: true },
-    { field: "orderEntryNumber", headerName: "Order Entry #", width: 140, headerAlign: "center", align: "center", sortable: true },
-    { field: "outboundDocumentType", headerName: "Outbound Doc Type", width: 170, headerAlign: "center", align: "center", sortable: true },
-    { field: "outboundDocumentNumber", headerName: "Outbound Doc #", width: 150, headerAlign: "center", align: "center", sortable: true },
-    { field: "zoneLocationType", headerName: "Zone Location Type", width: 160, headerAlign: "center", align: "center", sortable: true },
-    { field: "zoneCity", headerName: "Zone City", width: 120, headerAlign: "center", align: "center", sortable: true },
-    { field: "zoneState", headerName: "Zone State", width: 120, headerAlign: "center", align: "center", sortable: true },
+    { field: 'powerEquipmentStatus', headerName: t('equipment.equipmentStatus'), width: 160, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'zoneName', headerName: t('equipment.zone'), width: 130, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'location', headerName: t('equipment.location'), width: 130, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'assignedTo', headerName: t('equipment.assignedTo'), width: 130, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'assignationType', headerName: t('equipment.assignationType'), width: 150, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'truckModelNumber', headerName: t('equipment.truckModelNumber'), width: 140, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'truckSerialNumber', headerName: t('equipment.truckSerialNumber'), width: 140, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'checkoutReason', headerName: t('equipment.checkoutReason'), width: 150, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'inboundDocumentType', headerName: t('equipment.inboundDocType'), width: 160, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'inboundDocumentNumber', headerName: t('equipment.inboundDocNumber'), width: 150, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'orderEntryNumber', headerName: t('equipment.orderEntryNumber'), width: 140, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'outboundDocumentType', headerName: t('equipment.outboundDocType'), width: 170, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'outboundDocumentNumber', headerName: t('equipment.outboundDocNumber'), width: 150, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'zoneLocationType', headerName: t('equipment.zoneLocationType'), width: 160, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'zoneCity', headerName: t('equipment.zoneCity'), width: 120, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'zoneState', headerName: t('equipment.zoneState'), width: 120, headerAlign: 'center', align: 'center', sortable: true },
     {
-      field: "dateOfArrival",
-      headerName: "Date of Arrival",
+      field: 'dateOfArrival',
+      headerName: t('equipment.dateOfArrival'),
       width: 140,
-      headerAlign: "center",
-      align: "center",
+      headerAlign: 'center',
+      align: 'center',
       sortable: true,
       valueGetter: (params: GridValueGetterParams) =>
-        params.value ? moment(params.value).format("MMM DD, YYYY") : "—",
+        params.value ? moment(params.value).format('MMM DD, YYYY') : '—',
     },
-    { field: "customerName", headerName: "Customer Name", width: 150, headerAlign: "center", align: "center", sortable: true },
-    { field: "lastUpdatedBy", headerName: "Last Updated By", width: 150, headerAlign: "center", align: "center", sortable: true },
+    { field: 'customerName', headerName: t('equipment.customerName'), width: 150, headerAlign: 'center', align: 'center', sortable: true },
+    { field: 'lastUpdatedBy', headerName: t('equipment.lastUpdatedBy'), width: 150, headerAlign: 'center', align: 'center', sortable: true },
     {
-      field: "actions",
-      headerName: "Actions",
+      field: 'actions',
+      headerName: t('common.actions'),
       width: 120,
       sortable: false,
-      headerAlign: "center",
-      align: "center",
+      headerAlign: 'center',
+      align: 'center',
       renderCell: (params) => (
         <Box>
-          <Tooltip title="Edit" followCursor>
+          <Tooltip title={t('common.edit')} followCursor>
             <IconButton size="small" onClick={() => onEdit(params.row)}>
               <EditOutlined fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Delete" followCursor>
+          <Tooltip title={t('common.delete')} followCursor>
             <IconButton size="small" color="error" onClick={() => deleteEquipment(params.row.id)}>
               <DeleteOutline fontSize="small" />
             </IconButton>
@@ -154,7 +156,7 @@ const EquipmentTable = ({ equipmentApiData, deleteEquipment, onEdit, setPage, se
         rowsPerPageOptions={[10, 25, 100]}
         disableSelectionOnClick
         sx={{
-          border: "none",
+          border: 'none',
           '& .MuiDataGrid-cell': {
             textAlign: 'center',
             justifyContent: 'center',

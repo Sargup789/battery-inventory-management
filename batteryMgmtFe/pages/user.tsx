@@ -1,6 +1,7 @@
-import Layout from "@/components/general/Layout";
-import UserIndex from "@/components/UserComponents";
-import withLogin from "@/components/general/withLogin";
+import Layout from '@/components/general/Layout';
+import UserIndex from '@/components/UserComponents';
+import withLogin from '@/components/general/withLogin';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 export type UserData = {
   id: string;
@@ -19,5 +20,11 @@ const UserPage = () => (
     <UserIndex />
   </Layout>
 );
+
+export const getStaticProps = async ({ locale }: { locale: string }) => ({
+  props: {
+    ...(await serverSideTranslations(locale, ['common'])),
+  },
+});
 
 export default withLogin(UserPage);

@@ -1,20 +1,22 @@
-import React, { useState } from "react";
-import { Box, Button, Typography } from "@mui/material";
-import UserTable from "./UserTable";
-import AddUserDialog from "./AddUserDialog";
-import { useQuery } from "react-query";
-import axios from "axios";
-import { toast } from "react-toastify";
-import { UserApiResponse, UserData } from "@/pages/user";
+import React, { useState } from 'react';
+import { Box, Button, Typography } from '@mui/material';
+import UserTable from './UserTable';
+import AddUserDialog from './AddUserDialog';
+import { useQuery } from 'react-query';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { UserApiResponse, UserData } from '@/pages/user';
+import { useTranslation } from 'next-i18next';
 
 const UserIndex: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [userDialogData, setUserDialogData] = useState<UserData | {}>({});
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(10);
+  const { t } = useTranslation('common');
 
   const { data: userApiData = { data: [], totalCount: 0 }, refetch } = useQuery(
-    ["allUsers", page, size],
+    ['allUsers', page, size],
     async (): Promise<UserApiResponse> => {
       const res = await axios.get(`/api/router?path=api/auth/users&page=${page}&size=${size}`);
       if (Array.isArray(res.data)) {
@@ -28,10 +30,10 @@ const UserIndex: React.FC = () => {
   const handleDelete = async (id: string) => {
     try {
       await axios.delete(`/api/router?path=api/auth/${id}`);
-      toast.success("User deleted.");
+      toast.success(t('user.userDeleted'));
       refetch();
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to delete user.");
+      toast.error(error?.response?.data?.message || t('user.deleteFailed'));
     }
   };
 
@@ -44,15 +46,15 @@ const UserIndex: React.FC = () => {
     try {
       if (values.id) {
         await axios.put(`/api/router?path=api/auth/users/${values.id}`, values);
-        toast.success("User updated.");
+        toast.success(t('user.userUpdated'));
       } else {
-        await axios.post(`/api/router?path=api/auth/register`, values);
-        toast.success("User created.");
+        await axios.post('/api/router?path=api/auth/register', values);
+        toast.success(t('user.userCreated'));
       }
       refetch();
       handleDialogClose();
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "An error occurred.");
+      toast.error(error?.response?.data?.message || t('user.errorOccurred'));
     }
   };
 
@@ -62,10 +64,10 @@ const UserIndex: React.FC = () => {
         <Typography variant="h5" fontWeight={700} />
         <Button
           variant="contained"
-          style={{ borderRadius: 15, backgroundColor: "#9B2735", fontSize: "13px" }}
+          style={{ borderRadius: 15, backgroundColor: '#9B2735', fontSize: '13px' }}
           onClick={() => setDialogOpen(true)}
         >
-          Add User
+          {t('user.addUser')}
         </Button>
       </Box>
 

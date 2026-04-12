@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import { Box, Button, Typography } from "@mui/material";
-import { EquipmentApiResponse, EquipmentData, EquipmentFilters } from "@/pages/power-equipment";
-import EquipmentTable from "./EquipmentTable";
-import EquipmentTableFilters from "./EquipmentTableFilters";
-import AddEquipmentDialog from "./AddEquipmentDialog";
+import React, { useState } from 'react';
+import { Box, Button, Typography } from '@mui/material';
+import { EquipmentApiResponse, EquipmentData, EquipmentFilters } from '@/pages/power-equipment';
+import EquipmentTable from './EquipmentTable';
+import EquipmentTableFilters from './EquipmentTableFilters';
+import AddEquipmentDialog from './AddEquipmentDialog';
+import { useTranslation } from 'next-i18next';
 
 type Props = {
   equipmentApiData: EquipmentApiResponse;
@@ -23,6 +24,7 @@ const PowerEquipmentIndex = ({
   const [showFilters, setShowFilters] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editData, setEditData] = useState<EquipmentData | null>(null);
+  const { t } = useTranslation('common');
 
   const handleEdit = (equipment: EquipmentData) => {
     setEditData(equipment);
@@ -37,21 +39,21 @@ const PowerEquipmentIndex = ({
   return (
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h5" fontWeight={700}/>
+        <Typography variant="h5" fontWeight={700} />
         <Box display="flex" gap={2}>
           <Button
             variant="outlined"
             onClick={() => setShowFilters(!showFilters)}
-            style={{ borderRadius: 15, fontSize: "13px" }}
+            style={{ borderRadius: 15, fontSize: '13px' }}
           >
-            {showFilters ? "Hide Filters" : "Show Filters"}
+            {showFilters ? t('equipment.hideFilters') : t('equipment.showFilters')}
           </Button>
           <Button
             variant="contained"
-            style={{ borderRadius: 15, backgroundColor: "#9B2735", fontSize: "13px" }}
+            style={{ borderRadius: 15, backgroundColor: '#9B2735', fontSize: '13px' }}
             onClick={() => setDialogOpen(true)}
           >
-            Add Power Equipment
+            {t('equipment.addPowerEquipment')}
           </Button>
         </Box>
       </Box>

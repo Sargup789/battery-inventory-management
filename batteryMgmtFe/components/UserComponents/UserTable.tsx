@@ -10,6 +10,7 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import * as React from 'react';
+import { useTranslation } from 'next-i18next';
 
 interface Props {
   userApiData: UserApiResponse;
@@ -21,7 +22,9 @@ interface Props {
 }
 
 export default function UserTable({ userApiData, deleteUser, setPage, setSize, page, size }: Props) {
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const { t } = useTranslation('common');
+
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage + 1);
   };
 
@@ -30,7 +33,7 @@ export default function UserTable({ userApiData, deleteUser, setPage, setSize, p
     setPage(1);
   };
 
-  if (!userApiData.data) return (<div>Loading...</div>);
+  if (!userApiData.data) return (<div>{t('common.loading')}</div>);
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
@@ -38,10 +41,10 @@ export default function UserTable({ userApiData, deleteUser, setPage, setSize, p
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 'bold' }}>Username</TableCell>
-              <TableCell align="center" sx={{ fontWeight: 'bold' }}>Password</TableCell>
-              <TableCell align="center" sx={{ fontWeight: 'bold' }}>Role</TableCell>
-              <TableCell align="center" sx={{ fontWeight: 'bold' }}>Action</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>{t('user.username')}</TableCell>
+              <TableCell align="center" sx={{ fontWeight: 'bold' }}>{t('user.password')}</TableCell>
+              <TableCell align="center" sx={{ fontWeight: 'bold' }}>{t('user.role')}</TableCell>
+              <TableCell align="center" sx={{ fontWeight: 'bold' }}>{t('user.action')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -50,18 +53,18 @@ export default function UserTable({ userApiData, deleteUser, setPage, setSize, p
                 <TableCell component="th" scope="row">
                   {row.username}
                 </TableCell>
-                <TableCell align="center">{"*****"}</TableCell>
+                <TableCell align="center">{'*****'}</TableCell>
                 <TableCell align="center">
-                  {row.role === "administrator"
-                    ? "Administrator"
-                    : row.role === "editor"
-                      ? "Manager"
-                      : row.role === "viewer"
-                        ? "Operator"
-                        : ""}
+                  {row.role === 'administrator'
+                    ? t('user.administrator')
+                    : row.role === 'editor'
+                      ? t('user.manager')
+                      : row.role === 'viewer'
+                        ? t('user.operator')
+                        : ''}
                 </TableCell>
                 <TableCell align="center">
-                  <Tooltip title="Delete" followCursor>
+                  <Tooltip title={t('common.delete')} followCursor>
                     <IconButton
                       size="small"
                       onClick={() => deleteUser(row.id)}

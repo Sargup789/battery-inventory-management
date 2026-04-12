@@ -1,11 +1,13 @@
-import Layout from "@/components/general/Layout";
-import ZonesIndex from "@/components/ZoneComponents";
-import axios from "axios";
-import { UseQueryResult, useQuery } from "react-query";
-import React from "react";
-import withLogin from "@/components/general/withLogin";
-import { toast } from "react-toastify";
-import { ZoneData } from "@/pages/index";
+import Layout from '@/components/general/Layout';
+import ZonesIndex from '@/components/ZoneComponents';
+import axios from 'axios';
+import { UseQueryResult, useQuery } from 'react-query';
+import React from 'react';
+import withLogin from '@/components/general/withLogin';
+import { toast } from 'react-toastify';
+import { ZoneData } from '@/pages/index';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 
 export interface ZoneApiResponse {
   totalCount: number;
@@ -15,29 +17,29 @@ export interface ZoneApiResponse {
 
 const getEntityId = (item: any): string => {
   const candidate = item?.id ?? item?._id;
-  if (typeof candidate === "string") return candidate;
-  if (candidate && typeof candidate?.toHexString === "function") return candidate.toHexString();
-  if (candidate && typeof candidate?.toString === "function") return candidate.toString();
-  if (candidate && typeof candidate?.$oid === "string") return candidate.$oid;
-  return "";
+  if (typeof candidate === 'string') return candidate;
+  if (candidate && typeof candidate?.toHexString === 'function') return candidate.toHexString();
+  if (candidate && typeof candidate?.toString === 'function') return candidate.toString();
+  if (candidate && typeof candidate?.$oid === 'string') return candidate.$oid;
+  return '';
 };
 
 const normalizeZone = (raw: any): ZoneData => ({
   id: getEntityId(raw),
-  name: raw?.name || "",
-  identifier: raw?.identifier || "",
-  locationType: raw?.locationType || "",
-  city: raw?.city || "",
-  state: raw?.state || "",
+  name: raw?.name || '',
+  identifier: raw?.identifier || '',
+  locationType: raw?.locationType || '',
+  city: raw?.city || '',
+  state: raw?.state || '',
   parentZoneId: raw?.parentZoneId || null,
   equipmentCount: Number(raw?.equipmentCount ?? 0),
   subZones: Array.isArray(raw?.subZones) ? raw.subZones.map(normalizeZone) : [],
-  createdAt: raw?.createdAt || "",
-  updatedAt: raw?.updatedAt || "",
+  createdAt: raw?.createdAt || '',
+  updatedAt: raw?.updatedAt || '',
 });
 
 export const fetchZones = async (page = 1, size = 100): Promise<ZoneApiResponse> => {
-  const response = await axios.get(`/api/router?path=api/zones`, { params: { page, size } });
+  const response = await axios.get('/api/router?path=api/zones', { params: { page, size } });
   const raw = response.data;
   const rawData = Array.isArray(raw) ? raw : Array.isArray(raw?.data) ? raw.data : [];
   return {
@@ -50,9 +52,10 @@ export const fetchZones = async (page = 1, size = 100): Promise<ZoneApiResponse>
 const ZonesPage = () => {
   const [page, setPage] = React.useState(1);
   const [size, setSize] = React.useState(100);
+  const { t } = useTranslation('common');
 
   const { data: zones, isLoading, refetch }: UseQueryResult<ZoneApiResponse, unknown> = useQuery(
-    ["zones", page, size],
+    ['zones', page, size],
     () => fetchZones(page, size),
     { refetchOnWindowFocus: false, refetchOnReconnect: false, keepPreviousData: true }
   );
@@ -60,16 +63,16 @@ const ZonesPage = () => {
   const deleteZone = async (id: string) => {
     try {
       await axios.delete(`/api/router?path=api/zones/${id}`);
-      toast.success("Zone deleted successfully");
+      toast.success(t('zone.deletedSuccess'));
       refetch();
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to delete zone");
+      toast.error(error?.response?.data?.message || t('zone.deleteFailed'));
     }
   };
 
   return (
     <Layout>
-      {isLoading ? "Loading..." : (
+      {isLoading ? t('common.loading') : (
         <ZonesIndex
           zonesApiData={zones || { totalCount: 0, currentPage: 1, data: [] }}
           deleteZone={deleteZone}
@@ -83,5 +86,11 @@ const ZonesPage = () => {
     </Layout>
   );
 };
+
+export const getStaticProps = async ({ locale }: { locale: string }) => ({
+  props: {
+    ...(await serverSideTranslations(locale, ['common'])),
+  },
+});
 
 export default withLogin(ZonesPage);
